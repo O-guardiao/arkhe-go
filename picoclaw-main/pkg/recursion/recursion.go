@@ -7,15 +7,36 @@ package recursion
 
 import (
 	"context"
+	"strings"
 	"sync/atomic"
 	"time"
 
-	"github.com/sipeed/picoclaw/pkg/providers"
-	"github.com/sipeed/picoclaw/pkg/tools"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/providers"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/tools"
 )
+
+type GateMode string
+
+const (
+	GateModeManual GateMode = "manual"
+	GateModeForce  GateMode = "force"
+)
+
+func normalizeGateMode(raw string) GateMode {
+	switch strings.ToLower(strings.TrimSpace(raw)) {
+	case "", string(GateModeManual), "auto":
+		return GateModeManual
+	case string(GateModeForce):
+		return GateModeForce
+	default:
+		return GateModeManual
+	}
+}
 
 // RecursionConfig controls how the recursion engine behaves.
 type RecursionConfig struct {
+	GateMode GateMode
+
 	// Loop detection
 	LoopDetector LoopDetectorConfig
 
@@ -36,6 +57,7 @@ type RecursionConfig struct {
 // DefaultConfig returns sensible defaults matching RLM's production values.
 func DefaultConfig() RecursionConfig {
 	return RecursionConfig{
+		GateMode:            GateModeManual,
 		LoopDetector:        DefaultLoopDetectorConfig(),
 		MCTSBranches:        3,
 		MCTSDepth:           2,
@@ -105,3 +127,4 @@ type LLMCaller interface {
 	Chat(ctx context.Context, messages []providers.Message, tools []providers.ToolDefinition,
 		model string, options map[string]any) (*providers.LLMResponse, error)
 }
+

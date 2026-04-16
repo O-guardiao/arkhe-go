@@ -18,21 +18,21 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/sipeed/picoclaw/pkg/audio/asr"
-	"github.com/sipeed/picoclaw/pkg/audio/tts"
-	"github.com/sipeed/picoclaw/pkg/bus"
-	"github.com/sipeed/picoclaw/pkg/channels"
-	"github.com/sipeed/picoclaw/pkg/commands"
-	"github.com/sipeed/picoclaw/pkg/config"
-	"github.com/sipeed/picoclaw/pkg/constants"
-	"github.com/sipeed/picoclaw/pkg/logger"
-	"github.com/sipeed/picoclaw/pkg/media"
-	"github.com/sipeed/picoclaw/pkg/providers"
-	"github.com/sipeed/picoclaw/pkg/routing"
-	"github.com/sipeed/picoclaw/pkg/skills"
-	"github.com/sipeed/picoclaw/pkg/state"
-	"github.com/sipeed/picoclaw/pkg/tools"
-	"github.com/sipeed/picoclaw/pkg/utils"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/audio/asr"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/audio/tts"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/bus"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/channels"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/commands"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/constants"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/logger"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/media"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/providers"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/routing"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/skills"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/state"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/tools"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/utils"
 )
 
 type AgentLoop struct {
@@ -58,6 +58,7 @@ type AgentLoop struct {
 	hookRuntime    hookRuntime
 	steering       *steeringQueue
 	pendingSkills  sync.Map
+	turnExecutor   TurnExecutor
 	mu             sync.RWMutex
 
 	// Concurrent turn management (from HEAD)
@@ -1691,57 +1692,73 @@ func (al *AgentLoop) runAgentLoop(
 	agent *AgentInstance,
 	opts processOptions,
 ) (string, error) {
-	// Record last channel for heartbeat notifications (skip internal channels and cli)
-	if opts.Channel != "" && opts.ChatID != "" && !constants.IsInternalChannel(opts.Channel) {
-		channelKey := fmt.Sprintf("%s:%s", opts.Channel, opts.ChatID)
-		if err := al.RecordLastChannel(channelKey); err != nil {
-			logger.WarnCF(
-				"agent",
-				"Failed to record last channel",
-				map[string]any{"error": err.Error()},
-			)
+	effectiveOpts := opts
+	executor := al.getTurnExecutor()
+	execInfo := al.buildTurnExecutionInfo(ctx, agent, effectiveOpts)
+	if executor != nil {
+		execInfo = executor.PrepareTurn(execInfo)
+		effectiveOpts.UserMessage = execInfo.UserMessage
+	}
+
+	execute := func(execCtx context.Context) (string, error) {
+		// Record last channel for heartbeat notifications (skip internal channels and cli)
+		if effectiveOpts.Channel != "" && effectiveOpts.ChatID != "" && !constants.IsInternalChannel(effectiveOpts.Channel) {
+			channelKey := fmt.Sprintf("%s:%s", effectiveOpts.Channel, effectiveOpts.ChatID)
+			if err := al.RecordLastChannel(channelKey); err != nil {
+				logger.WarnCF(
+					"agent",
+					"Failed to record last channel",
+					map[string]any{"error": err.Error()},
+				)
+			}
 		}
-	}
 
-	ts := newTurnState(agent, opts, al.newTurnEventScope(agent.ID, opts.SessionKey))
-	result, err := al.runTurn(ctx, ts)
-	if err != nil {
-		return "", err
-	}
-	if result.status == TurnEndStatusAborted {
-		return "", nil
-	}
+		ts := newTurnState(agent, effectiveOpts, al.newTurnEventScope(agent.ID, effectiveOpts.SessionKey))
+		result, err := al.runTurn(execCtx, ts)
+		if err != nil {
+			return "", err
+		}
+		if result.status == TurnEndStatusAborted {
+			return "", nil
+		}
 
-	for _, followUp := range result.followUps {
-		if pubErr := al.bus.PublishInbound(ctx, followUp); pubErr != nil {
-			logger.WarnCF("agent", "Failed to publish follow-up after turn",
+		for _, followUp := range result.followUps {
+			if pubErr := al.bus.PublishInbound(execCtx, followUp); pubErr != nil {
+				logger.WarnCF("agent", "Failed to publish follow-up after turn",
+					map[string]any{
+						"turn_id": ts.turnID,
+						"error":   pubErr.Error(),
+					})
+			}
+		}
+
+		if effectiveOpts.SendResponse && result.finalContent != "" {
+			al.bus.PublishOutbound(execCtx, bus.OutboundMessage{
+				Channel: effectiveOpts.Channel,
+				ChatID:  effectiveOpts.ChatID,
+				Content: result.finalContent,
+			})
+		}
+
+		if result.finalContent != "" {
+			responsePreview := utils.Truncate(result.finalContent, 120)
+			logger.InfoCF("agent", fmt.Sprintf("Response: %s", responsePreview),
 				map[string]any{
-					"turn_id": ts.turnID,
-					"error":   pubErr.Error(),
+					"agent_id":     agent.ID,
+					"session_key":  effectiveOpts.SessionKey,
+					"iterations":   ts.currentIteration(),
+					"final_length": len(result.finalContent),
 				})
 		}
+
+		return result.finalContent, nil
 	}
 
-	if opts.SendResponse && result.finalContent != "" {
-		al.bus.PublishOutbound(ctx, bus.OutboundMessage{
-			Channel: opts.Channel,
-			ChatID:  opts.ChatID,
-			Content: result.finalContent,
-		})
+	if executor != nil {
+		return executor.ExecuteTurn(ctx, execInfo, execute)
 	}
 
-	if result.finalContent != "" {
-		responsePreview := utils.Truncate(result.finalContent, 120)
-		logger.InfoCF("agent", fmt.Sprintf("Response: %s", responsePreview),
-			map[string]any{
-				"agent_id":     agent.ID,
-				"session_key":  opts.SessionKey,
-				"iterations":   ts.currentIteration(),
-				"final_length": len(result.finalContent),
-			})
-	}
-
-	return result.finalContent, nil
+	return execute(ctx)
 }
 
 func (al *AgentLoop) targetReasoningChannelID(channelName string) (chatID string) {
@@ -3860,3 +3877,4 @@ func closeRegistryProviders(registry *AgentRegistry) {
 		agent.closeProviders()
 	}
 }
+

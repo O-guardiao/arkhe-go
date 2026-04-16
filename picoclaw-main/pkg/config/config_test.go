@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/yaml.v3"
 
-	"github.com/sipeed/picoclaw/pkg/credential"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/credential"
 )
 
 // mustSetupSSHKey generates a temporary Ed25519 SSH key in t.TempDir() and sets
@@ -533,6 +533,13 @@ func TestDefaultConfig_ToolFeedbackDisabled(t *testing.T) {
 	cfg := DefaultConfig()
 	if cfg.Agents.Defaults.ToolFeedback.Enabled {
 		t.Fatal("DefaultConfig().Agents.Defaults.ToolFeedback.Enabled should be false")
+	}
+}
+
+func TestDefaultConfig_RecursionGateModeManual(t *testing.T) {
+	cfg := DefaultConfig()
+	if cfg.Recursion.GateMode != "manual" {
+		t.Fatalf("DefaultConfig().Recursion.GateMode = %q, want %q", cfg.Recursion.GateMode, "manual")
 	}
 }
 

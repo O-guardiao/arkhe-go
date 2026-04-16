@@ -8,7 +8,7 @@ package config
 import (
 	"path/filepath"
 
-	"github.com/sipeed/picoclaw/pkg"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg"
 )
 
 // DefaultConfig returns the default configuration for PicoClaw.
@@ -156,6 +156,9 @@ func DefaultConfig() *Config {
 				InterceptorTimeoutMS: 5000,
 				ApprovalTimeoutMS:    60000,
 			},
+		},
+		Recursion: RecursionConfig{
+			GateMode: "manual",
 		},
 		ModelList: []*ModelConfig{
 			// ============================================
@@ -535,3 +538,4 @@ func DefaultConfig() *Config {
 		},
 	}
 }
+

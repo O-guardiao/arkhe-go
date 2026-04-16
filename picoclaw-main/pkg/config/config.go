@@ -13,9 +13,9 @@ import (
 
 	"github.com/caarlos0/env/v11"
 
-	"github.com/sipeed/picoclaw/pkg"
-	"github.com/sipeed/picoclaw/pkg/fileutil"
-	"github.com/sipeed/picoclaw/pkg/logger"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/fileutil"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/logger"
 )
 
 // rrCounter is a global counter for round-robin load balancing across models.
@@ -704,6 +704,7 @@ type ToolConfig struct {
 // RecursionConfig controls RLM-style recursion overlay (loop detection, MCTS, supervisor).
 type RecursionConfig struct {
 	Enabled             bool `json:"enabled"                         env:"PICOCLAW_RECURSION_ENABLED"`
+	GateMode            string `json:"gate_mode,omitempty"            env:"PICOCLAW_RECURSION_GATE_MODE"`
 	MCTSBranches        int  `json:"mcts_branches,omitempty"         env:"PICOCLAW_RECURSION_MCTS_BRANCHES"`
 	MCTSDepthPerBranch  int  `json:"mcts_depth_per_branch,omitempty" env:"PICOCLAW_RECURSION_MCTS_DEPTH"`
 	MCTSTimeoutSec      int  `json:"mcts_timeout_sec,omitempty"      env:"PICOCLAW_RECURSION_MCTS_TIMEOUT"`
@@ -1411,3 +1412,4 @@ func (t *ToolsConfig) IsToolEnabled(name string) bool {
 		return true
 	}
 }
+

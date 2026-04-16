@@ -1,11 +1,12 @@
 package recursion
 
 import (
+	"strings"
 	"time"
 
-	"github.com/sipeed/picoclaw/pkg/agent"
-	"github.com/sipeed/picoclaw/pkg/config"
-	"github.com/sipeed/picoclaw/pkg/logger"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/agent"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/logger"
 )
 
 // Setup integrates the recursion engine with an existing AgentLoop.
@@ -53,8 +54,10 @@ func Setup(al *agent.AgentLoop) *Supervisor {
 
 	// 3. Create the Supervisor.
 	supervisor := NewSupervisor(rc)
+	al.SetTurnExecutor(newTurnExecutor(rc, supervisor))
 
 	logger.InfoCF("recursion", "Recursion engine initialized", map[string]any{
+		"gate_mode":       string(rc.GateMode),
 		"mcts_branches":    rc.MCTSBranches,
 		"max_iterations":   rc.MaxIterations,
 		"max_exec_time_s":  int(rc.MaxExecutionTime.Seconds()),
@@ -67,6 +70,7 @@ func Setup(al *agent.AgentLoop) *Supervisor {
 // internal RecursionConfig with proper durations and defaults.
 func configFromSettings(s config.RecursionConfig) RecursionConfig {
 	rc := DefaultConfig()
+	rc.GateMode = normalizeGateMode(strings.TrimSpace(s.GateMode))
 
 	if s.MCTSBranches > 0 {
 		rc.MCTSBranches = s.MCTSBranches
@@ -92,3 +96,4 @@ func configFromSettings(s config.RecursionConfig) RecursionConfig {
 
 	return rc
 }
+
