@@ -11,9 +11,9 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/sipeed/picoclaw/pkg/channels/pico"
-	"github.com/sipeed/picoclaw/pkg/config"
-	ppid "github.com/sipeed/picoclaw/pkg/pid"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/channels/pico"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
+	ppid "github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/pid"
 )
 
 func TestEnsurePicoChannel_FreshConfig(t *testing.T) {
@@ -634,3 +634,4 @@ func mustGatewayTestPort(t *testing.T, rawURL string) int {
 
 	return port
 }
+

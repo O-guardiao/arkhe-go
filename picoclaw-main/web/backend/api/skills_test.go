@@ -15,7 +15,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/sipeed/picoclaw/pkg/config"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
 )
 
 func TestHandleListSkills(t *testing.T) {
@@ -1416,3 +1416,4 @@ func buildSkillZip(t *testing.T, files map[string]string) []byte {
 	}
 	return buf.Bytes()
 }
+

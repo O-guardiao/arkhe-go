@@ -8,9 +8,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/alexzhang13/rlm-go/clients"
-	"github.com/alexzhang13/rlm-go/protocol"
-	"github.com/alexzhang13/rlm-go/types"
+	"github.com/O-guardiao/arkhe-go/rlm-go/clients"
+	"github.com/O-guardiao/arkhe-go/rlm-go/protocol"
+	"github.com/O-guardiao/arkhe-go/rlm-go/types"
 )
 
 type LMHandler struct {

@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/sipeed/picoclaw/pkg/config"
-	"github.com/sipeed/picoclaw/pkg/providers"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/providers"
 )
 
 func ensureProtocolModel(model string) string {
@@ -168,3 +168,4 @@ func resolvedModelConfig(cfg *config.Config, modelName, workspace string) (*conf
 
 	return &clone, nil
 }
+

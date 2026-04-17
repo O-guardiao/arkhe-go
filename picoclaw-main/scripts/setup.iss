@@ -4,7 +4,7 @@
 #define MyAppName "PicoClaw Launcher"
 #define MyAppVersion "1.0"
 #define MyAppPublisher "PicoClaw"
-#define MyAppURL "https://github.com/sipeed/picoclaw"
+#define MyAppURL "https://github.com/O-guardiao/arkhe-go/picoclaw-main"
 #define MyAppExeName "picoclaw-launcher.exe"
 
 [Setup]
@@ -62,4 +62,5 @@ Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; WorkingDi
 
 [Run]
 Filename:"{app}\{#MyAppExeName}"; WorkingDir: "{app}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
+
 

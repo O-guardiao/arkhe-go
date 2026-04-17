@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/sipeed/picoclaw/pkg/updater"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/updater"
 )
 
 // registerUpdateRoutes registers the self-update endpoint.
@@ -50,3 +50,4 @@ func (h *Handler) handleUpdate(w http.ResponseWriter, r *http.Request) {
 
 	_ = json.NewEncoder(w).Encode(updateResponse{Status: "ok", Message: "update applied; restart to use new version"})
 }
+

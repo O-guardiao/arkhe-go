@@ -9,9 +9,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/sipeed/picoclaw/pkg/config"
-	"github.com/sipeed/picoclaw/pkg/media"
-	"github.com/sipeed/picoclaw/pkg/providers"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/media"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/providers"
 )
 
 type TTSProvider interface {
@@ -149,3 +149,4 @@ func SynthesizeAndStore(
 
 	return ref, nil
 }
+

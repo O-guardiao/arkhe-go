@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/sipeed/picoclaw/pkg/providers"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/providers"
 )
 
 // MockLLMProvider is a test implementation of LLMProvider
@@ -324,3 +324,4 @@ func TestSubagentTool_ForUserTruncation(t *testing.T) {
 		t.Error("ForLLM should contain reference to original task")
 	}
 }
+

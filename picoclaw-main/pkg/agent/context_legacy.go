@@ -7,8 +7,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/sipeed/picoclaw/pkg/logger"
-	"github.com/sipeed/picoclaw/pkg/providers"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/logger"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/providers"
 )
 
 // legacyContextManager wraps the existing summarization/compression logic
@@ -377,3 +377,4 @@ func (m *legacyContextManager) estimateTokens(messages []providers.Message) int 
 	}
 	return total
 }
+

@@ -9,7 +9,7 @@ package agent
 import (
 	"testing"
 
-	"github.com/sipeed/picoclaw/pkg/config"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
 )
 
 func boolPtr(b bool) *bool { return &b }
@@ -73,3 +73,4 @@ func TestServerIsDeferred(t *testing.T) {
 		})
 	}
 }
+

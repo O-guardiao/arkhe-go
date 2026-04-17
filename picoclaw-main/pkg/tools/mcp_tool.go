@@ -13,8 +13,8 @@ import (
 
 	"github.com/modelcontextprotocol/go-sdk/mcp"
 
-	"github.com/sipeed/picoclaw/pkg/logger"
-	"github.com/sipeed/picoclaw/pkg/media"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/logger"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/media"
 )
 
 // MCPManager defines the interface for MCP manager operations
@@ -599,3 +599,4 @@ func compactStrings(parts []string) []string {
 	}
 	return compact
 }
+

@@ -10,9 +10,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/sipeed/picoclaw/pkg/bus"
-	"github.com/sipeed/picoclaw/pkg/config"
-	"github.com/sipeed/picoclaw/pkg/providers"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/bus"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/providers"
 )
 
 // ---------------------------------------------------------------------------
@@ -762,3 +762,4 @@ func newCMTestAgentLoop(cfg *config.Config) *AgentLoop {
 	msgBus := bus.NewMessageBus()
 	return NewAgentLoop(cfg, msgBus, &simpleMockProvider{response: "test"})
 }
+

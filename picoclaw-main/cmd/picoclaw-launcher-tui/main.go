@@ -11,8 +11,8 @@ import (
 	"os/exec"
 	"path/filepath"
 
-	tuicfg "github.com/sipeed/picoclaw/cmd/picoclaw-launcher-tui/config"
-	"github.com/sipeed/picoclaw/cmd/picoclaw-launcher-tui/ui"
+	tuicfg "github.com/O-guardiao/arkhe-go/picoclaw-main/cmd/picoclaw-launcher-tui/config"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/cmd/picoclaw-launcher-tui/ui"
 )
 
 func main() {
@@ -46,3 +46,4 @@ func main() {
 		os.Exit(1)
 	}
 }
+

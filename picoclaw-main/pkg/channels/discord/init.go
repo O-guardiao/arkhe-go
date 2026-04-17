@@ -1,10 +1,10 @@
 package discord
 
 import (
-	"github.com/sipeed/picoclaw/pkg/audio/tts"
-	"github.com/sipeed/picoclaw/pkg/bus"
-	"github.com/sipeed/picoclaw/pkg/channels"
-	"github.com/sipeed/picoclaw/pkg/config"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/audio/tts"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/bus"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/channels"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
 )
 
 func init() {
@@ -16,3 +16,4 @@ func init() {
 		return ch, err
 	})
 }
+

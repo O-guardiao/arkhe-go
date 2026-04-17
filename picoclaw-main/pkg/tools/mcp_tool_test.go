@@ -10,7 +10,7 @@ import (
 
 	"github.com/modelcontextprotocol/go-sdk/mcp"
 
-	"github.com/sipeed/picoclaw/pkg/media"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/media"
 )
 
 // MockMCPManager is a mock implementation of MCPManager interface for testing
@@ -808,3 +808,4 @@ func TestMCPTool_Execute_WhitespaceWorkspaceDisablesArtifactPersistence(t *testi
 		t.Fatalf("expected large text to remain inline when workspace is blank, got %q", result.ForLLM)
 	}
 }
+

@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/sipeed/picoclaw/pkg/memory"
-	"github.com/sipeed/picoclaw/pkg/providers"
-	"github.com/sipeed/picoclaw/pkg/session"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/memory"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/providers"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/session"
 )
 
 // Compile-time interface satisfaction checks.
@@ -177,3 +177,4 @@ func TestJSONLBackend_SummarizeFlow(t *testing.T) {
 		t.Errorf("first message = %q, want %q", history[0].Content, "msg 16")
 	}
 }
+

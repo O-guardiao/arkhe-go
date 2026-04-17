@@ -12,8 +12,8 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/sipeed/picoclaw/pkg/logger"
-	"github.com/sipeed/picoclaw/pkg/utils"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/logger"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/utils"
 )
 
 // ElevenLabsTranscriber uses the ElevenLabs Scribe API for speech-to-text.
@@ -143,3 +143,4 @@ func (t *ElevenLabsTranscriber) Transcribe(ctx context.Context, audioFilePath st
 func (t *ElevenLabsTranscriber) Name() string {
 	return "elevenlabs"
 }
+

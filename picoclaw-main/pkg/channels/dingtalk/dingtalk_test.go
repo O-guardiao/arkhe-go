@@ -7,8 +7,8 @@ import (
 
 	"github.com/open-dingtalk/dingtalk-stream-sdk-go/chatbot"
 
-	"github.com/sipeed/picoclaw/pkg/bus"
-	"github.com/sipeed/picoclaw/pkg/config"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/bus"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
 )
 
 func newTestDingTalkChannel(t *testing.T, cfg config.DingTalkConfig) (*DingTalkChannel, *bus.MessageBus) {
@@ -129,3 +129,4 @@ func TestStripLeadingAtMentions(t *testing.T) {
 		})
 	}
 }
+

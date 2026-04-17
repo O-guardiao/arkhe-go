@@ -39,7 +39,7 @@ import (
 	"fmt"
 	"log"
 
-	rlm "github.com/alexzhang13/rlm-go"
+	rlm "github.com/O-guardiao/arkhe-go/rlm-go"
 )
 
 func main() {

@@ -8,7 +8,7 @@ package providers
 import (
 	"fmt"
 
-	"github.com/sipeed/picoclaw/pkg/config"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
 )
 
 // CreateProvider creates a provider based on the configuration.
@@ -42,3 +42,4 @@ func CreateProvider(cfg *config.Config) (LLMProvider, string, error) {
 
 	return provider, modelID, nil
 }
+

@@ -12,7 +12,7 @@ import (
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
 
-	tuicfg "github.com/sipeed/picoclaw/cmd/picoclaw-launcher-tui/config"
+	tuicfg "github.com/O-guardiao/arkhe-go/picoclaw-main/cmd/picoclaw-launcher-tui/config"
 )
 
 // App is the root TUI application.
@@ -323,3 +323,4 @@ func (a *App) buildShell(pageID string, content tview.Primitive, hint string) tv
 
 	return grid
 }
+

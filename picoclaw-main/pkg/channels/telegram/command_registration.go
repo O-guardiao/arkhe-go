@@ -8,8 +8,8 @@ import (
 
 	"github.com/mymmrac/telego"
 
-	"github.com/sipeed/picoclaw/pkg/commands"
-	"github.com/sipeed/picoclaw/pkg/logger"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/commands"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/logger"
 )
 
 var commandRegistrationBackoff = []time.Duration{
@@ -114,3 +114,4 @@ func (c *TelegramChannel) startCommandRegistration(ctx context.Context, defs []c
 		}
 	}()
 }
+

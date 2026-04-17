@@ -1,4 +1,4 @@
-module github.com/sipeed/picoclaw
+module github.com/O-guardiao/arkhe-go/picoclaw-main
 
 go 1.26.0
 
@@ -7,7 +7,7 @@ require (
 	github.com/BurntSushi/toml v1.6.0
 	github.com/SevereCloud/vksdk/v3 v3.3.1
 	github.com/adhocore/gronx v1.19.6
-	github.com/alexzhang13/rlm-go v0.0.0
+	github.com/O-guardiao/arkhe-go/rlm-go v0.0.0
 	github.com/anthropics/anthropic-sdk-go v1.26.0
 	github.com/atc0005/go-teams-notify/v2 v2.14.0
 	github.com/aws/aws-sdk-go-v2 v1.41.5
@@ -146,4 +146,5 @@ require (
 
 replace github.com/bwmarrin/discordgo => github.com/yeongaori/discordgo-fork v0.0.0-20260319072544-e8e546f5d532
 
-replace github.com/alexzhang13/rlm-go => ../rlm-go
+replace github.com/O-guardiao/arkhe-go/rlm-go => ../rlm-go
+

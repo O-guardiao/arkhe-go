@@ -4,8 +4,8 @@ import (
 	"context"
 	"strings"
 
-	"github.com/sipeed/picoclaw/pkg/audio/tts"
-	"github.com/sipeed/picoclaw/pkg/media"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/audio/tts"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/media"
 )
 
 type SendTTSTool struct {
@@ -80,3 +80,4 @@ func (t *SendTTSTool) Execute(ctx context.Context, args map[string]any) *ToolRes
 		ResponseHandled: true,
 	}
 }
+

@@ -8,8 +8,8 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/sipeed/picoclaw/pkg/logger"
-	"github.com/sipeed/picoclaw/pkg/utils"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/logger"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/utils"
 )
 
 const (
@@ -302,3 +302,4 @@ func (r *ToolRegistry) SearchBM25(query string, maxSearchResults int) []ToolSear
 	}
 	return out
 }
+

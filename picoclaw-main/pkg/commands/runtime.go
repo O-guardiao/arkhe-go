@@ -1,6 +1,6 @@
 package commands
 
-import "github.com/sipeed/picoclaw/pkg/config"
+import "github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
 
 // Runtime provides runtime dependencies to command handlers. It is constructed
 // per-request by the agent loop so that per-request state (like session scope)
@@ -18,3 +18,4 @@ type Runtime struct {
 	ClearHistory       func() error
 	ReloadConfig       func() error
 }
+

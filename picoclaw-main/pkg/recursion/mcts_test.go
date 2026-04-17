@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/sipeed/picoclaw/pkg/tools"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/tools"
 )
 
 type recordingSpawner struct {
@@ -116,3 +116,4 @@ func TestRunMCTS_RequiresModel(t *testing.T) {
 		t.Fatalf("expected model validation error, got %v", err)
 	}
 }
+

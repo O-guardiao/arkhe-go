@@ -7,9 +7,9 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/sipeed/picoclaw/cmd/picoclaw/internal"
-	"github.com/sipeed/picoclaw/pkg/channels/weixin"
-	"github.com/sipeed/picoclaw/pkg/config"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/cmd/picoclaw/internal"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/channels/weixin"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
 )
 
 func newWeixinCommand() *cobra.Command {
@@ -122,3 +122,4 @@ func printManualWeixinConfig(token, baseURL string) {
 	fmt.Println(`    "allow_from": []`)
 	fmt.Println(`  }`)
 }
+

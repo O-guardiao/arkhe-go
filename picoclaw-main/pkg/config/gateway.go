@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"os"
 
-	"github.com/sipeed/picoclaw/pkg/logger"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/logger"
 )
 
 const DefaultGatewayLogLevel = "warn"
@@ -70,3 +70,4 @@ func ResolveGatewayLogLevel(path string) string {
 
 	return normalizeGatewayLogLevel(cfg.Gateway.LogLevel)
 }
+

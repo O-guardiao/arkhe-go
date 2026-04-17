@@ -6,8 +6,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/sipeed/picoclaw/pkg/migrate/internal"
-	"github.com/sipeed/picoclaw/pkg/migrate/sources/openclaw"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/migrate/internal"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/migrate/sources/openclaw"
 )
 
 type (
@@ -318,3 +318,4 @@ func PrintPlan(actions []Action, warnings []string) {
 	fmt.Printf("%d files to copy, %d configs to convert, %d backups needed, %d skipped\n",
 		copies, configCount, backups, skips)
 }
+

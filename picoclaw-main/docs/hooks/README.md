@@ -195,8 +195,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/sipeed/picoclaw/pkg/agent"
-	"github.com/sipeed/picoclaw/pkg/logger"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/agent"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/logger"
 )
 
 type ExampleLoggerHookOptions struct {
@@ -362,8 +362,8 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/sipeed/picoclaw/pkg/agent"
-	"github.com/sipeed/picoclaw/pkg/config"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/agent"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
 )
 
 func init() {
@@ -740,3 +740,4 @@ It is not yet well suited for:
 - Full inbound/outbound message interception across the whole platform
 
 If you want a real human approval workflow, use hooks as the approval entry point and keep the state machine plus channel interaction in a separate `ApprovalManager`.
+

@@ -6,8 +6,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/sipeed/picoclaw/pkg/config"
-	"github.com/sipeed/picoclaw/pkg/migrate/internal"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/migrate/internal"
 )
 
 // OpenclawHomeEnvVar is the environment variable that overrides the source
@@ -151,3 +151,4 @@ func mapProvider(provider string) string {
 	}
 	return strings.ToLower(provider)
 }
+

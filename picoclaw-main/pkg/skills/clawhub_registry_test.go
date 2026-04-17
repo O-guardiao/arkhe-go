@@ -14,7 +14,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/sipeed/picoclaw/pkg/utils"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/utils"
 )
 
 func newTestRegistry(serverURL, authToken string) *ClawHubRegistry {
@@ -336,3 +336,4 @@ func createTestZip(t *testing.T, files map[string]string) []byte {
 	require.NoError(t, zw.Close())
 	return buf.Bytes()
 }
+

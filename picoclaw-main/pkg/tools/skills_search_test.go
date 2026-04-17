@@ -6,7 +6,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/sipeed/picoclaw/pkg/skills"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/skills"
 )
 
 func TestFindSkillsToolName(t *testing.T) {
@@ -88,3 +88,4 @@ func TestFormatSearchResultsWithData(t *testing.T) {
 	assert.Contains(t, output, "clawhub")
 	assert.Contains(t, output, "install_skill")
 }
+

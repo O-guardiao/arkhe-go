@@ -7,10 +7,10 @@ import (
 	"os"
 	"strings"
 
-	"github.com/sipeed/picoclaw/pkg/config"
-	"github.com/sipeed/picoclaw/pkg/logger"
-	"github.com/sipeed/picoclaw/pkg/providers"
-	"github.com/sipeed/picoclaw/pkg/utils"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/logger"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/providers"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/utils"
 )
 
 type AudioModelTranscriber struct {
@@ -93,3 +93,4 @@ func (t *AudioModelTranscriber) Transcribe(ctx context.Context, audioFilePath st
 func (t *AudioModelTranscriber) Name() string {
 	return "audio-model"
 }
+

@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	anthropicprovider "github.com/sipeed/picoclaw/pkg/providers/anthropic"
+	anthropicprovider "github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/providers/anthropic"
 )
 
 type ClaudeProvider struct {
@@ -67,3 +67,4 @@ func createClaudeTokenSource() func() (string, error) {
 		return cred.AccessToken, nil
 	}
 }
+

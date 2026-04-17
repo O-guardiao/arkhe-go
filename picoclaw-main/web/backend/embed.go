@@ -9,7 +9,7 @@ import (
 	"path"
 	"strings"
 
-	"github.com/sipeed/picoclaw/pkg/logger"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/logger"
 )
 
 //go:embed all:dist
@@ -77,3 +77,4 @@ func registerEmbedRoutes(mux *http.ServeMux) {
 		}),
 	)
 }
+

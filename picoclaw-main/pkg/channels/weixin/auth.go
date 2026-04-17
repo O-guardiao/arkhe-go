@@ -8,7 +8,7 @@ import (
 
 	"github.com/mdp/qrterminal/v3"
 
-	"github.com/sipeed/picoclaw/pkg/logger"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/logger"
 )
 
 // AuthFlowOpts configures the interactive QR login flow.
@@ -131,3 +131,4 @@ func PerformLoginInteractive(
 		}
 	}
 }
+

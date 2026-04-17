@@ -12,8 +12,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/sipeed/picoclaw/pkg/auth"
-	"github.com/sipeed/picoclaw/pkg/logger"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/auth"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/logger"
 )
 
 const (
@@ -811,3 +811,4 @@ func (p *AntigravityProvider) parseAntigravityError(statusCode int, body []byte)
 
 	return fmt.Errorf("antigravity API error (%s): %s", errResp.Error.Status, msg)
 }
+

@@ -8,8 +8,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/sipeed/picoclaw/pkg/config"
-	"github.com/sipeed/picoclaw/pkg/media"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/media"
 )
 
 func TestSendFileTool_MissingPath(t *testing.T) {
@@ -224,3 +224,4 @@ func TestDetectMediaType_UnknownFallsToOctetStream(t *testing.T) {
 		t.Errorf("expected application/octet-stream, got %q", got)
 	}
 }
+

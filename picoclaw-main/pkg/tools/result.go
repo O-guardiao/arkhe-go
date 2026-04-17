@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"strings"
 
-	"github.com/sipeed/picoclaw/pkg/providers"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/providers"
 )
 
 const (
@@ -221,3 +221,4 @@ func (tr *ToolResult) WithResponseHandled() *ToolResult {
 	tr.ResponseHandled = true
 	return tr
 }
+

@@ -10,7 +10,7 @@ import (
 
 	"github.com/pion/webrtc/v3/pkg/media/oggwriter"
 
-	"github.com/sipeed/picoclaw/pkg/bus"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/bus"
 )
 
 type fakeTranscriber struct {
@@ -194,3 +194,4 @@ func TestAgentCheckSilencePublishesInboundAndCleansUp(t *testing.T) {
 
 	waitForFileRemoval(t, filePath, 500*time.Millisecond)
 }
+

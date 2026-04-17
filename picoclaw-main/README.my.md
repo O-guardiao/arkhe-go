@@ -161,13 +161,13 @@ Lawati **[picoclaw.io](https://picoclaw.io)** — laman web rasmi mengesan platf
 
 ### Muat turun binari pra-kompil
 
-Muat turun binari untuk platform anda dari halaman [GitHub Releases](https://github.com/sipeed/picoclaw/releases).
+Muat turun binari untuk platform anda dari halaman [GitHub Releases](https://github.com/O-guardiao/arkhe-go/releases).
 
 ### Bina dari sumber (untuk pembangunan)
 
 ```bash
-git clone https://github.com/sipeed/picoclaw.git
-cd picoclaw
+git clone https://github.com/O-guardiao/arkhe-go.git
+cd arkhe-go/picoclaw-main
 make deps
 
 # Bina binari teras
@@ -224,8 +224,8 @@ Untuk dokumentasi WebUI terperinci, lihat [docs.picoclaw.io](https://docs.picocl
 
 ```bash
 # 1. Klon repo ini
-git clone https://github.com/sipeed/picoclaw.git
-cd picoclaw
+git clone https://github.com/O-guardiao/arkhe-go.git
+cd arkhe-go/picoclaw-main
 
 # 2. Jalankan pertama kali — jana docker/data/config.json secara automatik kemudian keluar
 docker compose -f docker/docker-compose.yml --profile launcher up
@@ -325,7 +325,7 @@ Muat turun APK dari [picoclaw.io](https://picoclaw.io/download/) dan pasang seca
 
 ```bash
 # Muat turun keluaran terkini
-wget https://github.com/sipeed/picoclaw/releases/latest/download/picoclaw_Linux_arm64.tar.gz
+wget https://github.com/O-guardiao/arkhe-go/releases/latest/download/picoclaw_Linux_arm64.tar.gz
 tar xzf picoclaw_Linux_arm64.tar.gz
 pkg install proot
 termux-chroot ./picoclaw onboard   # chroot menyediakan susun atur sistem fail Linux standard
@@ -612,3 +612,4 @@ Discord: <https://discord.gg/V4sAZ9XWpN>
 
 WeChat:
 <img src="assets/wechat.png" alt="Kod QR kumpulan WeChat" width="512">
+

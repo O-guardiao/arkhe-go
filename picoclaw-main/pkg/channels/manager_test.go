@@ -12,7 +12,7 @@ import (
 
 	"golang.org/x/time/rate"
 
-	"github.com/sipeed/picoclaw/pkg/bus"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/bus"
 )
 
 // mockChannel is a test double that delegates Send to a configurable function.
@@ -1492,3 +1492,4 @@ func TestManager_SendPlaceholder(t *testing.T) {
 		t.Error("expected SendPlaceholder to fail for unknown channel")
 	}
 }
+

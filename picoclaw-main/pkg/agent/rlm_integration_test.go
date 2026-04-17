@@ -11,9 +11,9 @@ import (
 	"sync/atomic"
 	"testing"
 
-	"github.com/sipeed/picoclaw/pkg/bus"
-	"github.com/sipeed/picoclaw/pkg/config"
-	"github.com/sipeed/picoclaw/pkg/providers"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/bus"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/providers"
 )
 
 func TestAgentLoop_RLMProviderUsesLocalTools(t *testing.T) {
@@ -217,3 +217,4 @@ func TestAgentLoop_RLMProviderUsesAgentWorkspaceAsWorkingDir(t *testing.T) {
 		t.Fatalf("expected no context artifacts in workspace, got %v", matches)
 	}
 }
+

@@ -3,8 +3,8 @@ package irc
 import (
 	"testing"
 
-	"github.com/sipeed/picoclaw/pkg/bus"
-	"github.com/sipeed/picoclaw/pkg/config"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/bus"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
 )
 
 func TestNewIRCChannel(t *testing.T) {
@@ -143,3 +143,4 @@ func TestStripBotMention(t *testing.T) {
 		})
 	}
 }
+

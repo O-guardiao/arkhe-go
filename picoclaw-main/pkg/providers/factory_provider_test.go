@@ -13,7 +13,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/sipeed/picoclaw/pkg/config"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
 )
 
 func TestExtractProtocol(t *testing.T) {
@@ -1155,3 +1155,4 @@ func TestCreateProviderFromConfig_RLMRejectsRemoteAPIBase(t *testing.T) {
 		t.Fatalf("expected local api_base error, got %v", err)
 	}
 }
+

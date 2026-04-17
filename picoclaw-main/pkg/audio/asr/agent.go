@@ -12,8 +12,8 @@ import (
 	"github.com/pion/rtp"
 	"github.com/pion/webrtc/v3/pkg/media/oggwriter"
 
-	"github.com/sipeed/picoclaw/pkg/bus"
-	"github.com/sipeed/picoclaw/pkg/logger"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/bus"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/logger"
 )
 
 type speechAccumulator struct {
@@ -250,3 +250,4 @@ func (a *Agent) processUtterance(ctx context.Context, acc *speechAccumulator) {
 		logger.ErrorCF("voice-agent", "Failed to publish inbound message", map[string]any{"error": err})
 	}
 }
+

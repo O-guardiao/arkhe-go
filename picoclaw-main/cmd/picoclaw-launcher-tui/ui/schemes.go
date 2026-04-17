@@ -11,7 +11,7 @@ import (
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
 
-	tuicfg "github.com/sipeed/picoclaw/cmd/picoclaw-launcher-tui/config"
+	tuicfg "github.com/O-guardiao/arkhe-go/picoclaw-main/cmd/picoclaw-launcher-tui/config"
 )
 
 func (a *App) newSchemesPage() tview.Primitive {
@@ -250,3 +250,4 @@ func (a *App) showSchemeForm(existing *tuicfg.Scheme, onSave func(tuicfg.Scheme)
 
 	a.showModal("scheme-form", centeredForm(form, 4, 12))
 }
+

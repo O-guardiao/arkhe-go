@@ -12,11 +12,11 @@ import (
 	"github.com/SevereCloud/vksdk/v3/longpoll-bot"
 	"github.com/SevereCloud/vksdk/v3/object"
 
-	"github.com/sipeed/picoclaw/pkg/bus"
-	"github.com/sipeed/picoclaw/pkg/channels"
-	"github.com/sipeed/picoclaw/pkg/config"
-	"github.com/sipeed/picoclaw/pkg/identity"
-	"github.com/sipeed/picoclaw/pkg/logger"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/bus"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/channels"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/identity"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/logger"
 )
 
 type VKChannel struct {
@@ -284,3 +284,4 @@ func (c *VKChannel) processAttachments(attachments []object.MessagesMessageAttac
 func (c *VKChannel) VoiceCapabilities() channels.VoiceCapabilities {
 	return channels.VoiceCapabilities{ASR: true, TTS: true}
 }
+

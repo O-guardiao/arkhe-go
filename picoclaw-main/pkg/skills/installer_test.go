@@ -33,33 +33,33 @@ func TestParseGitHubRef(t *testing.T) {
 		},
 		{
 			name:         "owner/repo with subpath",
-			repo:         "sipeed/picoclaw/skills/test",
-			wantOwner:    "sipeed",
-			wantRepoName: "picoclaw",
+			repo:         "O-guardiao/arkhe-go/picoclaw-main/skills/test",
+			wantOwner:    "O-guardiao",
+			wantRepoName: "arkhe-go",
 			wantRef:      "main",
-			wantSubPath:  "skills/test",
+			wantSubPath:  "picoclaw-main/skills/test",
 		},
 		{
 			name:         "full URL with tree",
-			repo:         "https://github.com/sipeed/picoclaw/tree/dev/skills/test",
-			wantOwner:    "sipeed",
-			wantRepoName: "picoclaw",
+			repo:         "https://github.com/O-guardiao/arkhe-go/tree/dev/picoclaw-main/skills/test",
+			wantOwner:    "O-guardiao",
+			wantRepoName: "arkhe-go",
 			wantRef:      "dev",
-			wantSubPath:  "skills/test",
+			wantSubPath:  "picoclaw-main/skills/test",
 		},
 		{
 			name:         "full URL with blob",
-			repo:         "https://github.com/sipeed/picoclaw/blob/main/README.md",
-			wantOwner:    "sipeed",
-			wantRepoName: "picoclaw",
+			repo:         "https://github.com/O-guardiao/arkhe-go/blob/main/picoclaw-main/README.md",
+			wantOwner:    "O-guardiao",
+			wantRepoName: "arkhe-go",
 			wantRef:      "main",
-			wantSubPath:  "README.md",
+			wantSubPath:  "picoclaw-main/README.md",
 		},
 		{
 			name:         "full URL without ref",
-			repo:         "https://github.com/sipeed/picoclaw",
-			wantOwner:    "sipeed",
-			wantRepoName: "picoclaw",
+			repo:         "https://github.com/O-guardiao/arkhe-go",
+			wantOwner:    "O-guardiao",
+			wantRepoName: "arkhe-go",
 			wantRef:      "main",
 			wantSubPath:  "",
 		},
@@ -83,11 +83,11 @@ func TestParseGitHubRef(t *testing.T) {
 		},
 		{
 			name:         "with whitespace",
-			repo:         "  sipeed/picoclaw  ",
-			wantOwner:    "sipeed",
-			wantRepoName: "picoclaw",
+			repo:         "  O-guardiao/arkhe-go/picoclaw-main  ",
+			wantOwner:    "O-guardiao",
+			wantRepoName: "arkhe-go",
 			wantRef:      "main",
-			wantSubPath:  "",
+			wantSubPath:  "picoclaw-main",
 		},
 	}
 
@@ -431,12 +431,12 @@ func TestSkillInstaller_InstallFromGitHub_SkillAlreadyExists(t *testing.T) {
 	}
 
 	// Create an existing skill directory
-	existingSkill := filepath.Join(skillsDir, "picoclaw")
+	existingSkill := filepath.Join(skillsDir, "picoclaw-main")
 	os.MkdirAll(existingSkill, 0o755)
 	os.WriteFile(filepath.Join(existingSkill, "SKILL.md"), []byte("existing"), 0o644)
 
 	// Try to install the same skill - should fail
-	err = installer.InstallFromGitHub(context.Background(), "sipeed/picoclaw")
+	err = installer.InstallFromGitHub(context.Background(), "O-guardiao/arkhe-go/picoclaw-main")
 	if err == nil {
 		t.Error("InstallFromGitHub() expected error for existing skill, got nil")
 	}

@@ -11,8 +11,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/sipeed/picoclaw/pkg/logger"
-	"github.com/sipeed/picoclaw/pkg/providers/common"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/logger"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/providers/common"
 )
 
 type OpenAITTSProvider struct {
@@ -124,3 +124,4 @@ func (t *OpenAITTSProvider) Synthesize(ctx context.Context, text string) (io.Rea
 
 	return resp.Body, nil
 }
+

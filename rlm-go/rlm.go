@@ -1,10 +1,10 @@
 package rlm
 
 import (
-	"github.com/alexzhang13/rlm-go/core"
-	"github.com/alexzhang13/rlm-go/logger"
-	"github.com/alexzhang13/rlm-go/types"
-	"github.com/alexzhang13/rlm-go/utils"
+	"github.com/O-guardiao/arkhe-go/rlm-go/core"
+	"github.com/O-guardiao/arkhe-go/rlm-go/logger"
+	"github.com/O-guardiao/arkhe-go/rlm-go/types"
+	"github.com/O-guardiao/arkhe-go/rlm-go/utils"
 )
 
 type RLM = core.RLM

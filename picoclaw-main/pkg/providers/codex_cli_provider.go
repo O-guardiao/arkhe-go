@@ -9,7 +9,7 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/sipeed/picoclaw/pkg/isolation"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/isolation"
 )
 
 // CodexCliProvider implements LLMProvider by wrapping the codex CLI as a subprocess.
@@ -225,3 +225,4 @@ func (p *CodexCliProvider) parseJSONLEvents(output string) (*LLMResponse, error)
 		Usage:        usage,
 	}, nil
 }
+

@@ -11,7 +11,7 @@ import (
 	"fmt"
 	"unicode/utf8"
 
-	"github.com/sipeed/picoclaw/pkg/providers"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/providers"
 )
 
 // CalculateDefaultMaxContextRunes computes a default context limit based on the model's context window.
@@ -171,3 +171,4 @@ func TruncateContextSmart(messages []providers.Message, maxRunes int) []provider
 	result = append(result, keptMsgs...)
 	return result
 }
+

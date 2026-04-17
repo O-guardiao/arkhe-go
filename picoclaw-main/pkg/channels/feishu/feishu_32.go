@@ -6,9 +6,9 @@ import (
 	"context"
 	"errors"
 
-	"github.com/sipeed/picoclaw/pkg/bus"
-	"github.com/sipeed/picoclaw/pkg/channels"
-	"github.com/sipeed/picoclaw/pkg/config"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/bus"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/channels"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
 )
 
 // FeishuChannel is a stub implementation for 32-bit architectures
@@ -59,3 +59,4 @@ func (c *FeishuChannel) ReactToMessage(ctx context.Context, chatID, messageID st
 func (c *FeishuChannel) SendMedia(ctx context.Context, msg bus.OutboundMediaMessage) ([]string, error) {
 	return nil, errUnsupported
 }
+

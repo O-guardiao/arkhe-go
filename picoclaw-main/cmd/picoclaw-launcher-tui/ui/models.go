@@ -16,7 +16,7 @@ import (
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
 
-	tuicfg "github.com/sipeed/picoclaw/cmd/picoclaw-launcher-tui/config"
+	tuicfg "github.com/O-guardiao/arkhe-go/picoclaw-main/cmd/picoclaw-launcher-tui/config"
 )
 
 type modelsAPIResponse struct {
@@ -198,3 +198,4 @@ func fetchModels(baseURL, apiKey string) ([]modelEntry, error) {
 		strings.TrimSpace(string(body[:min(len(body), 256)])),
 	)
 }
+

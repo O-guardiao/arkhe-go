@@ -160,14 +160,14 @@ Kunjungi **[picoclaw.io](https://picoclaw.io)** — website resmi mendeteksi pla
 
 ### Unduh binary yang sudah dikompilasi
 
-Atau, unduh binary untuk platform Anda dari halaman [GitHub Releases](https://github.com/sipeed/picoclaw/releases).
+Atau, unduh binary untuk platform Anda dari halaman [GitHub Releases](https://github.com/O-guardiao/arkhe-go/releases).
 
 ### Build dari source (untuk pengembangan)
 
 ```bash
-git clone https://github.com/sipeed/picoclaw.git
+git clone https://github.com/O-guardiao/arkhe-go.git
 
-cd picoclaw
+cd arkhe-go/picoclaw-main
 make deps
 
 # Build binary inti
@@ -226,8 +226,8 @@ Untuk dokumentasi WebUI lengkap, lihat [docs.picoclaw.io](https://docs.picoclaw.
 
 ```bash
 # 1. Clone repo ini
-git clone https://github.com/sipeed/picoclaw.git
-cd picoclaw
+git clone https://github.com/O-guardiao/arkhe-go.git
+cd arkhe-go/picoclaw-main
 
 # 2. Jalankan pertama kali — otomatis membuat docker/data/config.json lalu keluar
 #    (hanya terpicu ketika config.json dan workspace/ keduanya tidak ada)
@@ -328,7 +328,7 @@ Unduh APK dari [picoclaw.io](https://picoclaw.io/download/) dan instal langsung.
 
 ```bash
 # Unduh rilis terbaru
-wget https://github.com/sipeed/picoclaw/releases/latest/download/picoclaw_Linux_arm64.tar.gz
+wget https://github.com/O-guardiao/arkhe-go/releases/latest/download/picoclaw_Linux_arm64.tar.gz
 tar xzf picoclaw_Linux_arm64.tar.gz
 pkg install proot
 termux-chroot ./picoclaw onboard   # chroot menyediakan tata letak filesystem Linux standar
@@ -615,3 +615,4 @@ Discord: <https://discord.gg/V4sAZ9XWpN>
 
 WeChat:
 <img src="assets/wechat.png" alt="Kode QR grup WeChat" width="512">
+

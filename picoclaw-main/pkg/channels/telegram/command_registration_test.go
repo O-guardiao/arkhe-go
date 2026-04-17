@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/sipeed/picoclaw/pkg/commands"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/commands"
 )
 
 func TestStartCommandRegistration_DoesNotBlock(t *testing.T) {
@@ -94,3 +94,4 @@ func TestStartCommandRegistration_StopsAfterCancel(t *testing.T) {
 		t.Fatalf("expected retries to quiesce after cancel, got %d -> %d", stable, attempts.Load())
 	}
 }
+

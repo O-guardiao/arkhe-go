@@ -11,7 +11,7 @@ import (
 	"time"
 	"unicode"
 
-	"github.com/sipeed/picoclaw/pkg/media"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/media"
 )
 
 const (
@@ -290,3 +290,4 @@ func extensionForMIMEType(mimeType string) string {
 		return filepath.Ext(mimeType)
 	}
 }
+

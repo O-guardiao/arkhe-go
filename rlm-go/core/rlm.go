@@ -5,16 +5,17 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/alexzhang13/rlm-go/clients"
-	"github.com/alexzhang13/rlm-go/environments"
-	"github.com/alexzhang13/rlm-go/logger"
-	"github.com/alexzhang13/rlm-go/types"
-	"github.com/alexzhang13/rlm-go/utils"
+	"github.com/O-guardiao/arkhe-go/rlm-go/clients"
+	"github.com/O-guardiao/arkhe-go/rlm-go/environments"
+	"github.com/O-guardiao/arkhe-go/rlm-go/logger"
+	"github.com/O-guardiao/arkhe-go/rlm-go/types"
+	"github.com/O-guardiao/arkhe-go/rlm-go/utils"
 )
 
 type Config struct {
 	Backend                string
 	BackendKwargs          map[string]any
+	ClientFactory          ClientFactory
 	Environment            string
 	EnvironmentKwargs      map[string]any
 	Depth                  int
@@ -39,6 +40,8 @@ type Config struct {
 	OnIterationStart       func(depth int, iteration int)
 	OnIterationComplete    func(depth int, iteration int, duration float64)
 }
+
+type ClientFactory func(backend string, backendKwargs map[string]any) (clients.Client, error)
 
 type RLM struct {
 	config            Config
@@ -253,14 +256,14 @@ func (r *RLM) Close() error {
 }
 
 func (r *RLM) spawnCompletionContext(prompt any) (*LMHandler, environments.Environment, func(), error) {
-	client, err := clients.NewClient(r.config.Backend, cloneMap(r.config.BackendKwargs))
+	client, err := r.createClient(r.config.Backend, r.config.BackendKwargs)
 	if err != nil {
 		return nil, nil, nil, err
 	}
 
 	var otherClient clients.Client
 	if len(r.config.OtherBackends) > 0 && len(r.config.OtherBackendKwargs) > 0 {
-		otherClient, err = clients.NewClient(r.config.OtherBackends[0], cloneMap(r.config.OtherBackendKwargs[0]))
+		otherClient, err = r.createClient(r.config.OtherBackends[0], r.config.OtherBackendKwargs[0])
 		if err != nil {
 			return nil, nil, nil, err
 		}
@@ -272,7 +275,7 @@ func (r *RLM) spawnCompletionContext(prompt any) (*LMHandler, environments.Envir
 			if index >= len(r.config.OtherBackendKwargs) {
 				break
 			}
-			registered, err := clients.NewClient(backend, cloneMap(r.config.OtherBackendKwargs[index]))
+			registered, err := r.createClient(backend, r.config.OtherBackendKwargs[index])
 			if err != nil {
 				return nil, nil, nil, err
 			}
@@ -380,7 +383,7 @@ func (r *RLM) defaultAnswer(messageHistory []map[string]any, handler *LMHandler)
 }
 
 func (r *RLM) fallbackAnswer(prompt any) (types.RLMChatCompletion, error) {
-	client, err := clients.NewClient(r.config.Backend, cloneMap(r.config.BackendKwargs))
+	client, err := r.createClient(r.config.Backend, r.config.BackendKwargs)
 	if err != nil {
 		return types.RLMChatCompletion{}, err
 	}
@@ -416,9 +419,9 @@ func (r *RLM) subcall(prompt string, model string) (types.RLMChatCompletion, err
 		var client clients.Client
 		var err error
 		if len(r.config.OtherBackends) > 0 && len(r.config.OtherBackendKwargs) > 0 {
-			client, err = clients.NewClient(r.config.OtherBackends[0], cloneMap(r.config.OtherBackendKwargs[0]))
+			client, err = r.createClient(r.config.OtherBackends[0], r.config.OtherBackendKwargs[0])
 		} else {
-			client, err = clients.NewClient(r.config.Backend, childBackendKwargs)
+			client, err = r.createClient(r.config.Backend, childBackendKwargs)
 		}
 		if err != nil {
 			return types.RLMChatCompletion{}, err
@@ -654,6 +657,14 @@ func cloneMap(input map[string]any) map[string]any {
 		out[key] = value
 	}
 	return out
+}
+
+func (r *RLM) createClient(backend string, backendKwargs map[string]any) (clients.Client, error) {
+	clonedKwargs := cloneMap(backendKwargs)
+	if r.config.ClientFactory != nil {
+		return r.config.ClientFactory(backend, clonedKwargs)
+	}
+	return clients.NewClient(backend, clonedKwargs)
 }
 
 func stringValue(input map[string]any, key string) string {

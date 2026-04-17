@@ -15,10 +15,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/sipeed/picoclaw/pkg/auth"
-	"github.com/sipeed/picoclaw/pkg/config"
-	ppid "github.com/sipeed/picoclaw/pkg/pid"
-	"github.com/sipeed/picoclaw/web/backend/utils"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/auth"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
+	ppid "github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/pid"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/web/backend/utils"
 )
 
 func startLongRunningProcess(t *testing.T) *exec.Cmd {
@@ -1471,3 +1471,4 @@ func TestFindPicoclawBinary_EnvOverride_InvalidPath(t *testing.T) {
 		t.Errorf("FindPicoclawBinary() returned invalid env path %q, expected fallback", got)
 	}
 }
+

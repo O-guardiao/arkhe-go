@@ -4,13 +4,14 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/sipeed/picoclaw/pkg/providers/protocoltypes"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/providers/protocoltypes"
 )
 
 type (
 	ToolCall               = protocoltypes.ToolCall
 	FunctionCall           = protocoltypes.FunctionCall
 	LLMResponse            = protocoltypes.LLMResponse
+	ReasoningDetail        = protocoltypes.ReasoningDetail
 	UsageInfo              = protocoltypes.UsageInfo
 	Message                = protocoltypes.Message
 	ToolDefinition         = protocoltypes.ToolDefinition

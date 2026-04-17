@@ -10,8 +10,8 @@ import (
 
 	"gopkg.in/yaml.v3"
 
-	"github.com/sipeed/picoclaw/pkg/credential"
-	"github.com/sipeed/picoclaw/pkg/logger"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/credential"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/logger"
 )
 
 // FlexibleStringSlice is a []string that also accepts JSON numbers,
@@ -325,3 +325,4 @@ func (v SecureModelList) MarshalYAML() (any, error) {
 
 	return mm, nil
 }
+

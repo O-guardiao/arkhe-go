@@ -13,9 +13,9 @@ import (
 
 	"rsc.io/qr"
 
-	"github.com/sipeed/picoclaw/pkg/channels/weixin"
-	"github.com/sipeed/picoclaw/pkg/config"
-	"github.com/sipeed/picoclaw/pkg/logger"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/channels/weixin"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/logger"
 )
 
 const (
@@ -315,3 +315,4 @@ func (h *Handler) gcWeixinFlowsLocked(now time.Time) {
 		}
 	}
 }
+

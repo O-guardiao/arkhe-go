@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/sipeed/picoclaw/pkg/providers"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/providers"
 )
 
 func writeJSONSession(
@@ -434,3 +434,4 @@ func TestMigrateFromJSON_SkipsMetaJSONFiles(t *testing.T) {
 		t.Fatalf("meta file should not be renamed, stat err = %v", statErr)
 	}
 }
+

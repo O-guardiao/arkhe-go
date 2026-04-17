@@ -9,7 +9,7 @@ import (
 
 	sdkmcp "github.com/modelcontextprotocol/go-sdk/mcp"
 
-	"github.com/sipeed/picoclaw/pkg/config"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
 )
 
 func TestLoadEnvFile(t *testing.T) {
@@ -306,3 +306,4 @@ func TestClose_IdempotentOnEmptyManager(t *testing.T) {
 		t.Fatalf("second close should be idempotent, got: %v", err)
 	}
 }
+

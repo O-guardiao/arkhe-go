@@ -160,14 +160,14 @@ PicoClaw는 사실상 거의 모든 Linux 장치에 배포할 수 있습니다!
 
 ### 사전 컴파일된 바이너리 다운로드
 
-또는 [GitHub Releases](https://github.com/sipeed/picoclaw/releases) 페이지에서 플랫폼에 맞는 바이너리를 다운로드할 수 있습니다.
+또는 [GitHub Releases](https://github.com/O-guardiao/arkhe-go/releases) 페이지에서 플랫폼에 맞는 바이너리를 다운로드할 수 있습니다.
 
 ### 소스에서 빌드(개발용)
 
 ```bash
-git clone https://github.com/sipeed/picoclaw.git
+git clone https://github.com/O-guardiao/arkhe-go.git
 
-cd picoclaw
+cd arkhe-go/picoclaw-main
 make deps
 
 # 코어 바이너리 빌드
@@ -226,8 +226,8 @@ WebUI를 연 뒤 다음 순서로 진행하세요. **1)** 프로바이더 설정
 
 ```bash
 # 1. 이 저장소를 클론
-git clone https://github.com/sipeed/picoclaw.git
-cd picoclaw
+git clone https://github.com/O-guardiao/arkhe-go.git
+cd arkhe-go/picoclaw-main
 
 # 2. 첫 실행 - docker/data/config.json을 자동 생성한 뒤 종료
 #    (config.json과 workspace/가 모두 없을 때만 실행됨)
@@ -328,7 +328,7 @@ TUI 메뉴를 사용해 다음 순서로 진행하세요. **1)** 프로바이더
 
 ```bash
 # 최신 릴리스 다운로드
-wget https://github.com/sipeed/picoclaw/releases/latest/download/picoclaw_Linux_arm64.tar.gz
+wget https://github.com/O-guardiao/arkhe-go/releases/latest/download/picoclaw_Linux_arm64.tar.gz
 tar xzf picoclaw_Linux_arm64.tar.gz
 pkg install proot
 termux-chroot ./picoclaw onboard   # chroot가 표준 Linux 파일시스템 레이아웃을 제공합니다
@@ -624,3 +624,4 @@ Discord: <https://discord.gg/V4sAZ9XWpN>
 
 WeChat:
 <img src="assets/wechat.png" alt="WeChat group QR code" width="512">
+

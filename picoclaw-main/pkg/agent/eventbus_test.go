@@ -7,10 +7,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/sipeed/picoclaw/pkg/bus"
-	"github.com/sipeed/picoclaw/pkg/config"
-	"github.com/sipeed/picoclaw/pkg/providers"
-	"github.com/sipeed/picoclaw/pkg/tools"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/bus"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/providers"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/tools"
 )
 
 func TestEventBus_SubscribeEmitUnsubscribeClose(t *testing.T) {
@@ -683,3 +683,4 @@ var (
 	_ tools.Tool          = (*mockCustomTool)(nil)
 	_ tools.AsyncExecutor = (*asyncFollowUpTool)(nil)
 )
+

@@ -3,7 +3,7 @@ package channels
 import (
 	"context"
 
-	"github.com/sipeed/picoclaw/pkg/bus"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/bus"
 )
 
 // MediaSender is an optional interface for channels that can send
@@ -13,3 +13,4 @@ import (
 type MediaSender interface {
 	SendMedia(ctx context.Context, msg bus.OutboundMediaMessage) ([]string, error)
 }
+

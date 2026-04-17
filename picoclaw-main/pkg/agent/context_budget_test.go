@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/sipeed/picoclaw/pkg/providers"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/providers"
 )
 
 // msgUser creates a user message.
@@ -844,3 +844,4 @@ func TestIsOverContextBudget_RealisticSession(t *testing.T) {
 		t.Error("realistic session should exceed 500 context window")
 	}
 }
+

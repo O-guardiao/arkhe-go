@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/alexzhang13/rlm-go/types"
+	"github.com/O-guardiao/arkhe-go/rlm-go/types"
 )
 
 type MockClient struct {

@@ -8,9 +8,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/sipeed/picoclaw/pkg/bus"
-	"github.com/sipeed/picoclaw/pkg/config"
-	"github.com/sipeed/picoclaw/pkg/cron"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/bus"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/cron"
 )
 
 type stubJobExecutor struct {
@@ -345,3 +345,4 @@ func TestCronTool_ExecuteJobReturnsErrorWithoutPublish(t *testing.T) {
 		t.Fatalf("unexpected publish on error path: %q", executor.publishedResp)
 	}
 }
+

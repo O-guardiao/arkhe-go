@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/sipeed/picoclaw/web/backend/launcherconfig"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/web/backend/launcherconfig"
 )
 
 type launcherConfigPayload struct {
@@ -88,3 +88,4 @@ func (h *Handler) handleUpdateLauncherConfig(w http.ResponseWriter, r *http.Requ
 		LauncherToken: cfg.LauncherToken,
 	})
 }
+

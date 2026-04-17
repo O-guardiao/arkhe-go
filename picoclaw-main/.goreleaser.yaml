@@ -24,10 +24,10 @@ builds:
       - stdjson
     ldflags:
       - -s -w
-      - -X github.com/sipeed/picoclaw/pkg/config.Version={{ .Version }}
-      - -X github.com/sipeed/picoclaw/pkg/config.GitCommit={{ .ShortCommit }}
-      - -X github.com/sipeed/picoclaw/pkg/config.BuildTime={{ .Date }}
-      - -X github.com/sipeed/picoclaw/pkg/config.GoVersion={{ .Env.GOVERSION }}
+      - -X github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config.Version={{ .Version }}
+      - -X github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config.GitCommit={{ .ShortCommit }}
+      - -X github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config.BuildTime={{ .Date }}
+      - -X github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config.GoVersion={{ .Env.GOVERSION }}
     goos:
       - linux
       - windows
@@ -250,3 +250,4 @@ release:
     ---
 
     Released by [GoReleaser](https://github.com/goreleaser/goreleaser).
+

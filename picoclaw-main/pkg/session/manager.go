@@ -8,7 +8,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/sipeed/picoclaw/pkg/providers"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/providers"
 )
 
 type Session struct {
@@ -298,3 +298,4 @@ func (sm *SessionManager) SetHistory(key string, history []providers.Message) {
 		session.Updated = time.Now()
 	}
 }
+

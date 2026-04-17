@@ -11,8 +11,8 @@ import (
 
 	"golang.org/x/sys/windows"
 
-	"github.com/sipeed/picoclaw/pkg/config"
-	"github.com/sipeed/picoclaw/pkg/logger"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/logger"
 )
 
 const disableMaxPrivilege = 0x1
@@ -215,3 +215,4 @@ func formatWindowsAccessRules(rules []AccessRule) []map[string]string {
 	}
 	return formatted
 }
+

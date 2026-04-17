@@ -18,9 +18,9 @@ import (
 
 	"github.com/creack/pty"
 
-	"github.com/sipeed/picoclaw/pkg/config"
-	"github.com/sipeed/picoclaw/pkg/constants"
-	"github.com/sipeed/picoclaw/pkg/isolation"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/constants"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/isolation"
 )
 
 var (
@@ -1139,3 +1139,4 @@ func (t *ExecTool) SetAllowPatterns(patterns []string) error {
 	}
 	return nil
 }
+

@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/sipeed/picoclaw/pkg/skills"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/skills"
 )
 
 func TestInstallSkillToolName(t *testing.T) {
@@ -102,3 +102,4 @@ func TestInstallSkillToolMissingRegistry(t *testing.T) {
 	assert.True(t, result.IsError)
 	assert.Contains(t, result.ForLLM, "invalid registry")
 }
+

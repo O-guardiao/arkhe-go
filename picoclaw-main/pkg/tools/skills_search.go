@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/sipeed/picoclaw/pkg/skills"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/skills"
 )
 
 // FindSkillsTool allows the LLM agent to search for installable skills from registries.
@@ -117,3 +117,4 @@ func formatSearchResults(query string, results []skills.SearchResult, cached boo
 	sb.WriteString("Use install_skill with the slug to install a skill.")
 	return sb.String()
 }
+

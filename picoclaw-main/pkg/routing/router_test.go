@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/sipeed/picoclaw/pkg/providers"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/providers"
 )
 
 // ── ExtractFeatures ──────────────────────────────────────────────────────────
@@ -412,3 +412,4 @@ func TestRouter_SelectModel_ReturnsScore(t *testing.T) {
 		t.Errorf("score: got %f, want 0.42", score)
 	}
 }
+

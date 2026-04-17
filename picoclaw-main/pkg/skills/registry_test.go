@@ -8,7 +8,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/sipeed/picoclaw/pkg/utils"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/utils"
 )
 
 // mockRegistry is a test double implementing SkillRegistry.
@@ -178,3 +178,4 @@ func TestIsSafeSlug(t *testing.T) {
 	assert.Error(t, utils.ValidateSkillIdentifier("path/traversal"))
 	assert.Error(t, utils.ValidateSkillIdentifier("path\\traversal"))
 }
+

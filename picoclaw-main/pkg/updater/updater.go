@@ -21,7 +21,7 @@ import (
 	"github.com/minio/selfupdate"
 	"github.com/spf13/cobra"
 
-	"github.com/sipeed/picoclaw/pkg/config"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
 )
 
 // httpClient is a shared HTTP client used for release checks and downloads.
@@ -705,3 +705,4 @@ func NewUpdateCommand(binaryName string) *cobra.Command {
 	cmd.Flags().StringVar(&arch, "arch", "", "Target arch (default: runtime.GOARCH)")
 	return cmd
 }
+

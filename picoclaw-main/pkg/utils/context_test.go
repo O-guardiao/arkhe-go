@@ -8,7 +8,7 @@ package utils
 import (
 	"testing"
 
-	"github.com/sipeed/picoclaw/pkg/providers"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/providers"
 )
 
 func TestCalculateDefaultMaxContextRunes(t *testing.T) {
@@ -448,3 +448,4 @@ func TestContextTruncationPreservesToolCalls(t *testing.T) {
 		t.Error("Tool call message was not preserved during truncation")
 	}
 }
+

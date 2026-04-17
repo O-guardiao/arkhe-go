@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/sipeed/picoclaw/pkg/seahorse"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/seahorse"
 )
 
 func TestIngestSeahorseIdempotent(t *testing.T) {
@@ -77,3 +77,4 @@ func TestIngestSeahorseIdempotent(t *testing.T) {
 		}
 	}
 }
+

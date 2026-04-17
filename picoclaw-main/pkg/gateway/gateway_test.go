@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/sipeed/picoclaw/pkg/config"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
 )
 
 func TestRun_StartupFailuresReturnErrorAndEmitStructuredLog(t *testing.T) {
@@ -106,3 +106,4 @@ func TestGatewayRunStartupFailureHelper(t *testing.T) {
 	fmt.Fprintln(os.Stdout, err.Error())
 	os.Exit(0)
 }
+

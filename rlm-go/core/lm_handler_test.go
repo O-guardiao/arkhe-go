@@ -4,9 +4,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/alexzhang13/rlm-go/clients"
-	"github.com/alexzhang13/rlm-go/core"
-	"github.com/alexzhang13/rlm-go/protocol"
+	"github.com/O-guardiao/arkhe-go/rlm-go/clients"
+	"github.com/O-guardiao/arkhe-go/rlm-go/core"
+	"github.com/O-guardiao/arkhe-go/rlm-go/protocol"
 )
 
 func TestLMHandlerSingleRequest(t *testing.T) {

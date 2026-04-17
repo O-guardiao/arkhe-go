@@ -8,7 +8,7 @@ import (
 
 	"github.com/openai/openai-go/v3/responses"
 
-	"github.com/sipeed/picoclaw/pkg/providers/protocoltypes"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/providers/protocoltypes"
 )
 
 // --- TranslateMessages tests ---
@@ -613,3 +613,4 @@ func TestTranslateTools_SerializesToJSON(t *testing.T) {
 		t.Errorf("JSON should contain web_search, got: %s", s)
 	}
 }
+

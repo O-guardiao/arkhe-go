@@ -10,9 +10,9 @@ import (
 	"github.com/openai/openai-go/v3/option"
 	"github.com/openai/openai-go/v3/responses"
 
-	"github.com/sipeed/picoclaw/pkg/auth"
-	"github.com/sipeed/picoclaw/pkg/logger"
-	orc "github.com/sipeed/picoclaw/pkg/providers/openai_responses_common"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/auth"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/logger"
+	orc "github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/providers/openai_responses_common"
 )
 
 const (
@@ -268,3 +268,4 @@ func createCodexTokenSource() func() (string, string, error) {
 		return cred.AccessToken, cred.AccountID, nil
 	}
 }
+

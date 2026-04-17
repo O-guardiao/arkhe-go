@@ -5,7 +5,7 @@ package sources
 import (
 	"context"
 
-	"github.com/sipeed/picoclaw/pkg/devices/events"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/devices/events"
 )
 
 type USBMonitor struct{}
@@ -27,3 +27,4 @@ func (m *USBMonitor) Start(ctx context.Context) (<-chan *events.DeviceEvent, err
 func (m *USBMonitor) Stop() error {
 	return nil
 }
+

@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/sipeed/picoclaw/pkg/credential"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/credential"
 )
 
 func TestResolve_PlainKey(t *testing.T) {
@@ -281,3 +281,4 @@ func TestEncrypt_SSHKeyOutsideAllowedDirs(t *testing.T) {
 		t.Fatal("expected error for SSH key outside allowed directories, got nil")
 	}
 }
+

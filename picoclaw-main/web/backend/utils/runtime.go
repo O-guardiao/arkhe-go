@@ -8,8 +8,8 @@ import (
 	"path/filepath"
 	"runtime"
 
-	"github.com/sipeed/picoclaw/pkg/config"
-	"github.com/sipeed/picoclaw/pkg/logger"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/logger"
 )
 
 // GetPicoclawHome returns the picoclaw home directory.
@@ -81,3 +81,4 @@ func OpenBrowser(url string) error {
 		return fmt.Errorf("unsupported platform")
 	}
 }
+

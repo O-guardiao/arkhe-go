@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/yaml.v3"
 
-	"github.com/sipeed/picoclaw/pkg/credential"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/credential"
 )
 
 func TestLoadSecurityValue(t *testing.T) {
@@ -143,3 +143,4 @@ func TestLoadSecurityValue(t *testing.T) {
 	assert.NotNil(t, v6.Tools.Pico.Token)
 	assert.Equal(t, "newtoken1", v6.Tools.Pico.Token.String())
 }
+

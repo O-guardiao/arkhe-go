@@ -1,4 +1,4 @@
-//go:build !mipsle && !netbsd && !(freebsd && arm) && !android
+//go:build goolm && !mipsle && !netbsd && !(freebsd && arm) && !android
 
 package gateway
 
@@ -6,7 +6,12 @@ import (
 	// Matrix currently pulls in mautrix crypto and modernc sqlite transitively.
 	//
 	// We exclude it on:
-	// - linux/mipsle: mautrix crypto falls back to libolm when the `goolm` build
+	// - builds without the goolm tag: mautrix crypto falls back to libolm which
+	//   requires CGO and the libolm C library. The goolm tag switches to a pure-Go
+	//   OLM implementation, allowing CGO_ENABLED=0 builds (the project default).
+	//   The Makefile passes -tags goolm automatically; bare "go build" callers must
+	//   pass it explicitly or set GOFLAGS="-tags=goolm".
+	// - linux/mipsle: mautrix crypto falls back to libolm when the goolm build
 	//   tag is unavailable, and modernc.org/sqlite/modernc.org/libc also lacks a
 	//   working build path for our mipsle + softfloat target.
 	// - netbsd/*: modernc.org/sqlite v1.46.1 fails to compile due to broken
@@ -20,5 +25,5 @@ import (
 	// long-term fix is to split Matrix basic support from its E2EE/sqlite-backed
 	// crypto path, or to upgrade/replace the upstream sqlite dependency once the
 	// affected targets are supported.
-	_ "github.com/sipeed/picoclaw/pkg/channels/matrix"
+	_ "github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/channels/matrix"
 )

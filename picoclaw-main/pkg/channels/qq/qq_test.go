@@ -16,10 +16,10 @@ import (
 	"github.com/tencent-connect/botgo/dto"
 	"github.com/tencent-connect/botgo/openapi/options"
 
-	"github.com/sipeed/picoclaw/pkg/bus"
-	"github.com/sipeed/picoclaw/pkg/channels"
-	"github.com/sipeed/picoclaw/pkg/config"
-	"github.com/sipeed/picoclaw/pkg/media"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/bus"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/channels"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/media"
 )
 
 func TestHandleC2CMessage_IncludesAccountIDMetadata(t *testing.T) {
@@ -738,3 +738,4 @@ func writeWAVFile(t *testing.T, dir, name string, duration time.Duration) string
 
 	return writeTempFile(t, dir, name, buf.Bytes())
 }
+

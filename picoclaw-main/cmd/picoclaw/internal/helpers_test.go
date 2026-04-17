@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/sipeed/picoclaw/pkg/config"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
 )
 
 func TestGetConfigPath(t *testing.T) {
@@ -55,3 +55,4 @@ func TestGetConfigPath_Windows(t *testing.T) {
 
 	require.True(t, strings.EqualFold(got, want), "GetConfigPath() = %q, want %q", got, want)
 }
+

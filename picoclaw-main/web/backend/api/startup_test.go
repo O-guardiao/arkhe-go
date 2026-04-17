@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/sipeed/picoclaw/web/backend/launcherconfig"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/web/backend/launcherconfig"
 )
 
 func TestResolveLaunchCommandUsesConfigFileDefaults(t *testing.T) {
@@ -77,3 +77,4 @@ func TestBuildDarwinPlistIncludesRunAtLoad(t *testing.T) {
 		t.Fatalf("plist missing RunAtLoad true value:\n%s", plist)
 	}
 }
+

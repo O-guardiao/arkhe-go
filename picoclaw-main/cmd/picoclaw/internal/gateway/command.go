@@ -5,10 +5,10 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/sipeed/picoclaw/cmd/picoclaw/internal"
-	"github.com/sipeed/picoclaw/pkg/gateway"
-	"github.com/sipeed/picoclaw/pkg/logger"
-	"github.com/sipeed/picoclaw/pkg/utils"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/cmd/picoclaw/internal"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/gateway"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/logger"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/utils"
 )
 
 func NewGatewayCommand() *cobra.Command {
@@ -50,3 +50,4 @@ func NewGatewayCommand() *cobra.Command {
 
 	return cmd
 }
+

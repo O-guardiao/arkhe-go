@@ -3,11 +3,11 @@ package agent
 import (
 	"sync"
 
-	"github.com/sipeed/picoclaw/pkg/config"
-	"github.com/sipeed/picoclaw/pkg/logger"
-	"github.com/sipeed/picoclaw/pkg/providers"
-	"github.com/sipeed/picoclaw/pkg/routing"
-	"github.com/sipeed/picoclaw/pkg/tools"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/logger"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/providers"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/routing"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/tools"
 )
 
 // AgentRegistry manages multiple agent instances and routes messages to them.
@@ -138,3 +138,4 @@ func (r *AgentRegistry) GetDefaultAgent() *AgentInstance {
 	}
 	return nil
 }
+

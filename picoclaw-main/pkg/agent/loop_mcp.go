@@ -11,10 +11,10 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/sipeed/picoclaw/pkg/config"
-	"github.com/sipeed/picoclaw/pkg/logger"
-	"github.com/sipeed/picoclaw/pkg/mcp"
-	"github.com/sipeed/picoclaw/pkg/tools"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/logger"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/mcp"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/tools"
 )
 
 type mcpRuntime struct {
@@ -223,3 +223,4 @@ func serverIsDeferred(discoveryEnabled bool, serverCfg config.MCPServerConfig) b
 	}
 	return true
 }
+

@@ -11,8 +11,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/sipeed/picoclaw/pkg/auth"
-	"github.com/sipeed/picoclaw/pkg/config"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/auth"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
 )
 
 func TestOAuthLoginRejectsUnsupportedMethod(t *testing.T) {
@@ -287,3 +287,4 @@ func resetOAuthHooks(t *testing.T) {
 		oauthFetchGoogleUserEmailFunc = origFetchGoogleEmail
 	})
 }
+

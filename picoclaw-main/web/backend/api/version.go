@@ -13,8 +13,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/sipeed/picoclaw/pkg/config"
-	"github.com/sipeed/picoclaw/web/backend/utils"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/web/backend/utils"
 )
 
 type systemVersionResponse struct {
@@ -343,3 +343,4 @@ func isLikelyVersionValue(value string) bool {
 	}
 	return false
 }
+

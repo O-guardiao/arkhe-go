@@ -160,14 +160,14 @@ PicoClaw はほぼすべての Linux デバイスにデプロイできます！
 
 ### プリコンパイル済みバイナリをダウンロード
 
-または、[GitHub Releases](https://github.com/sipeed/picoclaw/releases) ページからプラットフォームに合ったバイナリをダウンロードしてください。
+または、[GitHub Releases](https://github.com/O-guardiao/arkhe-go/releases) ページからプラットフォームに合ったバイナリをダウンロードしてください。
 
 ### ソースからビルド（開発用）
 
 ```bash
-git clone https://github.com/sipeed/picoclaw.git
+git clone https://github.com/O-guardiao/arkhe-go.git
 
-cd picoclaw
+cd arkhe-go/picoclaw-main
 make deps
 
 # コアバイナリをビルド
@@ -226,8 +226,8 @@ WebUI の詳細なドキュメントは [docs.picoclaw.io](https://docs.picoclaw
 
 ```bash
 # 1. このリポジトリをクローン
-git clone https://github.com/sipeed/picoclaw.git
-cd picoclaw
+git clone https://github.com/O-guardiao/arkhe-go.git
+cd arkhe-go/picoclaw-main
 
 # 2. 初回実行 — docker/data/config.json を自動生成して終了
 #    （config.json と workspace/ の両方が存在しない場合のみ実行）
@@ -328,7 +328,7 @@ TUI の詳細なドキュメントは [docs.picoclaw.io](https://docs.picoclaw.i
 
 ```bash
 # 最新リリースをダウンロード
-wget https://github.com/sipeed/picoclaw/releases/latest/download/picoclaw_Linux_arm64.tar.gz
+wget https://github.com/O-guardiao/arkhe-go/releases/latest/download/picoclaw_Linux_arm64.tar.gz
 tar xzf picoclaw_Linux_arm64.tar.gz
 pkg install proot
 termux-chroot ./picoclaw onboard   # chroot で標準的な Linux ファイルシステムレイアウトを提供
@@ -615,3 +615,4 @@ Discord: <https://discord.gg/V4sAZ9XWpN>
 
 WeChat:
 <img src="assets/wechat.png" alt="WeChat group QR code" width="512">
+

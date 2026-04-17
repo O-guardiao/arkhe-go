@@ -11,12 +11,12 @@ import (
 
 	"github.com/ergochat/readline"
 
-	"github.com/sipeed/picoclaw/cmd/picoclaw/internal"
-	"github.com/sipeed/picoclaw/pkg/agent"
-	"github.com/sipeed/picoclaw/pkg/bus"
-	"github.com/sipeed/picoclaw/pkg/logger"
-	"github.com/sipeed/picoclaw/pkg/providers"
-	"github.com/sipeed/picoclaw/pkg/recursion"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/cmd/picoclaw/internal"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/agent"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/bus"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/logger"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/providers"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/recursion"
 )
 
 func agentCmd(message, sessionKey, model string, debug bool) error {
@@ -167,3 +167,4 @@ func simpleInteractiveMode(agentLoop *agent.AgentLoop, sessionKey string) {
 		fmt.Printf("\n%s %s\n\n", internal.Logo, response)
 	}
 }
+

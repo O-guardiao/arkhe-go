@@ -15,8 +15,8 @@ import (
 
 	"golang.org/x/sync/singleflight"
 
-	"github.com/sipeed/picoclaw/pkg/config"
-	"github.com/sipeed/picoclaw/pkg/providers"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/providers"
 )
 
 const (
@@ -636,3 +636,4 @@ func splitOllamaModel(raw string) (base, tag string) {
 	base, tag, _ = strings.Cut(raw, ":")
 	return strings.TrimSpace(base), strings.TrimSpace(tag)
 }
+

@@ -11,8 +11,8 @@ import (
 
 	"github.com/h2non/filetype"
 
-	"github.com/sipeed/picoclaw/pkg/config"
-	"github.com/sipeed/picoclaw/pkg/media"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/media"
 )
 
 // SendFileTool allows the LLM to send a local file (image, document, etc.)
@@ -162,3 +162,4 @@ func detectMediaType(path string) string {
 
 	return "application/octet-stream"
 }
+

@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/sipeed/picoclaw/pkg/commands"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/commands"
 )
 
 type mockRegistrar struct{}
@@ -14,3 +14,4 @@ func (mockRegistrar) RegisterCommands(context.Context, []commands.Definition) er
 func TestCommandRegistrarCapable_Compiles(t *testing.T) {
 	var _ CommandRegistrarCapable = mockRegistrar{}
 }
+

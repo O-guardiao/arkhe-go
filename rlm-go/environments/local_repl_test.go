@@ -6,8 +6,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/alexzhang13/rlm-go/environments"
-	"github.com/alexzhang13/rlm-go/types"
+	"github.com/O-guardiao/arkhe-go/rlm-go/environments"
+	"github.com/O-guardiao/arkhe-go/rlm-go/types"
 )
 
 func TestLocalREPLSimpleExecution(t *testing.T) {

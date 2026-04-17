@@ -6,7 +6,7 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/sipeed/picoclaw/pkg/config"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
 )
 
 var execCommand = exec.Command
@@ -42,3 +42,4 @@ func EnsureOnboarded(configPath string) error {
 
 	return nil
 }
+

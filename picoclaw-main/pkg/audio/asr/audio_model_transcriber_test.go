@@ -8,8 +8,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/sipeed/picoclaw/pkg/config"
-	"github.com/sipeed/picoclaw/pkg/providers"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/providers"
 )
 
 var _ Transcriber = (*AudioModelTranscriber)(nil)
@@ -201,3 +201,4 @@ func TestAudioModelTranscriberTranscribe(t *testing.T) {
 		}
 	})
 }
+

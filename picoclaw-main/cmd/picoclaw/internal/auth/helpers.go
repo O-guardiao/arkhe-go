@@ -10,10 +10,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/sipeed/picoclaw/cmd/picoclaw/internal"
-	"github.com/sipeed/picoclaw/pkg/auth"
-	"github.com/sipeed/picoclaw/pkg/config"
-	"github.com/sipeed/picoclaw/pkg/providers"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/cmd/picoclaw/internal"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/auth"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/providers"
 )
 
 const (
@@ -509,3 +509,4 @@ func isAnthropicModel(model string) bool {
 	return model == "anthropic" ||
 		strings.HasPrefix(model, "anthropic/")
 }
+

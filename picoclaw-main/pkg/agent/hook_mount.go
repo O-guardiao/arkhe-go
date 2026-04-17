@@ -7,7 +7,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/sipeed/picoclaw/pkg/config"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
 )
 
 type hookRuntime struct {
@@ -51,9 +51,15 @@ func (r *hookRuntime) reset(al *AgentLoop) {
 // BuiltinHookFactory constructs an in-process hook from config.
 type BuiltinHookFactory func(ctx context.Context, spec config.BuiltinHookConfig) (any, error)
 
+// WorkspaceHookFactory constructs an in-process hook that also receives the
+// resolved workspace path. Used by hooks like memory_extractor that need
+// file-system access to the agent workspace.
+type WorkspaceHookFactory func(ctx context.Context, spec config.BuiltinHookConfig, workspace string) (any, error)
+
 var (
 	builtinHookRegistryMu sync.RWMutex
 	builtinHookRegistry   = map[string]BuiltinHookFactory{}
+	workspaceHookRegistry = map[string]WorkspaceHookFactory{}
 )
 
 // RegisterBuiltinHook registers a named in-process hook factory for config-driven mounting.
@@ -71,7 +77,32 @@ func RegisterBuiltinHook(name string, factory BuiltinHookFactory) error {
 	if _, exists := builtinHookRegistry[name]; exists {
 		return fmt.Errorf("builtin hook %q is already registered", name)
 	}
+	if _, exists := workspaceHookRegistry[name]; exists {
+		return fmt.Errorf("builtin hook %q is already registered (workspace)", name)
+	}
 	builtinHookRegistry[name] = factory
+	return nil
+}
+
+// RegisterWorkspaceHook registers a named workspace-aware hook factory.
+func RegisterWorkspaceHook(name string, factory WorkspaceHookFactory) error {
+	if name == "" {
+		return fmt.Errorf("workspace hook name is required")
+	}
+	if factory == nil {
+		return fmt.Errorf("workspace hook %q factory is nil", name)
+	}
+
+	builtinHookRegistryMu.Lock()
+	defer builtinHookRegistryMu.Unlock()
+
+	if _, exists := builtinHookRegistry[name]; exists {
+		return fmt.Errorf("builtin hook %q is already registered", name)
+	}
+	if _, exists := workspaceHookRegistry[name]; exists {
+		return fmt.Errorf("workspace hook %q is already registered", name)
+	}
+	workspaceHookRegistry[name] = factory
 	return nil
 }
 
@@ -81,6 +112,7 @@ func unregisterBuiltinHook(name string) {
 	}
 	builtinHookRegistryMu.Lock()
 	delete(builtinHookRegistry, name)
+	delete(workspaceHookRegistry, name)
 	builtinHookRegistryMu.Unlock()
 }
 
@@ -89,6 +121,14 @@ func lookupBuiltinHook(name string) (BuiltinHookFactory, bool) {
 	defer builtinHookRegistryMu.RUnlock()
 
 	factory, ok := builtinHookRegistry[name]
+	return factory, ok
+}
+
+func lookupWorkspaceHook(name string) (WorkspaceHookFactory, bool) {
+	builtinHookRegistryMu.RLock()
+	defer builtinHookRegistryMu.RUnlock()
+
+	factory, ok := workspaceHookRegistry[name]
 	return factory, ok
 }
 
@@ -141,12 +181,19 @@ func (al *AgentLoop) loadConfiguredHooks(ctx context.Context) (err error) {
 	builtinNames := enabledBuiltinHookNames(al.cfg.Hooks.Builtins)
 	for _, name := range builtinNames {
 		spec := al.cfg.Hooks.Builtins[name]
-		factory, ok := lookupBuiltinHook(name)
-		if !ok {
+
+		// Try workspace-aware factory first, then standard factory.
+		var hook any
+		var factoryErr error
+
+		if wsFactory, ok := lookupWorkspaceHook(name); ok {
+			hook, factoryErr = wsFactory(ctx, spec, al.cfg.WorkspacePath())
+		} else if factory, ok := lookupBuiltinHook(name); ok {
+			hook, factoryErr = factory(ctx, spec)
+		} else {
 			return fmt.Errorf("builtin hook %q is not registered", name)
 		}
 
-		hook, factoryErr := factory(ctx, spec)
 		if factoryErr != nil {
 			return fmt.Errorf("build builtin hook %q: %w", name, factoryErr)
 		}

@@ -3,7 +3,7 @@ package skills
 import (
 	"github.com/spf13/cobra"
 
-	"github.com/sipeed/picoclaw/pkg/skills"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/skills"
 )
 
 func newRemoveCommand(installerFn func() (*skills.SkillInstaller, error)) *cobra.Command {
@@ -25,3 +25,4 @@ func newRemoveCommand(installerFn func() (*skills.SkillInstaller, error)) *cobra
 
 	return cmd
 }
+

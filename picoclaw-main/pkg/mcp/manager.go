@@ -15,8 +15,8 @@ import (
 
 	"github.com/modelcontextprotocol/go-sdk/mcp"
 
-	"github.com/sipeed/picoclaw/pkg/config"
-	"github.com/sipeed/picoclaw/pkg/logger"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/logger"
 )
 
 // headerTransport is an http.RoundTripper that adds custom headers to requests
@@ -540,3 +540,4 @@ func (m *Manager) GetAllTools() map[string][]*mcp.Tool {
 	}
 	return result
 }
+

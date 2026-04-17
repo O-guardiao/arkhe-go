@@ -8,7 +8,7 @@ import (
 	"runtime"
 	"testing"
 
-	"github.com/sipeed/picoclaw/pkg/config"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
 )
 
 func TestHandleListTools(t *testing.T) {
@@ -196,3 +196,4 @@ func TestHandleUpdateToolState(t *testing.T) {
 		t.Fatalf("cron should be enabled: %#v", updated.Tools.Cron)
 	}
 }
+

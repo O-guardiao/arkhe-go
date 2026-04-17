@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"unicode/utf8"
 
-	"github.com/sipeed/picoclaw/pkg/providers"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/providers"
 )
 
 // EstimateMessageTokens estimates the token count for a single message,
@@ -89,3 +89,4 @@ func EstimateToolDefsTokens(defs []providers.ToolDefinition) int {
 
 	return totalChars * 2 / 5
 }
+

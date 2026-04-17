@@ -26,8 +26,8 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/bedrockruntime/document"
 	"github.com/aws/aws-sdk-go-v2/service/bedrockruntime/types"
 
-	"github.com/sipeed/picoclaw/pkg/providers/common"
-	"github.com/sipeed/picoclaw/pkg/providers/protocoltypes"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/providers/common"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/providers/protocoltypes"
 )
 
 type (
@@ -614,3 +614,4 @@ func isSSOTokenError(err error) bool {
 
 	return false
 }
+

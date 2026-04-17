@@ -8,8 +8,8 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/sipeed/picoclaw/pkg/config"
-	"github.com/sipeed/picoclaw/pkg/media"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/media"
 )
 
 // LoadImageTool loads a local image file into the MediaStore and returns a
@@ -161,3 +161,4 @@ func (t *LoadImageTool) Execute(ctx context.Context, args map[string]any) *ToolR
 		Media: []string{ref},
 	}
 }
+

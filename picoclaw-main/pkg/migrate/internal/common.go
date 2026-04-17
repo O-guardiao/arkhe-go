@@ -5,7 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/sipeed/picoclaw/pkg/config"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
 )
 
 func ResolveTargetHome(override string) (string, error) {
@@ -154,3 +154,4 @@ func CopyFile(src, dst string) error {
 	_, err = io.Copy(dstFile, srcFile)
 	return err
 }
+

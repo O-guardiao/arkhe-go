@@ -9,8 +9,8 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/sipeed/picoclaw/pkg"
-	"github.com/sipeed/picoclaw/pkg/config"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
 )
 
 // MountRule describes a source-to-target mount exposed inside the Linux
@@ -441,3 +441,4 @@ func PrepareCommand(cmd *exec.Cmd) error {
 	}
 	return nil
 }
+

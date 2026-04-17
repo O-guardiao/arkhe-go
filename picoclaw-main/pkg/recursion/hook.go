@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/sipeed/picoclaw/pkg/agent"
-	"github.com/sipeed/picoclaw/pkg/tools"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/agent"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/tools"
 )
 
 // RecursionHook integrates loop detection and compaction with PicoClaw's
@@ -254,3 +254,4 @@ func truncate(s string, maxLen int) string {
 	}
 	return s[:maxLen] + "..."
 }
+

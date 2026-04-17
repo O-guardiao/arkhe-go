@@ -6,12 +6,12 @@ import (
 	"sync"
 	"time"
 
-	"github.com/sipeed/picoclaw/pkg/bus"
-	"github.com/sipeed/picoclaw/pkg/constants"
-	"github.com/sipeed/picoclaw/pkg/devices/events"
-	"github.com/sipeed/picoclaw/pkg/devices/sources"
-	"github.com/sipeed/picoclaw/pkg/logger"
-	"github.com/sipeed/picoclaw/pkg/state"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/bus"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/constants"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/devices/events"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/devices/sources"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/logger"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/state"
 )
 
 type Service struct {
@@ -153,3 +153,4 @@ func parseLastChannel(lastChannel string) (platform, userID string) {
 	}
 	return parts[0], parts[1]
 }
+

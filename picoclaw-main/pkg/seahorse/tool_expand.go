@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/sipeed/picoclaw/pkg/tools"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/tools"
 )
 
 // ExpandTool recovers full message content by ID.
@@ -127,3 +127,4 @@ func (t *ExpandTool) Execute(ctx context.Context, args map[string]any) *tools.To
 	data, _ := json.Marshal(output)
 	return tools.NewToolResult(string(data))
 }
+

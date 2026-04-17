@@ -160,14 +160,14 @@ Acesse **[picoclaw.io](https://picoclaw.io)** — o site oficial detecta automat
 
 ### Download do binário pré-compilado
 
-Alternativamente, baixe o binário para sua plataforma na página de [GitHub Releases](https://github.com/sipeed/picoclaw/releases).
+Alternativamente, baixe o binário para sua plataforma na página de [GitHub Releases](https://github.com/O-guardiao/arkhe-go/releases).
 
 ### Compilar a partir do código-fonte (para desenvolvimento)
 
 ```bash
-git clone https://github.com/sipeed/picoclaw.git
+git clone https://github.com/O-guardiao/arkhe-go.git
 
-cd picoclaw
+cd arkhe-go/picoclaw-main
 make deps
 
 # Compilar o binário principal
@@ -231,8 +231,8 @@ Para a leitura detalhada por área, com inventário estrutural, runtime core, in
 
 ```bash
 # 1. Clone este repositório
-git clone https://github.com/sipeed/picoclaw.git
-cd picoclaw
+git clone https://github.com/O-guardiao/arkhe-go.git
+cd arkhe-go/picoclaw-main
 
 # 2. Primeira execução — gera automaticamente docker/data/config.json e encerra
 #    (só é acionado quando config.json e workspace/ estão ausentes)
@@ -333,7 +333,7 @@ Baixe o APK de [picoclaw.io](https://picoclaw.io/download/) e instale diretament
 
 ```bash
 # Baixar a versão mais recente
-wget https://github.com/sipeed/picoclaw/releases/latest/download/picoclaw_Linux_arm64.tar.gz
+wget https://github.com/O-guardiao/arkhe-go/releases/latest/download/picoclaw_Linux_arm64.tar.gz
 tar xzf picoclaw_Linux_arm64.tar.gz
 pkg install proot
 termux-chroot ./picoclaw onboard   # chroot fornece um layout padrão de sistema de arquivos Linux
@@ -620,3 +620,4 @@ Discord: <https://discord.gg/V4sAZ9XWpN>
 
 WeChat:
 <img src="assets/wechat.png" alt="WeChat group QR code" width="512">
+

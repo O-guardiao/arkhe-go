@@ -14,8 +14,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/sipeed/picoclaw/pkg/providers/common"
-	"github.com/sipeed/picoclaw/pkg/providers/protocoltypes"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/providers/common"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/providers/protocoltypes"
 )
 
 type (
@@ -491,3 +491,4 @@ func supportsPromptCacheKey(apiBase string) bool {
 	host := u.Hostname()
 	return host == "api.openai.com" || strings.HasSuffix(host, ".openai.azure.com")
 }
+

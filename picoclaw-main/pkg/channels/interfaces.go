@@ -3,8 +3,8 @@ package channels
 import (
 	"context"
 
-	"github.com/sipeed/picoclaw/pkg/bus"
-	"github.com/sipeed/picoclaw/pkg/commands"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/bus"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/commands"
 )
 
 // TypingCapable — channels that can show a typing/thinking indicator.
@@ -68,3 +68,4 @@ type PlaceholderRecorder interface {
 type CommandRegistrarCapable interface {
 	RegisterCommands(ctx context.Context, defs []commands.Definition) error
 }
+

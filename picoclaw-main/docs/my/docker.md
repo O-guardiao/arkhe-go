@@ -8,8 +8,8 @@ Anda juga boleh menjalankan PicoClaw menggunakan Docker Compose tanpa memasang a
 
 ```bash
 # 1. Clone repo ini
-git clone https://github.com/sipeed/picoclaw.git
-cd picoclaw
+git clone https://github.com/O-guardiao/arkhe-go.git
+cd arkhe-go/picoclaw-main
 
 # 2. Larian pertama — jana docker/data/config.json secara automatik kemudian keluar
 docker compose -f docker/docker-compose.yml --profile gateway up
@@ -164,3 +164,4 @@ picoclaw agent -m "What is 2+2?"
 Itu sahaja! Anda kini mempunyai pembantu AI yang berfungsi dalam masa 2 minit.
 
 ---
+

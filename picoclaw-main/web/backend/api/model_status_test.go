@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/sipeed/picoclaw/pkg/config"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
 )
 
 func TestProbeLocalModelAvailability_OpenAICompatibleIncludesAPIKey(t *testing.T) {
@@ -392,3 +392,4 @@ func TestOllamaModelMatches_WithTagRequiresExactTag(t *testing.T) {
 		t.Fatal("ollamaModelMatches() = false, want true when both candidate and request omit tag (latest)")
 	}
 }
+

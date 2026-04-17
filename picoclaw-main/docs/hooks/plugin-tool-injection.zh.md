@@ -476,8 +476,8 @@ package myhooks
 
 import (
     "context"
-    "github.com/sipeed/picoclaw/pkg/agent"
-    "github.com/sipeed/picoclaw/pkg/tools"
+    "github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/agent"
+    "github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/tools"
 )
 
 type WeatherPluginHook struct{}

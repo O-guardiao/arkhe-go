@@ -3,8 +3,8 @@ package providers
 import (
 	"testing"
 
-	"github.com/sipeed/picoclaw/pkg/auth"
-	"github.com/sipeed/picoclaw/pkg/config"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/auth"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
 )
 
 func TestCreateProviderReturnsHTTPProviderForOpenRouter(t *testing.T) {
@@ -109,3 +109,4 @@ func TestCreateProviderReturnsCodexProviderForOpenAIOAuth(t *testing.T) {
 	// which is not yet implemented in the new factory_provider.go
 	t.Skip("OpenAI OAuth via model_list not yet implemented")
 }
+

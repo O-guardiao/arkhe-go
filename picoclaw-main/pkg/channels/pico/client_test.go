@@ -12,9 +12,9 @@ import (
 
 	"github.com/gorilla/websocket"
 
-	"github.com/sipeed/picoclaw/pkg/bus"
-	"github.com/sipeed/picoclaw/pkg/channels"
-	"github.com/sipeed/picoclaw/pkg/config"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/bus"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/channels"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
 )
 
 func TestNewPicoClientChannel_MissingURL(t *testing.T) {
@@ -380,3 +380,4 @@ func TestPicoClientChannel_HandleServerMessage_IgnoresThought(t *testing.T) {
 	case <-time.After(150 * time.Millisecond):
 	}
 }
+

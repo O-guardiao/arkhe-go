@@ -10,9 +10,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/sipeed/picoclaw/pkg/bus"
-	"github.com/sipeed/picoclaw/pkg/config"
-	"github.com/sipeed/picoclaw/pkg/media"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/bus"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/media"
 )
 
 func TestDispatchIncoming_UsesActualChatIDAndStoresReqIDRoute(t *testing.T) {
@@ -658,3 +658,4 @@ func wecomTestAck(body any) wecomEnvelope {
 		Body:    raw,
 	}
 }
+

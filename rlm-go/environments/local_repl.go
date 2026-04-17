@@ -15,8 +15,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/alexzhang13/rlm-go/protocol"
-	"github.com/alexzhang13/rlm-go/types"
+	"github.com/O-guardiao/arkhe-go/rlm-go/protocol"
+	"github.com/O-guardiao/arkhe-go/rlm-go/types"
 	"github.com/traefik/yaegi/interp"
 	"github.com/traefik/yaegi/stdlib"
 )

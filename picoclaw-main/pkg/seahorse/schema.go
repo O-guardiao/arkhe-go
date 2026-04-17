@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/sipeed/picoclaw/pkg/logger"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/logger"
 )
 
 // SQL statements for FTS5 tables with trigram tokenizer.
@@ -183,3 +183,4 @@ func checkFTS5Support(db *sql.DB) error {
 
 	return nil
 }
+

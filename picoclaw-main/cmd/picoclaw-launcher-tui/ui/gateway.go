@@ -16,8 +16,8 @@ import (
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
 
-	"github.com/sipeed/picoclaw/pkg/config"
-	ppid "github.com/sipeed/picoclaw/pkg/pid"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
+	ppid "github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/pid"
 )
 
 type gatewayStatus struct {
@@ -227,3 +227,4 @@ func (a *App) newGatewayPage() tview.Primitive {
 
 	return a.buildShell("gateway", flex, " [#39ff14]Enter:[-] select  [#ff2a2a]ESC:[-] back ")
 }
+

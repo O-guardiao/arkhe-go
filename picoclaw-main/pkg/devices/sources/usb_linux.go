@@ -10,8 +10,8 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/sipeed/picoclaw/pkg/devices/events"
-	"github.com/sipeed/picoclaw/pkg/logger"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/devices/events"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/logger"
 )
 
 var usbClassToCapability = map[string]string{
@@ -195,3 +195,4 @@ func parseUSBEvent(action string, props map[string]string) *events.DeviceEvent {
 
 	return ev
 }
+

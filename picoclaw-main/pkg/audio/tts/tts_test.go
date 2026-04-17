@@ -10,8 +10,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/sipeed/picoclaw/pkg/config"
-	"github.com/sipeed/picoclaw/pkg/media"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/media"
 )
 
 func TestNewOpenAITTSProvider_APIBaseNormalization(t *testing.T) {
@@ -245,3 +245,4 @@ func TestSynthesizeAndStore_UsesMp3MetadataForMimo(t *testing.T) {
 		t.Fatalf("filename extension = %q, want %q", filepath.Ext(meta.Filename), ".mp3")
 	}
 }
+

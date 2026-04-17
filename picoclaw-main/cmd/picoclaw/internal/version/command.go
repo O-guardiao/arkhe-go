@@ -3,9 +3,9 @@ package version
 import (
 	"github.com/spf13/cobra"
 
-	"github.com/sipeed/picoclaw/cmd/picoclaw/internal"
-	"github.com/sipeed/picoclaw/cmd/picoclaw/internal/cliui"
-	"github.com/sipeed/picoclaw/pkg/config"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/cmd/picoclaw/internal"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/cmd/picoclaw/internal/cliui"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
 )
 
 func NewVersionCommand() *cobra.Command {
@@ -25,3 +25,4 @@ func printVersion() {
 	build, goVer := config.FormatBuildInfo()
 	cliui.PrintVersion(internal.Logo, "picoclaw "+config.FormatVersion(), build, goVer)
 }
+

@@ -162,19 +162,19 @@ pkg/identity/
 package channels
 
 import (
-    "github.com/sipeed/picoclaw/pkg/bus"
-    "github.com/sipeed/picoclaw/pkg/config"
+    "github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/bus"
+    "github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
 )
 
 // 新代码（重构分支）
 package telegram
 
 import (
-    "github.com/sipeed/picoclaw/pkg/bus"
-    "github.com/sipeed/picoclaw/pkg/channels"     // 引用父包
-    "github.com/sipeed/picoclaw/pkg/config"
-    "github.com/sipeed/picoclaw/pkg/identity"      // 新增
-    "github.com/sipeed/picoclaw/pkg/media"          // 新增（如需媒体）
+    "github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/bus"
+    "github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/channels"     // 引用父包
+    "github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
+    "github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/identity"      // 新增
+    "github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/media"          // 新增（如需媒体）
 )
 ```
 
@@ -321,9 +321,9 @@ c.HandleMessage(ctx, peer, messageID, senderID, chatID, content, mediaRefs, meta
 package telegram
 
 import (
-    "github.com/sipeed/picoclaw/pkg/bus"
-    "github.com/sipeed/picoclaw/pkg/channels"
-    "github.com/sipeed/picoclaw/pkg/config"
+    "github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/bus"
+    "github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/channels"
+    "github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
 )
 
 func init() {
@@ -338,9 +338,9 @@ func init() {
 ```go
 // cmd/picoclaw/internal/gateway/helpers.go
 import (
-    _ "github.com/sipeed/picoclaw/pkg/channels/telegram"   // 触发 init() 注册
-    _ "github.com/sipeed/picoclaw/pkg/channels/discord"
-    _ "github.com/sipeed/picoclaw/pkg/channels/your_new_channel"  // 新增
+    _ "github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/channels/telegram"   // 触发 init() 注册
+    _ "github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/channels/discord"
+    _ "github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/channels/your_new_channel"  // 新增
 )
 ```
 
@@ -421,9 +421,9 @@ Agent Loop 的主要变化：
 package matrix
 
 import (
-    "github.com/sipeed/picoclaw/pkg/bus"
-    "github.com/sipeed/picoclaw/pkg/channels"
-    "github.com/sipeed/picoclaw/pkg/config"
+    "github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/bus"
+    "github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/channels"
+    "github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
 )
 
 func init() {
@@ -442,11 +442,11 @@ import (
     "context"
     "fmt"
 
-    "github.com/sipeed/picoclaw/pkg/bus"
-    "github.com/sipeed/picoclaw/pkg/channels"
-    "github.com/sipeed/picoclaw/pkg/config"
-    "github.com/sipeed/picoclaw/pkg/identity"
-    "github.com/sipeed/picoclaw/pkg/logger"
+    "github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/bus"
+    "github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/channels"
+    "github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
+    "github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/identity"
+    "github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/logger"
 )
 
 // MatrixChannel implements channels.Channel for the Matrix protocol.
@@ -814,7 +814,7 @@ if m.config.Channels.Matrix.Enabled && m.config.Channels.Matrix.Token != "" {
 ```go
 // cmd/picoclaw/internal/gateway/helpers.go
 import (
-    _ "github.com/sipeed/picoclaw/pkg/channels/matrix"
+    _ "github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/channels/matrix"
 )
 ```
 
@@ -1383,3 +1383,4 @@ agentLoop.Stop()               // 停止 Agent
 7. **PlaceholderConfig 的配置与实现**：`PlaceholderConfig` 出现在 6 个 channel config 中（Telegram、Discord、Slack、LINE、OneBot、Pico），但只有实现了 `PlaceholderCapable` + `MessageEditor` 的 channel（Telegram、Discord、Pico）能真正使用占位消息编辑功能。其余 channel 的 `PlaceholderConfig` 为预留字段。
 
 8. **ReasoningChannelID**：大多数 channel config 都包含 `reasoning_channel_id` 字段，用于将 LLM 的思维链（reasoning/thinking）路由到指定 channel（WhatsApp、Telegram、Feishu、Discord、MaixCam、QQ、DingTalk、Slack、LINE、OneBot、WeCom）。注意：`PicoConfig` 目前不包含该字段。`BaseChannel` 通过 `WithReasoningChannelID` 选项和 `ReasoningChannelID()` 方法暴露此配置。
+

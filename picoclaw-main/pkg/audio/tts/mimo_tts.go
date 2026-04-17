@@ -12,7 +12,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/sipeed/picoclaw/pkg/logger"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/logger"
 )
 
 type MimoTTSProvider struct {
@@ -160,3 +160,4 @@ func (t *MimoTTSProvider) Synthesize(ctx context.Context, text string) (io.ReadC
 
 	return io.NopCloser(bytes.NewReader(audioBytes)), nil
 }
+

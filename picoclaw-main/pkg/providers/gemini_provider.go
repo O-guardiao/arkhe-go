@@ -11,7 +11,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/sipeed/picoclaw/pkg/providers/common"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/providers/common"
 )
 
 const (
@@ -794,3 +794,4 @@ type geminiFunctionDeclaration struct {
 	Description string `json:"description,omitempty"`
 	Parameters  any    `json:"parameters,omitempty"`
 }
+

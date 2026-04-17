@@ -3,7 +3,7 @@ package asr
 import (
 	"testing"
 
-	"github.com/sipeed/picoclaw/pkg/config"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
 )
 
 func TestDetectTranscriber(t *testing.T) {
@@ -226,3 +226,4 @@ func TestDetectTranscriber(t *testing.T) {
 		})
 	}
 }
+

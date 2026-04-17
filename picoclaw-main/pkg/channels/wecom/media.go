@@ -20,8 +20,8 @@ import (
 
 	"github.com/h2non/filetype"
 
-	"github.com/sipeed/picoclaw/pkg/bus"
-	"github.com/sipeed/picoclaw/pkg/media"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/bus"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/media"
 )
 
 const (
@@ -800,3 +800,4 @@ func (c *WeComChannel) resolveMediaRoute(chatID string) (wecomTurn, uint32, bool
 	}
 	return wecomTurn{ChatID: chatID}, 0, false
 }
+

@@ -3,8 +3,8 @@ package slack
 import (
 	"testing"
 
-	"github.com/sipeed/picoclaw/pkg/bus"
-	"github.com/sipeed/picoclaw/pkg/config"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/bus"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
 )
 
 func TestParseSlackChatID(t *testing.T) {
@@ -168,3 +168,4 @@ func TestSlackChannelIsAllowed(t *testing.T) {
 		}
 	})
 }
+

@@ -15,8 +15,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/sipeed/picoclaw/cmd/picoclaw/internal"
-	"github.com/sipeed/picoclaw/pkg/config"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/cmd/picoclaw/internal"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
 )
 
 func TestNewWeComCommand(t *testing.T) {
@@ -155,3 +155,4 @@ func TestAuthWeComCmdWithScanner(t *testing.T) {
 	assert.Equal(t, wecomDefaultWebSocketURL, cfg.Channels.WeCom.WebSocketURL)
 	assert.Contains(t, output.String(), "WeCom connected.")
 }
+

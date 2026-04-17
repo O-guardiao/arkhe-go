@@ -1,3 +1,5 @@
+//go:build goolm
+
 package matrix
 
 import (
@@ -14,8 +16,8 @@ import (
 	"maunium.net/go/mautrix/event"
 	"maunium.net/go/mautrix/id"
 
-	"github.com/sipeed/picoclaw/pkg/config"
-	"github.com/sipeed/picoclaw/pkg/media"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/media"
 )
 
 func TestMatrixLocalpartMentionRegexp(t *testing.T) {

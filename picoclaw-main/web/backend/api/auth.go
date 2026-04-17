@@ -9,7 +9,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/sipeed/picoclaw/web/backend/middleware"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/web/backend/middleware"
 )
 
 // PasswordStore is the interface for bcrypt-backed dashboard password persistence.
@@ -300,3 +300,4 @@ func writeErrorf(w http.ResponseWriter, format string, args ...any) {
 	msg, _ := json.Marshal(fmt.Sprintf(format, args...))
 	_, _ = w.Write([]byte(`{"error":` + string(msg) + `}`))
 }
+

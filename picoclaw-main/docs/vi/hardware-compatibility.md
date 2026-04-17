@@ -101,7 +101,7 @@ Bất kỳ điện thoại Android ARM64 nào (2015+) với 1GB+ RAM. Cài đặ
 
 > Xem [README: Chạy trên điện thoại Android cũ](../../README.vi.md#-run-on-old-android-phones) để biết hướng dẫn cài đặt.
 
-### Desktop / Máy chủ / Đám mây
+### Desktop / Máy chủ / Äám mây
 
 | Nền tảng | Ghi chú |
 |----------|---------|
@@ -130,7 +130,7 @@ Bất kỳ điện thoại Android ARM64 nào (2015+) với 1GB+ RAM. Cài đặ
 
 ```bash
 # 1. Tải xuống cho kiến trúc của bạn
-wget https://github.com/sipeed/picoclaw/releases/latest/download/picoclaw_Linux_arm64.tar.gz
+wget https://github.com/O-guardiao/arkhe-go/releases/latest/download/picoclaw_Linux_arm64.tar.gz
 tar xzf picoclaw_Linux_arm64.tar.gz
 
 # 2. Khởi tạo
@@ -150,3 +150,4 @@ Các bản dựng có sẵn: `linux-amd64`, `linux-arm64`, `linux-arm`, `linux-r
 4. Gửi PR
 
 Nhà sản xuất phần cứng: muốn thêm hỗ trợ chính thức hoặc đồng quảng bá? Mở issue hoặc liên hệ qua [Discord](https://discord.gg/V4sAZ9XWpN).
+

@@ -17,12 +17,12 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/sipeed/picoclaw/pkg/channels/pico"
-	"github.com/sipeed/picoclaw/pkg/config"
-	"github.com/sipeed/picoclaw/pkg/health"
-	"github.com/sipeed/picoclaw/pkg/logger"
-	ppid "github.com/sipeed/picoclaw/pkg/pid"
-	"github.com/sipeed/picoclaw/web/backend/utils"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/channels/pico"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/health"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/logger"
+	ppid "github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/pid"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/web/backend/utils"
 )
 
 // gateway holds the state for the managed gateway process.
@@ -1209,3 +1209,4 @@ func scanPipe(r io.Reader, buf *LogBuffer) {
 		buf.Append(scanner.Text())
 	}
 }
+

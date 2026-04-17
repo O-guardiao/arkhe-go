@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/sipeed/picoclaw/pkg/logger"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/logger"
 )
 
 // DownloadToFile streams an HTTP response body to a temporary file in small
@@ -91,3 +91,4 @@ func DownloadToFile(ctx context.Context, client *http.Client, req *http.Request,
 
 	return tmpPath, nil
 }
+

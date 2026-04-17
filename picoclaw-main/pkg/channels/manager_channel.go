@@ -5,8 +5,8 @@ import (
 	"encoding/hex"
 	"encoding/json"
 
-	"github.com/sipeed/picoclaw/pkg/config"
-	"github.com/sipeed/picoclaw/pkg/logger"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/logger"
 )
 
 func toChannelHashes(cfg *config.Config) map[string]string {
@@ -183,3 +183,4 @@ func updateKeys(newcfg, old *config.ChannelsConfig) {
 		}
 	}
 }
+

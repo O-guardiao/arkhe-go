@@ -3,7 +3,7 @@ package identity
 import (
 	"testing"
 
-	"github.com/sipeed/picoclaw/pkg/bus"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/bus"
 )
 
 func TestBuildCanonicalID(t *testing.T) {
@@ -259,3 +259,4 @@ func TestIsNumeric(t *testing.T) {
 		}
 	}
 }
+

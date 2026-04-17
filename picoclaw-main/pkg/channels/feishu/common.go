@@ -7,7 +7,7 @@ import (
 
 	larkim "github.com/larksuite/oapi-sdk-go/v3/service/im/v1"
 
-	"github.com/sipeed/picoclaw/pkg/channels"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/channels"
 )
 
 // mentionPlaceholderRegex matches @_user_N placeholders inserted by Feishu for mentions.
@@ -152,3 +152,4 @@ func extractImageKeysRecursive(v any, feishuKeys, externalURLs *[]string) {
 func (c *FeishuChannel) VoiceCapabilities() channels.VoiceCapabilities {
 	return channels.VoiceCapabilities{ASR: true, TTS: true}
 }
+

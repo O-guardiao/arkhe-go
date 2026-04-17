@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/sipeed/picoclaw/pkg/providers/protocoltypes"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/providers/protocoltypes"
 )
 
 // --- NewHTTPClient tests ---
@@ -626,3 +626,4 @@ func TestParseResponse_WithThoughtSignature(t *testing.T) {
 			out.ToolCalls[0].ExtraContent.Google.ThoughtSignature, "sig123")
 	}
 }
+

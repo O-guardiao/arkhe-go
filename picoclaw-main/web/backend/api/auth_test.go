@@ -9,7 +9,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/sipeed/picoclaw/web/backend/middleware"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/web/backend/middleware"
 )
 
 func TestLauncherAuthLoginAndStatus(t *testing.T) {
@@ -264,3 +264,4 @@ func TestLauncherAuthLogoutRejectsTrailingJSON(t *testing.T) {
 		t.Fatalf("want 400 got %d %s", rec.Code, rec.Body.String())
 	}
 }
+

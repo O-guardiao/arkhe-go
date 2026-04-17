@@ -12,7 +12,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/alexzhang13/rlm-go/types"
+	"github.com/O-guardiao/arkhe-go/rlm-go/types"
 )
 
 const DefaultTimeout = 300 * time.Second

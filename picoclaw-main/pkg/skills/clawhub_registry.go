@@ -10,7 +10,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/sipeed/picoclaw/pkg/utils"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/utils"
 )
 
 const (
@@ -360,3 +360,4 @@ func (c *ClawHubRegistry) downloadToTempFileWithRetry(ctx context.Context, urlSt
 
 	return tmpPath, nil
 }
+

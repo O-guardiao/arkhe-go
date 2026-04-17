@@ -10,7 +10,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/sipeed/picoclaw/pkg/config"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
 )
 
 func TestSaveWeixinBindingReturnsSuccessWhenRestartFails(t *testing.T) {
@@ -54,3 +54,4 @@ func TestSaveWeixinBindingReturnsSuccessWhenRestartFails(t *testing.T) {
 		t.Fatalf("Weixin.Enabled = false, want true")
 	}
 }
+

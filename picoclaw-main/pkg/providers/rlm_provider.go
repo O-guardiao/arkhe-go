@@ -12,9 +12,9 @@ import (
 	"sync/atomic"
 	"time"
 
-	rlm "github.com/alexzhang13/rlm-go"
+	rlm "github.com/O-guardiao/arkhe-go/rlm-go"
 
-	"github.com/sipeed/picoclaw/pkg/config"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
 )
 
 const (
@@ -365,6 +365,7 @@ func (p *RLMProvider) buildEngineConfig(
 	engineCfg := rlm.Config{
 		Backend:                backend,
 		BackendKwargs:          backendKwargs,
+		ClientFactory:          newRLMEmbeddedClient,
 		Environment:            "local",
 		EnvironmentKwargs:      environmentKwargs,
 		MaxDepth:               resolveNestedInt(p.modelCfg.ExtraBody, []string{"rlm", "max_depth"}, 2),
@@ -436,12 +437,154 @@ func completionToResponse(completion rlm.RLMChatCompletion, resolvedModel string
 		usage = nil
 	}
 
-	return &LLMResponse{
+	resp := &LLMResponse{
 		Content:      completion.Response,
 		FinishReason: "stop",
 		Usage:        usage,
 		Reasoning:    fmt.Sprintf("rlm local runtime completed with backend %s", resolvedModel),
 	}
+
+	// Propagate RLM trajectory as ReasoningDetails so the agent loop
+	// (and hooks like memory_extractor) can observe what the RLM engine
+	// actually did: iterations, code executed, sub-calls, etc.
+	resp.ReasoningDetails = extractRLMTrajectory(completion.Metadata)
+
+	return resp
+}
+
+// extractRLMTrajectory converts the RLM engine's Metadata (iterations, code
+// blocks, sub-calls) into compact ReasoningDetail entries. Only concise
+// summaries are kept — full prompts are omitted to save tokens.
+func extractRLMTrajectory(metadata map[string]any) []ReasoningDetail {
+	if len(metadata) == 0 {
+		return nil
+	}
+
+	var details []ReasoningDetail
+
+	// Extract run_metadata summary.
+	if rm, ok := metadata["run_metadata"]; ok {
+		if rmMap, ok := rm.(map[string]any); ok {
+			summary := formatRLMRunMetadata(rmMap)
+			if summary != "" {
+				details = append(details, ReasoningDetail{
+					Type:   "rlm_run_metadata",
+					Format: "text",
+					Text:   summary,
+				})
+			}
+		}
+	}
+
+	// Extract iterations.
+	itersRaw, ok := metadata["iterations"]
+	if !ok {
+		return details
+	}
+
+	iters, ok := itersRaw.([]any)
+	if !ok {
+		return details
+	}
+
+	for i, iterRaw := range iters {
+		iterMap, ok := iterRaw.(map[string]any)
+		if !ok {
+			continue
+		}
+		summary := formatRLMIteration(i+1, iterMap)
+		if summary == "" {
+			continue
+		}
+		details = append(details, ReasoningDetail{
+			Type:   "rlm_iteration",
+			Format: "text",
+			Index:  i,
+			Text:   summary,
+		})
+	}
+
+	return details
+}
+
+// formatRLMRunMetadata summarizes the run_metadata block.
+func formatRLMRunMetadata(rm map[string]any) string {
+	var parts []string
+	if model, ok := rm["root_model"].(string); ok && model != "" {
+		parts = append(parts, "model="+model)
+	}
+	if maxIter, ok := rm["max_iterations"]; ok {
+		parts = append(parts, fmt.Sprintf("max_iterations=%v", maxIter))
+	}
+	if maxDepth, ok := rm["max_depth"]; ok {
+		parts = append(parts, fmt.Sprintf("max_depth=%v", maxDepth))
+	}
+	if backend, ok := rm["backend"].(string); ok && backend != "" {
+		parts = append(parts, "backend="+backend)
+	}
+	if len(parts) == 0 {
+		return ""
+	}
+	return "RLM run: " + strings.Join(parts, ", ")
+}
+
+// formatRLMIteration produces a concise summary of a single RLM iteration.
+func formatRLMIteration(num int, iter map[string]any) string {
+	var sb strings.Builder
+	fmt.Fprintf(&sb, "Iteration %d", num)
+
+	// Summarize code blocks.
+	if codeBlocks, ok := iter["code_blocks"].([]any); ok && len(codeBlocks) > 0 {
+		fmt.Fprintf(&sb, " [%d code block(s)", len(codeBlocks))
+		for _, cbRaw := range codeBlocks {
+			cb, ok := cbRaw.(map[string]any)
+			if !ok {
+				continue
+			}
+			code, _ := cb["code"].(string)
+			if len(code) > 200 {
+				code = code[:200] + "..."
+			}
+			if code != "" {
+				fmt.Fprintf(&sb, ": %s", strings.ReplaceAll(code, "\n", "; "))
+			}
+			// Summarize result.
+			if result, ok := cb["result"].(map[string]any); ok {
+				if stdout, ok := result["stdout"].(string); ok && stdout != "" {
+					if len(stdout) > 100 {
+						stdout = stdout[:100] + "..."
+					}
+					fmt.Fprintf(&sb, " → stdout: %s", strings.TrimSpace(stdout))
+				}
+				if stderr, ok := result["stderr"].(string); ok && stderr != "" {
+					if len(stderr) > 100 {
+						stderr = stderr[:100] + "..."
+					}
+					fmt.Fprintf(&sb, " → stderr: %s", strings.TrimSpace(stderr))
+				}
+				// Count RLM sub-calls.
+				if rlmCalls, ok := result["rlm_calls"].([]any); ok && len(rlmCalls) > 0 {
+					fmt.Fprintf(&sb, " [%d sub-call(s)]", len(rlmCalls))
+				}
+			}
+		}
+		sb.WriteString("]")
+	}
+
+	// Final answer?
+	if fa, ok := iter["final_answer"].(string); ok && fa != "" {
+		if len(fa) > 150 {
+			fa = fa[:150] + "..."
+		}
+		fmt.Fprintf(&sb, " → answer: %s", fa)
+	}
+
+	// Iteration time.
+	if t, ok := iter["iteration_time"].(float64); ok && t > 0 {
+		fmt.Fprintf(&sb, " (%.1fs)", t)
+	}
+
+	return sb.String()
 }
 
 func (p *RLMProvider) shouldPersistSession(options map[string]any) bool {

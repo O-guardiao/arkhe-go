@@ -24,13 +24,13 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/sipeed/picoclaw/pkg/config"
-	"github.com/sipeed/picoclaw/pkg/logger"
-	"github.com/sipeed/picoclaw/web/backend/api"
-	"github.com/sipeed/picoclaw/web/backend/dashboardauth"
-	"github.com/sipeed/picoclaw/web/backend/launcherconfig"
-	"github.com/sipeed/picoclaw/web/backend/middleware"
-	"github.com/sipeed/picoclaw/web/backend/utils"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/logger"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/web/backend/api"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/web/backend/dashboardauth"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/web/backend/launcherconfig"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/web/backend/middleware"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/web/backend/utils"
 )
 
 const (
@@ -392,3 +392,4 @@ func main() {
 		runTray()
 	}
 }
+

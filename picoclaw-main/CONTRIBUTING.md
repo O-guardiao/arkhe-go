@@ -42,12 +42,12 @@ For substantial new features, please open an issue first to discuss the design b
 1. **Fork** the repository on GitHub.
 2. **Clone** your fork locally:
    ```bash
-   git clone https://github.com/<your-username>/picoclaw.git
-   cd picoclaw
+   git clone https://github.com/<your-username>/arkhe-go.git
+   cd arkhe-go/picoclaw-main
    ```
 3. Add the upstream remote:
    ```bash
-   git remote add upstream https://github.com/sipeed/picoclaw.git
+   git remote add upstream https://github.com/O-guardiao/arkhe-go.git
    ```
 
 ---
@@ -300,3 +300,4 @@ PicoClaw's architecture was substantially designed and implemented with AI assis
 We believe AI-assisted development done responsibly produces great results. We also believe humans must remain accountable for what they ship. These two beliefs are not in conflict.
 
 Thank you for contributing!
+

@@ -17,10 +17,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/sipeed/picoclaw/pkg/config"
-	"github.com/sipeed/picoclaw/pkg/fileutil"
-	"github.com/sipeed/picoclaw/pkg/skills"
-	"github.com/sipeed/picoclaw/pkg/utils"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/fileutil"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/skills"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/utils"
 )
 
 type skillSupportResponse struct {
@@ -1101,3 +1101,4 @@ func builtinSkillsDir() string {
 	}
 	return filepath.Join(wd, "skills")
 }
+

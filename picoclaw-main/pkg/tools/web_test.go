@@ -12,7 +12,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/sipeed/picoclaw/pkg/logger"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/logger"
 )
 
 const (
@@ -1667,3 +1667,4 @@ func TestWebTool_GLMSearch_Priority(t *testing.T) {
 		t.Errorf("Expected GLMSearchProvider when only GLM enabled, got %T", tool2.provider)
 	}
 }
+

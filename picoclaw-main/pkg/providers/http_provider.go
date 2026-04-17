@@ -10,7 +10,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/sipeed/picoclaw/pkg/providers/openai_compat"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/providers/openai_compat"
 )
 
 type HTTPProvider struct {
@@ -77,3 +77,4 @@ func (p *HTTPProvider) GetDefaultModel() string {
 func (p *HTTPProvider) SupportsNativeSearch() bool {
 	return p.delegate.SupportsNativeSearch()
 }
+

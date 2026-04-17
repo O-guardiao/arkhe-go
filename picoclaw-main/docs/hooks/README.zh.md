@@ -195,8 +195,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/sipeed/picoclaw/pkg/agent"
-	"github.com/sipeed/picoclaw/pkg/logger"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/agent"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/logger"
 )
 
 type ExampleLoggerHookOptions struct {
@@ -362,8 +362,8 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/sipeed/picoclaw/pkg/agent"
-	"github.com/sipeed/picoclaw/pkg/config"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/agent"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
 )
 
 func init() {
@@ -740,3 +740,4 @@ if __name__ == "__main__":
 - inbound/outbound 全链路消息拦截
 
 如果你要做人审流转，推荐把 hook 作为审批入口，把审批状态机和 channel 交互放到独立的 `ApprovalManager`。
+

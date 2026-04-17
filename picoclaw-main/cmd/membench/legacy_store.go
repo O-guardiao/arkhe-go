@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/sipeed/picoclaw/pkg/providers"
-	"github.com/sipeed/picoclaw/pkg/session"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/providers"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/session"
 )
 
 // LegacyStore wraps session.SessionManager for legacy baseline.
@@ -32,3 +32,4 @@ func (ls *LegacyStore) GetHistory(sampleID string) []providers.Message {
 	sessionKey := "locomo-" + sampleID
 	return ls.sm.GetHistory(sessionKey)
 }
+

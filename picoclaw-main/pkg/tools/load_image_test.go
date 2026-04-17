@@ -7,9 +7,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/sipeed/picoclaw/pkg/config"
-	"github.com/sipeed/picoclaw/pkg/media"
-	"github.com/sipeed/picoclaw/pkg/providers"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/media"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/providers"
 )
 
 func TestLoadImage_PathRequired(t *testing.T) {
@@ -172,3 +172,4 @@ func TestLoadImage_SuccessPath(t *testing.T) {
 		t.Errorf("expected resolved path %q, got %q", imgPath, resolved)
 	}
 }
+

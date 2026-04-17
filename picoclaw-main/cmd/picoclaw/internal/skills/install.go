@@ -5,8 +5,8 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/sipeed/picoclaw/cmd/picoclaw/internal"
-	"github.com/sipeed/picoclaw/pkg/skills"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/cmd/picoclaw/internal"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/skills"
 )
 
 func newInstallCommand(installerFn func() (*skills.SkillInstaller, error)) *cobra.Command {
@@ -56,3 +56,4 @@ picoclaw skills install --registry clawhub github
 
 	return cmd
 }
+

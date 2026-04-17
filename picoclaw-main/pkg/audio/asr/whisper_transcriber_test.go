@@ -8,7 +8,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/sipeed/picoclaw/pkg/config"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
 )
 
 func TestWhisperTranscriberTranscribeDataUsesConfiguredModel(t *testing.T) {
@@ -100,3 +100,4 @@ func TestWhisperTranscriberUsesEndpointAPIBaseWithoutDoubleAppend(t *testing.T) 
 		t.Errorf("path = %q, want %q", gotPath, "/audio/transcriptions")
 	}
 }
+

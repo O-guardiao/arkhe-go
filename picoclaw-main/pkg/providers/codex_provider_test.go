@@ -11,7 +11,7 @@ import (
 	openaiopt "github.com/openai/openai-go/v3/option"
 	"github.com/openai/openai-go/v3/responses"
 
-	orc "github.com/sipeed/picoclaw/pkg/providers/openai_responses_common"
+	orc "github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/providers/openai_responses_common"
 )
 
 func TestBuildCodexParams_BasicMessage(t *testing.T) {
@@ -647,3 +647,4 @@ func writeCompletedSSE(w http.ResponseWriter, response map[string]any) {
 	fmt.Fprintf(w, "data: %s\n\n", string(b))
 	fmt.Fprintf(w, "data: [DONE]\n\n")
 }
+

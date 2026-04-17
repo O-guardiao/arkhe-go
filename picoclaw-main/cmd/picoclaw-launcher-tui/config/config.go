@@ -15,7 +15,7 @@ import (
 
 	"github.com/BurntSushi/toml"
 
-	"github.com/sipeed/picoclaw/pkg/fileutil"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/fileutil"
 )
 
 // DefaultConfigPath returns the default path to the tui.toml config file.
@@ -234,3 +234,4 @@ func (cfg *TUIConfig) CurrentModelLabel() string {
 	}
 	return label + cur.Model
 }
+

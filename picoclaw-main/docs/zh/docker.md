@@ -8,8 +8,8 @@
 
 ```bash
 # 1. 克隆仓库
-git clone https://github.com/sipeed/picoclaw.git
-cd picoclaw
+git clone https://github.com/O-guardiao/arkhe-go.git
+cd arkhe-go/picoclaw-main
 
 # 2. 首次运行 — 自动生成 docker/data/config.json 后退出
 #    （仅在 config.json 和 workspace/ 都不存在时触发）
@@ -167,3 +167,4 @@ picoclaw agent -m "2+2 等于几？"
 就是这样！您在 2 分钟内就拥有了一个可工作的 AI 助手。
 
 ---
+

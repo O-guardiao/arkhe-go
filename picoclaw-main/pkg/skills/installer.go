@@ -12,7 +12,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/sipeed/picoclaw/pkg/utils"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/utils"
 )
 
 // GitHubContent represents a file or directory in GitHub API response
@@ -289,3 +289,4 @@ func (si *SkillInstaller) Uninstall(skillName string) error {
 
 	return nil
 }
+

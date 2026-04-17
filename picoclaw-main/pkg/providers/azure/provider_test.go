@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/sipeed/picoclaw/pkg/providers/protocoltypes"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/providers/protocoltypes"
 )
 
 // writeValidResponse writes a minimal valid Responses API response.
@@ -415,3 +415,4 @@ func TestProviderChat_AzureNoNativeWebSearch(t *testing.T) {
 		t.Errorf("tool type = %v, want %q", tool["type"], "function")
 	}
 }
+

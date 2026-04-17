@@ -7,8 +7,8 @@ import (
 	"runtime"
 	"testing"
 
-	"github.com/sipeed/picoclaw/pkg"
-	"github.com/sipeed/picoclaw/pkg/config"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
 )
 
 func TestResolveInstanceRoot_UsesPicoclawHome(t *testing.T) {
@@ -246,3 +246,4 @@ func TestPrepareCommand_AppliesUserEnv(t *testing.T) {
 		t.Fatal("PrepareCommand() did not inject HOME")
 	}
 }
+

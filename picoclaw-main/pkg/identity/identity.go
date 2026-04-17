@@ -6,7 +6,7 @@ package identity
 import (
 	"strings"
 
-	"github.com/sipeed/picoclaw/pkg/bus"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/bus"
 )
 
 // BuildCanonicalID constructs a canonical "platform:id" identifier.
@@ -111,3 +111,4 @@ func isNumeric(s string) bool {
 	}
 	return true
 }
+

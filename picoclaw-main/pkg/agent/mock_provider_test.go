@@ -3,7 +3,7 @@ package agent
 import (
 	"context"
 
-	"github.com/sipeed/picoclaw/pkg/providers"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/providers"
 )
 
 type mockProvider struct{}
@@ -24,3 +24,4 @@ func (m *mockProvider) Chat(
 func (m *mockProvider) GetDefaultModel() string {
 	return "mock-model"
 }
+

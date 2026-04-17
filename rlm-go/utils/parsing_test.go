@@ -3,9 +3,9 @@ package utils_test
 import (
 	"testing"
 
-	"github.com/alexzhang13/rlm-go/environments"
-	"github.com/alexzhang13/rlm-go/types"
-	"github.com/alexzhang13/rlm-go/utils"
+	"github.com/O-guardiao/arkhe-go/rlm-go/environments"
+	"github.com/O-guardiao/arkhe-go/rlm-go/types"
+	"github.com/O-guardiao/arkhe-go/rlm-go/utils"
 )
 
 func TestFindCodeBlocks(t *testing.T) {

@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/sipeed/picoclaw/pkg/tools"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/tools"
 )
 
 func TestExecuteHeartbeat_Async(t *testing.T) {
@@ -248,3 +248,4 @@ func TestBuildPrompt_UserTasksAfterMarkerProducePrompt(t *testing.T) {
 		t.Fatalf("prompt = %q, want user task content", prompt)
 	}
 }
+

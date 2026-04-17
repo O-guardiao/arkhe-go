@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/sipeed/picoclaw/pkg/config"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
 )
 
 var configPath = ""
@@ -406,3 +406,4 @@ func TestListAvailableModels_MarkerLogic(t *testing.T) {
 	assert.Contains(t, output, "> - middle-model (openai/middle)")
 	assert.Contains(t, output, "  - last-model (openai/last)")
 }
+

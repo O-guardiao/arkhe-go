@@ -3,7 +3,7 @@ package skills
 import (
 	"github.com/spf13/cobra"
 
-	"github.com/sipeed/picoclaw/pkg/skills"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/skills"
 )
 
 func newListCommand(loaderFn func() (*skills.SkillsLoader, error)) *cobra.Command {
@@ -23,3 +23,4 @@ func newListCommand(loaderFn func() (*skills.SkillsLoader, error)) *cobra.Comman
 
 	return cmd
 }
+

@@ -7,8 +7,8 @@ import (
 
 	goteamsnotify "github.com/atc0005/go-teams-notify/v2"
 
-	"github.com/sipeed/picoclaw/pkg/bus"
-	"github.com/sipeed/picoclaw/pkg/config"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/bus"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
 )
 
 // mockTeamsClient implements teamsMessageSender for testing.
@@ -581,3 +581,4 @@ func TestIsSeparatorRow(t *testing.T) {
 		}
 	}
 }
+

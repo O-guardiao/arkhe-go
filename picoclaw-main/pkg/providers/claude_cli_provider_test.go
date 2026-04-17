@@ -10,7 +10,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/sipeed/picoclaw/pkg/config"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
 )
 
 // --- Compile-time interface check ---
@@ -984,3 +984,4 @@ func TestFindMatchingBrace(t *testing.T) {
 		}
 	}
 }
+

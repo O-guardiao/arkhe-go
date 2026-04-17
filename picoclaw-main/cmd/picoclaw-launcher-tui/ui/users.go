@@ -11,7 +11,7 @@ import (
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
 
-	tuicfg "github.com/sipeed/picoclaw/cmd/picoclaw-launcher-tui/config"
+	tuicfg "github.com/O-guardiao/arkhe-go/picoclaw-main/cmd/picoclaw-launcher-tui/config"
 )
 
 func (a *App) newUsersPage(schemeName string) tview.Primitive {
@@ -259,3 +259,4 @@ func (a *App) showUserForm(schemeName string, existing *tuicfg.User, onSave func
 
 	a.showModal("user-form", centeredForm(form, 4, 13))
 }
+

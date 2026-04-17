@@ -8,8 +8,8 @@ Você também pode executar o PicoClaw usando Docker Compose sem instalar nada l
 
 ```bash
 # 1. Clone este repositório
-git clone https://github.com/sipeed/picoclaw.git
-cd picoclaw
+git clone https://github.com/O-guardiao/arkhe-go.git
+cd arkhe-go/picoclaw-main
 
 # 2. Primeira execução — gera automaticamente docker/data/config.json e encerra
 #    (só é acionado quando config.json e workspace/ estão ambos ausentes)
@@ -165,3 +165,4 @@ picoclaw agent -m "What is 2+2?"
 Pronto! Você tem um assistente de IA funcionando em 2 minutos.
 
 ---
+

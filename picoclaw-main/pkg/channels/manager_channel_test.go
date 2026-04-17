@@ -5,8 +5,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/sipeed/picoclaw/pkg/config"
-	"github.com/sipeed/picoclaw/pkg/logger"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/logger"
 )
 
 func TestToChannelHashes(t *testing.T) {
@@ -49,3 +49,4 @@ func TestToChannelHashes(t *testing.T) {
 	assert.Equal(t, "", cc.Telegram.Token.String())
 	assert.Equal(t, false, cc.Telegram.Enabled)
 }
+

@@ -9,7 +9,7 @@ import (
 	"sync/atomic"
 	"testing"
 
-	"github.com/sipeed/picoclaw/pkg/config"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
 )
 
 func TestRLMProviderChatExecutesBoundTools(t *testing.T) {
@@ -166,3 +166,76 @@ func TestRLMProviderChatErrorsWithoutRuntimeBinding(t *testing.T) {
 		t.Fatalf("expected unbound runtime error in response, got %q", response.Content)
 	}
 }
+
+func TestRLMProviderBuildEngineConfigInjectsPicoClawClientFactory(t *testing.T) {
+	var observedModel string
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		var requestBody map[string]any
+		if err := json.NewDecoder(r.Body).Decode(&requestBody); err != nil {
+			t.Fatalf("decode request: %v", err)
+		}
+		observedModel, _ = requestBody["model"].(string)
+		response := map[string]any{
+			"choices": []map[string]any{{
+				"message":       map[string]any{"content": "embedded-response"},
+				"finish_reason": "stop",
+			}},
+			"usage": map[string]any{
+				"prompt_tokens":     13,
+				"completion_tokens": 5,
+				"total_tokens":      18,
+			},
+		}
+		if err := json.NewEncoder(w).Encode(response); err != nil {
+			t.Fatalf("encode response: %v", err)
+		}
+	}))
+	defer server.Close()
+
+	provider, err := NewRLMProvider(&config.ModelConfig{
+		ModelName: "local-rlm",
+		Model:     "rlm/lmstudio/local-model",
+		APIBase:   server.URL,
+	})
+	if err != nil {
+		t.Fatalf("NewRLMProvider() error = %v", err)
+	}
+
+	engineCfg, _, resolvedModel, err := provider.buildEngineConfig(
+		nil,
+		nil,
+		func() ToolCallContext { return ToolCallContext{} },
+		func() context.Context { return context.Background() },
+		"lmstudio/local-model",
+		false,
+	)
+	if err != nil {
+		t.Fatalf("buildEngineConfig() error = %v", err)
+	}
+	if engineCfg.ClientFactory == nil {
+		t.Fatal("expected engine config to inject a ClientFactory")
+	}
+
+	client, err := engineCfg.ClientFactory(engineCfg.Backend, engineCfg.BackendKwargs)
+	if err != nil {
+		t.Fatalf("ClientFactory() error = %v", err)
+	}
+	content, err := client.Completion(context.Background(), "hello from PicoClaw", "")
+	if err != nil {
+		t.Fatalf("Completion() error = %v", err)
+	}
+	if content != "embedded-response" {
+		t.Fatalf("expected embedded-response, got %q", content)
+	}
+	if resolvedModel != "local-model" {
+		t.Fatalf("expected resolvedModel local-model, got %q", resolvedModel)
+	}
+	if observedModel != "local-model" {
+		t.Fatalf("expected observed model local-model, got %q", observedModel)
+	}
+	usage := client.GetLastUsage()
+	if usage.TotalCalls != 1 || usage.TotalInputTokens != 13 || usage.TotalOutputTokens != 5 {
+		t.Fatalf("unexpected usage: %+v", usage)
+	}
+}
+

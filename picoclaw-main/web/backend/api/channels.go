@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/sipeed/picoclaw/pkg/config"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
 )
 
 type channelCatalogItem struct {
@@ -228,3 +228,4 @@ func collectConfiguredSecrets(secrets ...channelSecretPresence) []string {
 	}
 	return configured
 }
+

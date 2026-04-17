@@ -162,19 +162,19 @@ Using Telegram as an example, the main changes are:
 package channels
 
 import (
-    "github.com/sipeed/picoclaw/pkg/bus"
-    "github.com/sipeed/picoclaw/pkg/config"
+    "github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/bus"
+    "github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
 )
 
 // New code (refactored branch)
 package telegram
 
 import (
-    "github.com/sipeed/picoclaw/pkg/bus"
-    "github.com/sipeed/picoclaw/pkg/channels"     // Reference parent package
-    "github.com/sipeed/picoclaw/pkg/config"
-    "github.com/sipeed/picoclaw/pkg/identity"      // New
-    "github.com/sipeed/picoclaw/pkg/media"          // New (if media support needed)
+    "github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/bus"
+    "github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/channels"     // Reference parent package
+    "github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
+    "github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/identity"      // New
+    "github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/media"          // New (if media support needed)
 )
 ```
 
@@ -321,9 +321,9 @@ Create `init.go` for your channel:
 package telegram
 
 import (
-    "github.com/sipeed/picoclaw/pkg/bus"
-    "github.com/sipeed/picoclaw/pkg/channels"
-    "github.com/sipeed/picoclaw/pkg/config"
+    "github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/bus"
+    "github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/channels"
+    "github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
 )
 
 func init() {
@@ -338,9 +338,9 @@ func init() {
 ```go
 // cmd/picoclaw/internal/gateway/helpers.go
 import (
-    _ "github.com/sipeed/picoclaw/pkg/channels/telegram"   // Triggers init() registration
-    _ "github.com/sipeed/picoclaw/pkg/channels/discord"
-    _ "github.com/sipeed/picoclaw/pkg/channels/your_new_channel"  // New addition
+    _ "github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/channels/telegram"   // Triggers init() registration
+    _ "github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/channels/discord"
+    _ "github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/channels/your_new_channel"  // New addition
 )
 ```
 
@@ -421,9 +421,9 @@ To add a new chat platform (e.g., `matrix`), you need to:
 package matrix
 
 import (
-    "github.com/sipeed/picoclaw/pkg/bus"
-    "github.com/sipeed/picoclaw/pkg/channels"
-    "github.com/sipeed/picoclaw/pkg/config"
+    "github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/bus"
+    "github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/channels"
+    "github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
 )
 
 func init() {
@@ -442,11 +442,11 @@ import (
     "context"
     "fmt"
 
-    "github.com/sipeed/picoclaw/pkg/bus"
-    "github.com/sipeed/picoclaw/pkg/channels"
-    "github.com/sipeed/picoclaw/pkg/config"
-    "github.com/sipeed/picoclaw/pkg/identity"
-    "github.com/sipeed/picoclaw/pkg/logger"
+    "github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/bus"
+    "github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/channels"
+    "github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
+    "github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/identity"
+    "github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/logger"
 )
 
 // MatrixChannel implements channels.Channel for the Matrix protocol.
@@ -815,7 +815,7 @@ if m.config.Channels.Matrix.Enabled && m.config.Channels.Matrix.Token != "" {
 ```go
 // cmd/picoclaw/internal/gateway/helpers.go
 import (
-    _ "github.com/sipeed/picoclaw/pkg/channels/matrix"
+    _ "github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/channels/matrix"
 )
 ```
 
@@ -1384,3 +1384,4 @@ agentLoop.Stop()               // Stop Agent
 7. **PlaceholderConfig vs implementation**: `PlaceholderConfig` appears in 6 channel configs (Telegram, Discord, Slack, LINE, OneBot, Pico), but only channels that implement both `PlaceholderCapable` + `MessageEditor` (Telegram, Discord, Pico) can actually use placeholder message editing. The rest are reserved fields.
 
 8. **ReasoningChannelID**: Most channel configs include a `reasoning_channel_id` field to route LLM reasoning/thinking output to a designated channel (WhatsApp, Telegram, Feishu, Discord, MaixCam, QQ, DingTalk, Slack, LINE, OneBot, WeCom). Note: `PicoConfig` does not currently expose this field. `BaseChannel` exposes this via the `WithReasoningChannelID` option and `ReasoningChannelID()` method.
+

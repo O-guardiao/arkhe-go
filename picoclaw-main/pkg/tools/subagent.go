@@ -7,7 +7,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/sipeed/picoclaw/pkg/providers"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/providers"
 )
 
 // SubTurnSpawner is an interface for spawning sub-turns.
@@ -453,3 +453,4 @@ Task: %s`,
 	// Fallback: spawner not configured
 	return ErrorResult("Subagent manager not configured").WithError(fmt.Errorf("spawner not set"))
 }
+

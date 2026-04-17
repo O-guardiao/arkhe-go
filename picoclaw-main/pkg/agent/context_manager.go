@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/sipeed/picoclaw/pkg/providers"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/providers"
 )
 
 // ContextManager manages conversation context via a pluggable strategy.
@@ -88,3 +88,4 @@ func lookupContextManager(name string) (ContextManagerFactory, bool) {
 	f, ok := cmRegistry[name]
 	return f, ok
 }
+

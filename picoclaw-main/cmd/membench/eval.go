@@ -10,7 +10,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/sipeed/picoclaw/pkg/seahorse"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/seahorse"
 )
 
 // EvalResult holds per-sample evaluation results for one mode.
@@ -364,3 +364,4 @@ func PrintComparison(results []EvalResult, llmResults []EvalResult) {
 		printSection("With LLM", llmResults)
 	}
 }
+

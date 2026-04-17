@@ -6,8 +6,8 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/sipeed/picoclaw/pkg/config"
-	"github.com/sipeed/picoclaw/pkg/fileutil"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/fileutil"
 )
 
 type AuthCredential struct {
@@ -111,3 +111,4 @@ func DeleteAllCredentials() error {
 	}
 	return nil
 }
+

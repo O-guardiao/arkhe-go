@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/sipeed/picoclaw/pkg/config"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
 )
 
 func (h *Handler) effectiveLauncherPublic() bool {
@@ -218,3 +218,4 @@ func (h *Handler) buildPicoEventsURL(r *http.Request) string {
 func (h *Handler) buildPicoSendURL(r *http.Request) string {
 	return requestHTTPScheme(r) + "://" + h.picoWebUIAddr(r) + "/pico/send"
 }
+

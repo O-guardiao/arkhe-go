@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"runtime"
 
-	"github.com/sipeed/picoclaw/pkg/config"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
 )
 
 type toolCatalogEntry struct {
@@ -333,3 +333,4 @@ func applyToolState(cfg *config.Config, toolName string, enabled bool) error {
 	}
 	return nil
 }
+

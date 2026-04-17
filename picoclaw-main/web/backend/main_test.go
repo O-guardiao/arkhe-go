@@ -3,7 +3,7 @@ package main
 import (
 	"testing"
 
-	"github.com/sipeed/picoclaw/web/backend/launcherconfig"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/web/backend/launcherconfig"
 )
 
 func TestShouldEnableLauncherFileLogging(t *testing.T) {
@@ -95,3 +95,4 @@ func TestMaskSecret(t *testing.T) {
 		}
 	}
 }
+

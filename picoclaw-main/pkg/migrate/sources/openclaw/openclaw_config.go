@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/sipeed/picoclaw/pkg/config"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
 )
 
 type OpenClawConfig struct {
@@ -1184,3 +1184,4 @@ func (c ToolsConfig) ToStandardTools() config.ToolsConfig {
 		},
 	}
 }
+

@@ -13,20 +13,20 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/sipeed/picoclaw/cmd/picoclaw/internal"
-	"github.com/sipeed/picoclaw/cmd/picoclaw/internal/agent"
-	"github.com/sipeed/picoclaw/cmd/picoclaw/internal/auth"
-	"github.com/sipeed/picoclaw/cmd/picoclaw/internal/cliui"
-	"github.com/sipeed/picoclaw/cmd/picoclaw/internal/cron"
-	"github.com/sipeed/picoclaw/cmd/picoclaw/internal/gateway"
-	"github.com/sipeed/picoclaw/cmd/picoclaw/internal/migrate"
-	"github.com/sipeed/picoclaw/cmd/picoclaw/internal/model"
-	"github.com/sipeed/picoclaw/cmd/picoclaw/internal/onboard"
-	"github.com/sipeed/picoclaw/cmd/picoclaw/internal/skills"
-	"github.com/sipeed/picoclaw/cmd/picoclaw/internal/status"
-	"github.com/sipeed/picoclaw/cmd/picoclaw/internal/version"
-	"github.com/sipeed/picoclaw/pkg/config"
-	"github.com/sipeed/picoclaw/pkg/updater"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/cmd/picoclaw/internal"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/cmd/picoclaw/internal/agent"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/cmd/picoclaw/internal/auth"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/cmd/picoclaw/internal/cliui"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/cmd/picoclaw/internal/cron"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/cmd/picoclaw/internal/gateway"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/cmd/picoclaw/internal/migrate"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/cmd/picoclaw/internal/model"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/cmd/picoclaw/internal/onboard"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/cmd/picoclaw/internal/skills"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/cmd/picoclaw/internal/status"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/cmd/picoclaw/internal/version"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/updater"
 )
 
 var rootNoColor bool
@@ -149,3 +149,4 @@ func main() {
 		os.Exit(1)
 	}
 }
+

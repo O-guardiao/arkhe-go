@@ -11,8 +11,8 @@ import (
 	"testing"
 	"time"
 
-	basechannels "github.com/sipeed/picoclaw/pkg/channels"
-	"github.com/sipeed/picoclaw/pkg/config"
+	basechannels "github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/channels"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
 )
 
 type roundTripFunc func(*http.Request) (*http.Response, error)
@@ -319,3 +319,4 @@ func TestSelectInboundMediaItemFallsBackToRefMessage(t *testing.T) {
 		t.Fatalf("selectInboundMediaItem().Type = %d, want %d", item.Type, MessageItemTypeImage)
 	}
 }
+

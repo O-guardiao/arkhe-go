@@ -11,10 +11,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/sipeed/picoclaw/pkg/config"
-	anthropicmessages "github.com/sipeed/picoclaw/pkg/providers/anthropic_messages"
-	"github.com/sipeed/picoclaw/pkg/providers/azure"
-	"github.com/sipeed/picoclaw/pkg/providers/bedrock"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
+	anthropicmessages "github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/providers/anthropic_messages"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/providers/azure"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/providers/bedrock"
 )
 
 type protocolMeta struct {
@@ -418,3 +418,4 @@ func getDefaultAPIBase(protocol string) string {
 	}
 	return meta.defaultAPIBase
 }
+

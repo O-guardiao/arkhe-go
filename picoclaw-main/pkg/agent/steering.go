@@ -6,10 +6,10 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/sipeed/picoclaw/pkg/logger"
-	"github.com/sipeed/picoclaw/pkg/providers"
-	"github.com/sipeed/picoclaw/pkg/routing"
-	"github.com/sipeed/picoclaw/pkg/tools"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/logger"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/providers"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/routing"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/tools"
 )
 
 // SteeringMode controls how queued steering messages are dequeued.
@@ -501,3 +501,4 @@ func (al *AgentLoop) InjectFollowUp(msg providers.Message) error {
 func (al *AgentLoop) InjectSteering(msg providers.Message) error {
 	return al.Steer(msg)
 }
+

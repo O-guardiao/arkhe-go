@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/alexzhang13/rlm-go/environments"
-	"github.com/alexzhang13/rlm-go/types"
+	"github.com/O-guardiao/arkhe-go/rlm-go/environments"
+	"github.com/O-guardiao/arkhe-go/rlm-go/types"
 )
 
 const RLMSystemPrompt = `You are solving a task using a persistent Go REPL environment.

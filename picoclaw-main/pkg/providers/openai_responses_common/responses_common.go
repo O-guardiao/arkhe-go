@@ -10,7 +10,7 @@ import (
 	"github.com/openai/openai-go/v3"
 	"github.com/openai/openai-go/v3/responses"
 
-	"github.com/sipeed/picoclaw/pkg/providers/protocoltypes"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/providers/protocoltypes"
 )
 
 // TranslateMessages converts internal Message entries to the OpenAI Responses API
@@ -294,3 +294,4 @@ func parseResponse(apiResp *responses.Response) *protocoltypes.LLMResponse {
 		Usage:            usage,
 	}
 }
+

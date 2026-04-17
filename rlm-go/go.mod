@@ -1,4 +1,4 @@
-module github.com/alexzhang13/rlm-go
+module github.com/O-guardiao/arkhe-go/rlm-go
 
 go 1.26.0
 

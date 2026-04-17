@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/sipeed/picoclaw/pkg/logger"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/logger"
 )
 
 // botGoLogger preserves useful SDK info logs while demoting noisy heartbeat
@@ -39,3 +39,4 @@ func shouldDemoteBotGoInfo(message string) bool {
 	return strings.Contains(message, " write Heartbeat message") ||
 		strings.Contains(message, " receive HeartbeatAck message")
 }
+

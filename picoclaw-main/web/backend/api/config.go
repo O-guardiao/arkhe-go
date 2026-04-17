@@ -8,8 +8,8 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/sipeed/picoclaw/pkg/config"
-	"github.com/sipeed/picoclaw/pkg/logger"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/logger"
 )
 
 // registerConfigRoutes binds configuration management endpoints to the ServeMux.
@@ -490,3 +490,4 @@ func applyConfigSecretsFromMap(cfg *config.Config, raw map[string]any) {
 		}
 	}
 }
+

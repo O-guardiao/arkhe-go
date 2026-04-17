@@ -9,9 +9,9 @@ import (
 	"net/http/httputil"
 	"time"
 
-	"github.com/sipeed/picoclaw/pkg/config"
-	"github.com/sipeed/picoclaw/pkg/logger"
-	ppid "github.com/sipeed/picoclaw/pkg/pid"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/logger"
+	ppid "github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/pid"
 )
 
 // registerPicoRoutes binds Pico Channel management endpoints to the ServeMux.
@@ -238,3 +238,4 @@ func generateSecureToken() string {
 	}
 	return hex.EncodeToString(b)
 }
+

@@ -7,9 +7,9 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/sipeed/picoclaw/pkg/bus"
-	"github.com/sipeed/picoclaw/pkg/channels"
-	"github.com/sipeed/picoclaw/pkg/config"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/bus"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/channels"
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
 )
 
 func newTestPicoChannel(t *testing.T) *PicoChannel {
@@ -142,3 +142,4 @@ func (c *PicoChannel) addConnForTest(pc *picoConn) {
 	}
 	bySession[pc.id] = pc
 }
+

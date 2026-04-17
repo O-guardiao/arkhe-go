@@ -8,8 +8,8 @@ Bạn cũng có thể chạy PicoClaw bằng Docker Compose mà không cần cà
 
 ```bash
 # 1. Clone repo này
-git clone https://github.com/sipeed/picoclaw.git
-cd picoclaw
+git clone https://github.com/O-guardiao/arkhe-go.git
+cd arkhe-go/picoclaw-main
 
 # 2. Lần chạy đầu tiên — tự động tạo docker/data/config.json rồi thoát
 #    (chỉ kích hoạt khi cả config.json và workspace/ đều không tồn tại)
@@ -165,3 +165,4 @@ picoclaw agent -m "What is 2+2?"
 Vậy là xong! Bạn có một trợ lý AI hoạt động trong 2 phút.
 
 ---
+
