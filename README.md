@@ -13,3 +13,4 @@ O diretorio `rlm-go/` deste repositorio nao veio de um repositorio original publ
 Ele e a recriacao local existente nesta maquina e, a partir daqui, deve ser tratado como a base oficial de desenvolvimento dentro de `arkhe-go`.
 
 O modulo Go em `picoclaw-main/go.mod` aponta para `../rlm-go`, tornando este repositorio autocontido para desenvolvimento e testes locais.
+Os artefatos Docker em `picoclaw-main/docker/` devem buildar a partir da raiz de `arkhe-go` para carregar essa dependencia local; usar apenas `picoclaw-main/` como contexto perde a fusao com `rlm-go`.

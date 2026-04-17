@@ -332,15 +332,23 @@ check: deps fmt vet test
 run: build
 	@$(BUILD_DIR)/$(BINARY_NAME) $(ARGS)
 
-## docker-build: Build Docker image (minimal Alpine-based)
+## docker-build: Build arkhe-go Docker image (minimal Alpine)
 docker-build:
-	@echo "Building minimal Docker image (Alpine-based)..."
-	docker compose -f docker/docker-compose.yml build picoclaw-agent picoclaw-gateway
+	@echo "Building arkhe-go minimal image (picoclaw + rlm-go)..."
+	docker compose -f docker/docker-compose.yml build arkhe-agent arkhe-gateway
 
-## docker-build-full: Build Docker image with full MCP support (Node.js 24)
+## docker-build-launcher: Build arkhe-go launcher image (Web Console)
+docker-build-launcher:
+	@echo "Building arkhe-go launcher image (picoclaw + rlm-go)..."
+	docker compose -f docker/docker-compose.yml build arkhe-launcher
+
+## docker-build-full: Build arkhe-go full image (Node.js + Python + MCP)
 docker-build-full:
-	@echo "Building full-featured Docker image (Node.js 24)..."
-	docker compose -f docker/docker-compose.full.yml build picoclaw-agent picoclaw-gateway
+	@echo "Building arkhe-go full image (picoclaw + rlm-go + MCP)..."
+	docker compose -f docker/docker-compose.full.yml build arkhe-agent arkhe-gateway
+
+## docker-build-all: Build all arkhe-go Docker images
+docker-build-all: docker-build docker-build-launcher docker-build-full
 
 ## docker-test: Test MCP tools in Docker container
 docker-test:
@@ -348,27 +356,31 @@ docker-test:
 	@chmod +x scripts/test-docker-mcp.sh
 	@./scripts/test-docker-mcp.sh
 
-## docker-run: Run picoclaw gateway in Docker (Alpine-based)
+## docker-run: Run arkhe-go gateway in Docker (Alpine)
 docker-run:
 	docker compose -f docker/docker-compose.yml --profile gateway up
 
-## docker-run-full: Run picoclaw gateway in Docker (full-featured)
+## docker-run-launcher: Run arkhe-go launcher in Docker (Web Console)
+docker-run-launcher:
+	docker compose -f docker/docker-compose.yml --profile launcher up
+
+## docker-run-full: Run arkhe-go gateway in Docker (full MCP)
 docker-run-full:
 	docker compose -f docker/docker-compose.full.yml --profile gateway up
 
-## docker-run-agent: Run picoclaw agent in Docker (interactive, Alpine-based)
+## docker-run-agent: Run arkhe-go agent in Docker (interactive, Alpine)
 docker-run-agent:
-	docker compose -f docker/docker-compose.yml run --rm picoclaw-agent
+	docker compose -f docker/docker-compose.yml --profile agent run --rm arkhe-agent
 
-## docker-run-agent-full: Run picoclaw agent in Docker (interactive, full-featured)
+## docker-run-agent-full: Run arkhe-go agent in Docker (interactive, full MCP)
 docker-run-agent-full:
-	docker compose -f docker/docker-compose.full.yml run --rm picoclaw-agent
+	docker compose -f docker/docker-compose.full.yml --profile agent run --rm arkhe-agent
 
-## docker-clean: Clean Docker images and volumes
+## docker-clean: Clean all arkhe-go Docker images and volumes
 docker-clean:
 	docker compose -f docker/docker-compose.yml down -v
 	docker compose -f docker/docker-compose.full.yml down -v
-	docker rmi picoclaw:latest picoclaw:full 2>/dev/null || true
+	docker rmi arkhe-go:local arkhe-go:full-local arkhe-go:launcher-local 2>/dev/null || true
 
 
 ## build-macos-app: Build PicoClaw macOS .app bundle (no terminal window)
@@ -415,7 +427,9 @@ help:
 	@echo "  make install            # Install to ~/.local/bin"
 	@echo "  make uninstall          # Remove from /usr/local/bin"
 	@echo "  make install-skills     # Install skills to workspace"
-	@echo "  make docker-build       # Build minimal Docker image"
+	@echo "  make docker-build       # Build arkhe-go minimal image"
+	@echo "  make docker-build-all   # Build all arkhe-go images"
+	@echo "  make docker-run-launcher# Run Web Console in Docker"
 	@echo "  make docker-test        # Test MCP tools in Docker"
 	@echo ""
 	@echo "Environment Variables:"

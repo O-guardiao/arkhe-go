@@ -1,44 +1,58 @@
+# ============================================================
+# arkhe-go — docker-compose full (Node.js + Python + MCP support)
+#
+# Build context is always the arkhe-go root so the local rlm-go
+# dependency is included in every image.
+#
+# Usage (run from picoclaw-main/):
+#   docker compose -f docker/docker-compose.full.yml --profile agent   run --rm arkhe-agent -m "Hello"
+#   docker compose -f docker/docker-compose.full.yml --profile gateway up -d
+# ============================================================
+
+x-arkhe-full-build: &arkhe_full_build
+  context: ../..
+  dockerfile: picoclaw-main/docker/Dockerfile.full
+
 services:
   # ─────────────────────────────────────────────
-  # PicoClaw Agent (one-shot query) - Full MCP Support
-  #   docker compose -f docker/docker-compose.full.yml run --rm picoclaw-agent -m "Hello"
+  # Agent (one-shot interactive query) — Full MCP support
   # ─────────────────────────────────────────────
-  picoclaw-agent:
-    build:
-      context: ..
-      dockerfile: docker/Dockerfile.full
-    container_name: picoclaw-agent-full
+  arkhe-agent:
+    build: *arkhe_full_build
+    image: arkhe-go:full-local
+    container_name: arkhe-agent-full
+    pull_policy: never
     profiles:
       - agent
     volumes:
       - ../config/config.json:/root/.picoclaw/config.json:ro
-      - picoclaw-workspace:/root/.picoclaw/workspace
-      - picoclaw-npm-cache:/root/.npm # npm cache for faster MCP server installs
+      - arkhe-workspace:/root/.picoclaw/workspace
+      - arkhe-npm-cache:/root/.npm
     entrypoint: ["picoclaw", "agent"]
     stdin_open: true
     tty: true
 
   # ─────────────────────────────────────────────
-  # PicoClaw Gateway (Long-running Bot) - Full MCP Support
-  #   docker compose -f docker/docker-compose.full.yml --profile gateway up
+  # Gateway (long-running bot) — Full MCP support
   # ─────────────────────────────────────────────
-  picoclaw-gateway:
-    build:
-      context: ..
-      dockerfile: docker/Dockerfile.full
-    container_name: picoclaw-gateway-full
+  arkhe-gateway:
+    build: *arkhe_full_build
+    image: arkhe-go:full-local
+    container_name: arkhe-gateway-full
     restart: unless-stopped
+    pull_policy: never
     profiles:
       - gateway
+    ports:
+      - "18790:18790"
+    environment:
+      - PICOCLAW_GATEWAY_HOST=0.0.0.0
     volumes:
-      # Configuration file
       - ../config/config.json:/root/.picoclaw/config.json:ro
-      # Persistent workspace (sessions, memory, logs)
-      - picoclaw-workspace:/root/.picoclaw/workspace
-      # NPM cache for faster MCP server installs
-      - picoclaw-npm-cache:/root/.npm
+      - arkhe-workspace:/root/.picoclaw/workspace
+      - arkhe-npm-cache:/root/.npm
     command: ["gateway"]
 
 volumes:
-  picoclaw-workspace:
-  picoclaw-npm-cache: # Cache npm packages to speed up MCP server installations
+  arkhe-workspace:
+  arkhe-npm-cache:

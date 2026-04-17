@@ -1,0 +1,47 @@
+# ============================================================
+# arkhe-go — Launcher (Web Console + Gateway)
+# Build context: arkhe-go root (../..)
+# Includes picoclaw + rlm-go fusion
+# ============================================================
+
+# Stage 1: Build the full launcher stack from the arkhe-go monorepo
+FROM golang:1.26.0-alpine AS builder
+
+RUN apk add --no-cache git make nodejs npm && \
+  npm install -g pnpm
+
+WORKDIR /src/picoclaw-main
+
+# Cache Go deps — include the local rlm-go replace target.
+COPY picoclaw-main/go.mod picoclaw-main/go.sum ./
+COPY rlm-go/go.mod rlm-go/go.sum /src/rlm-go/
+RUN go mod download
+
+# Cache frontend deps before copying the full source tree.
+COPY picoclaw-main/web/frontend/package.json picoclaw-main/web/frontend/pnpm-lock.yaml /src/picoclaw-main/web/frontend/
+WORKDIR /src/picoclaw-main/web/frontend
+RUN pnpm install --frozen-lockfile
+
+# Copy full source (picoclaw + rlm-go) and build all binaries.
+WORKDIR /src/picoclaw-main
+COPY picoclaw-main /src/picoclaw-main
+COPY rlm-go /src/rlm-go
+RUN make build build-launcher build-launcher-tui
+
+# Stage 2: Minimal Alpine runtime for the launcher stack
+FROM alpine:3.23
+
+LABEL org.opencontainers.image.title="arkhe-go-launcher" \
+      org.opencontainers.image.description="PicoClaw + rlm-go fusion — Web Console" \
+      org.opencontainers.image.source="https://github.com/O-guardiao/arkhe-go"
+
+RUN apk add --no-cache ca-certificates tzdata
+
+COPY --from=builder /src/picoclaw-main/build/picoclaw /usr/local/bin/picoclaw
+COPY --from=builder /src/picoclaw-main/build/picoclaw-launcher /usr/local/bin/picoclaw-launcher
+COPY --from=builder /src/picoclaw-main/build/picoclaw-launcher-tui /usr/local/bin/picoclaw-launcher-tui
+
+EXPOSE 18800 18790
+
+ENTRYPOINT ["picoclaw-launcher"]
+CMD ["-console", "-public", "-no-browser"]

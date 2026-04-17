@@ -1,26 +1,34 @@
 # ============================================================
-# Stage 1: Build the picoclaw binary
+# arkhe-go — Full MCP support image (Node.js + Python + uv)
+# Build context: arkhe-go root (../..)
+# Includes picoclaw + rlm-go fusion
 # ============================================================
+
+# Stage 1: Build from the arkhe-go monorepo
 FROM golang:1.26.0-alpine AS builder
 
 RUN apk add --no-cache git make
 
-WORKDIR /src
+WORKDIR /src/picoclaw-main
 
-# Cache dependencies
-COPY go.mod go.sum ./
+# Cache Go deps — include the local rlm-go replace target.
+COPY picoclaw-main/go.mod picoclaw-main/go.sum ./
+COPY rlm-go/go.mod rlm-go/go.sum /src/rlm-go/
 RUN go mod download
 
-# Copy source and build
-COPY . .
+# Copy full source (picoclaw + rlm-go) and build.
+COPY picoclaw-main /src/picoclaw-main
+COPY rlm-go /src/rlm-go
 RUN make build
 
-# ============================================================
 # Stage 2: Node.js-based runtime with full MCP support
-# ============================================================
 FROM node:24-alpine3.23
 
-# Install runtime dependencies
+LABEL org.opencontainers.image.title="arkhe-go-full" \
+      org.opencontainers.image.description="PicoClaw + rlm-go fusion — full MCP support" \
+      org.opencontainers.image.source="https://github.com/O-guardiao/arkhe-go"
+
+# Runtime deps for MCP servers (Node.js already in base)
 RUN apk add --no-cache \
   ca-certificates \
   curl \
@@ -28,17 +36,21 @@ RUN apk add --no-cache \
   python3 \
   py3-pip
 
-# Install uv and symlink to system path
+# Install uv (Python package manager) for MCP servers that need it
 RUN curl -LsSf https://astral.sh/uv/install.sh | sh && \
   ln -s /root/.local/bin/uv /usr/local/bin/uv && \
   ln -s /root/.local/bin/uvx /usr/local/bin/uvx && \
   uv --version
 
-# Copy binary
-COPY --from=builder /src/build/picoclaw /usr/local/bin/picoclaw
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD wget -q --spider http://localhost:18790/health || exit 1
 
-# Create picoclaw home directory
+COPY --from=builder /src/picoclaw-main/build/picoclaw /usr/local/bin/picoclaw
+
+# Bootstrap default config
 RUN /usr/local/bin/picoclaw onboard
+
+EXPOSE 18790
 
 ENTRYPOINT ["picoclaw"]
 CMD ["gateway"]

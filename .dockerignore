@@ -1,0 +1,15 @@
+# arkhe-go root .dockerignore
+# Build context is the monorepo root — exclude everything Docker doesn't need.
+
+.git
+**/.git
+**/.DS_Store
+**/.env
+**/.picoclaw
+**/build
+**/data
+**/dist
+**/node_modules
+
+# Ignore other projects that live alongside arkhe-go in the workspace
+# (only picoclaw-main/ and rlm-go/ are needed)

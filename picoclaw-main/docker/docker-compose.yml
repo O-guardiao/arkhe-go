@@ -1,16 +1,34 @@
+# ============================================================
+# arkhe-go — docker-compose (minimal Alpine images)
+#
+# Build context is always the arkhe-go root so the local rlm-go
+# dependency is included in every image.
+#
+# Usage (run from picoclaw-main/):
+#   docker compose -f docker/docker-compose.yml --profile agent   run --rm arkhe-agent -m "Hello"
+#   docker compose -f docker/docker-compose.yml --profile gateway up -d
+#   docker compose -f docker/docker-compose.yml --profile launcher up -d
+# ============================================================
+
+x-arkhe-build: &arkhe_build
+  context: ../..
+  dockerfile: picoclaw-main/docker/Dockerfile
+
+x-arkhe-launcher-build: &arkhe_launcher_build
+  context: ../..
+  dockerfile: picoclaw-main/docker/Dockerfile.launcher
+
 services:
   # ─────────────────────────────────────────────
-  # PicoClaw Agent (one-shot query)
-  #   docker compose -f docker/docker-compose.yml run --rm picoclaw-agent -m "Hello"
+  # Agent (one-shot interactive query)
   # ─────────────────────────────────────────────
-  picoclaw-agent:
-    image: docker.io/sipeed/picoclaw:latest
-    container_name: picoclaw-agent
+  arkhe-agent:
+    build: *arkhe_build
+    image: arkhe-go:local
+    container_name: arkhe-agent
+    pull_policy: never
     profiles:
       - agent
-    # Uncomment to access host network; leave commented unless needed.
-    #extra_hosts:
-    #  - "host.docker.internal:host-gateway"
     volumes:
       - ./data:/root/.picoclaw
     entrypoint: ["picoclaw", "agent"]
@@ -18,39 +36,40 @@ services:
     tty: true
 
   # ─────────────────────────────────────────────
-  # PicoClaw Gateway (Long-running Bot)
-  #   docker compose -f docker/docker-compose.yml --profile gateway up
+  # Gateway (long-running bot)
   # ─────────────────────────────────────────────
-  picoclaw-gateway:
-    image: docker.io/sipeed/picoclaw:latest
-    container_name: picoclaw-gateway
+  arkhe-gateway:
+    build: *arkhe_build
+    image: arkhe-go:local
+    container_name: arkhe-gateway
     restart: unless-stopped
+    pull_policy: never
     profiles:
       - gateway
-    # Uncomment to access host network; leave commented unless needed.
-    #extra_hosts:
-    #  - "host.docker.internal:host-gateway"
+    ports:
+      - "18790:18790"
+    environment:
+      - PICOCLAW_GATEWAY_HOST=0.0.0.0
     volumes:
       - ./data:/root/.picoclaw
 
   # ─────────────────────────────────────────────
-  # PicoClaw Launcher (Web Console + Gateway)
-  #   docker compose -f docker/docker-compose.yml --profile launcher up
+  # Launcher (Web Console + Gateway)
   # ─────────────────────────────────────────────
-  picoclaw-launcher:
-    image: docker.io/sipeed/picoclaw:launcher
-    container_name: picoclaw-launcher
+  arkhe-launcher:
+    build: *arkhe_launcher_build
+    image: arkhe-go:launcher-local
+    container_name: arkhe-launcher
     restart: unless-stopped
+    pull_policy: never
     profiles:
       - launcher
-    # Set a fixed dashboard token instead of a random one each restart.
-    # If not set, a random token is generated and printed to the console on startup.
-    #environment:
-    #  - PICOCLAW_LAUNCHER_TOKEN=your-secret-token-here
     ports:
       - "18800:18800"
-      # Publish the gateway only when you explicitly need inbound webhooks.
-      # In that case, also set PICOCLAW_GATEWAY_HOST=0.0.0.0 in the environment.
-      # - "18790:18790"
+      - "18790:18790"
+    environment:
+      - PICOCLAW_GATEWAY_HOST=0.0.0.0
+      # Set a fixed token instead of a random one each restart:
+      # - PICOCLAW_LAUNCHER_TOKEN=your-secret-token-here
     volumes:
       - ./data:/root/.picoclaw
