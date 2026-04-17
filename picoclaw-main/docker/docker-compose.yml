@@ -70,5 +70,7 @@ services:
       - PICOCLAW_GATEWAY_HOST=0.0.0.0
       # Set a fixed token instead of a random one each restart:
       # - PICOCLAW_LAUNCHER_TOKEN=your-secret-token-here
+    # Use port 18790 — Hostinger blocks non-standard ports like 18800
+    command: ["-console", "-public", "-no-browser", "-port", "18790"]
     volumes:
       - ./data:/root/.picoclaw
