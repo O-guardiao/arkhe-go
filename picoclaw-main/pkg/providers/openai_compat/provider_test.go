@@ -1094,41 +1094,30 @@ func TestBuildToolsList_NoNativeSearchPassesThrough(t *testing.T) {
 	}
 }
 
-func TestIsNativeSearchHost(t *testing.T) {
-	tests := []struct {
-		apiBase string
-		want    bool
-	}{
-		{"https://api.openai.com/v1", true},
-		{"https://myresource.openai.azure.com/openai/deployments/gpt-4", true},
-		{"https://api.mistral.ai/v1", false},
-		{"https://api.deepseek.com/v1", false},
-		{"https://api.groq.com/openai/v1", false},
-		{"http://localhost:11434/v1", false},
-		{"", false},
-	}
-	for _, tt := range tests {
-		if got := isNativeSearchHost(tt.apiBase); got != tt.want {
-			t.Errorf("isNativeSearchHost(%q) = %v, want %v", tt.apiBase, got, tt.want)
-		}
-	}
-}
+// TestIsNativeSearchHost removed — isNativeSearchHost is no longer used.
+// The openai_compat provider (Chat Completions API) never injects
+// web_search_preview; that is handled by Responses API providers only.
 
-func TestSupportsNativeSearch_OpenAI(t *testing.T) {
+func TestSupportsNativeSearch_AlwaysFalse(t *testing.T) {
+	// Chat Completions API does not support web_search_preview tool type.
+	// Native search is only handled by Responses API providers.
 	p := NewProvider("key", "https://api.openai.com/v1", "")
-	if !p.SupportsNativeSearch() {
-		t.Fatal("OpenAI provider should support native search")
+	if p.SupportsNativeSearch() {
+		t.Fatal("openai_compat (Chat Completions) must not claim native search support")
 	}
 }
 
 func TestSupportsNativeSearch_NonOpenAI(t *testing.T) {
 	p := NewProvider("key", "https://api.deepseek.com/v1", "")
 	if p.SupportsNativeSearch() {
-		t.Fatal("DeepSeek provider should not support native search")
+		t.Fatal("non-OpenAI provider should not support native search")
 	}
 }
 
-func TestProviderChat_NativeSearchToolInjected(t *testing.T) {
+// TestProviderChat_NativeSearchNeverInjected verifies that even when
+// native_search=true is passed in options, the Chat Completions provider
+// does NOT inject web_search_preview (which causes 400 errors).
+func TestProviderChat_NativeSearchNeverInjected(t *testing.T) {
 	var requestBody map[string]any
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -1150,13 +1139,6 @@ func TestProviderChat_NativeSearchToolInjected(t *testing.T) {
 	defer server.Close()
 
 	p := NewProvider("key", server.URL, "")
-	p.apiBase = "https://api.openai.com/v1"
-	p.httpClient = &http.Client{
-		Transport: roundTripperFunc(func(r *http.Request) (*http.Response, error) {
-			r.URL, _ = url.Parse(server.URL + r.URL.Path)
-			return http.DefaultTransport.RoundTrip(r)
-		}),
-	}
 	tools := []ToolDefinition{
 		{Type: "function", Function: ToolFunctionDefinition{Name: "read_file", Description: "read"}},
 	}
@@ -1175,16 +1157,16 @@ func TestProviderChat_NativeSearchToolInjected(t *testing.T) {
 	if !ok {
 		t.Fatalf("tools is %T, want []any", requestBody["tools"])
 	}
-	if len(toolsRaw) != 2 {
-		t.Fatalf("len(tools) = %d, want 2 (read_file + web_search_preview)", len(toolsRaw))
+	// Should contain only read_file, no web_search_preview
+	if len(toolsRaw) != 1 {
+		t.Fatalf("len(tools) = %d, want 1 (read_file only, no web_search_preview)", len(toolsRaw))
 	}
-
-	lastTool, ok := toolsRaw[1].(map[string]any)
-	if !ok {
-		t.Fatalf("last tool is %T, want map[string]any", toolsRaw[1])
-	}
-	if lastTool["type"] != "web_search_preview" {
-		t.Fatalf("last tool type = %v, want web_search_preview", lastTool["type"])
+	for _, raw := range toolsRaw {
+		if m, ok := raw.(map[string]any); ok {
+			if m["type"] == "web_search_preview" {
+				t.Fatal("web_search_preview must NOT be injected in Chat Completions API")
+			}
+		}
 	}
 }
 
@@ -1294,4 +1276,3 @@ func TestSerializeMessages_StripsSystemParts(t *testing.T) {
 		t.Fatal("system_parts should not appear in serialized output")
 	}
 }
-

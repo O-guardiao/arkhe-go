@@ -139,11 +139,11 @@ func (p *Provider) buildRequestBody(
 		"messages": common.SerializeMessages(messages),
 	}
 
-	// When fallback uses a different provider (e.g. DeepSeek), that provider must not inject web_search_preview.
-	nativeSearch, _ := options["native_search"].(bool)
-	nativeSearch = nativeSearch && isNativeSearchHost(p.apiBase)
-	if len(tools) > 0 || nativeSearch {
-		requestBody["tools"] = buildToolsList(tools, nativeSearch)
+	// Chat Completions API does NOT support web_search_preview tool type.
+	// Native search is only valid on the Responses API (codex_provider).
+	// Always ignore native_search here to prevent 400 errors.
+	if len(tools) > 0 {
+		requestBody["tools"] = buildToolsList(tools, false)
 		requestBody["tool_choice"] = "auto"
 	}
 
@@ -466,17 +466,13 @@ func buildToolsList(tools []ToolDefinition, nativeSearch bool) []any {
 	return result
 }
 
+// SupportsNativeSearch returns false because the openai_compat provider uses
+// the Chat Completions API (/chat/completions), which does NOT support
+// web_search_preview as a tool type — only 'function' and 'custom' are valid.
+// Native web search is handled exclusively by providers that use the
+// Responses API (codex_provider, openai_responses_common).
 func (p *Provider) SupportsNativeSearch() bool {
-	return isNativeSearchHost(p.apiBase)
-}
-
-func isNativeSearchHost(apiBase string) bool {
-	u, err := url.Parse(apiBase)
-	if err != nil {
-		return false
-	}
-	host := u.Hostname()
-	return host == "api.openai.com" || strings.HasSuffix(host, ".openai.azure.com")
+	return false
 }
 
 // supportsPromptCacheKey reports whether the given API base is known to
@@ -491,4 +487,3 @@ func supportsPromptCacheKey(apiBase string) bool {
 	host := u.Hostname()
 	return host == "api.openai.com" || strings.HasSuffix(host, ".openai.azure.com")
 }
-
