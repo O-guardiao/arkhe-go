@@ -181,7 +181,10 @@ func Run(debug bool, homePath, configPath string, allowEmptyStartup bool) (runEr
 	agentLoop := agent.NewAgentLoop(cfg, msgBus, provider)
 
 	// Initialize recursion engine (no-op if not enabled in config)
-	recursion.Setup(agentLoop)
+	sup := recursion.Setup(agentLoop)
+
+	// Update BuildInfo to reflect rlm-go fusion state at runtime
+	cfg.BuildInfo.RLMGoFusion = sup != nil
 
 	fmt.Println("\n📦 Agent Status:")
 	startupInfo := agentLoop.GetStartupInfo()
@@ -189,12 +192,18 @@ func Run(debug bool, homePath, configPath string, allowEmptyStartup bool) (runEr
 	skillsInfo := startupInfo["skills"].(map[string]any)
 	fmt.Printf("  • Tools: %d loaded\n", toolsInfo["count"])
 	fmt.Printf("  • Skills: %d/%d available\n", skillsInfo["available"], skillsInfo["total"])
+	if sup != nil {
+		fmt.Println("  • RLM-Go Fusion: active (recursion engine enabled)")
+	} else {
+		fmt.Println("  • RLM-Go Fusion: inactive")
+	}
 
 	logger.InfoCF("agent", "Agent initialized",
 		map[string]any{
 			"tools_count":      toolsInfo["count"],
 			"skills_total":     skillsInfo["total"],
 			"skills_available": skillsInfo["available"],
+			"rlm_go_fusion":    sup != nil,
 		})
 
 	runningServices, err := setupAndStartServices(cfg, agentLoop, msgBus, pidData.Token)

@@ -1102,6 +1102,8 @@ func (h *Handler) gatewayStatusData() map[string]any {
 		if configDefaultModel != "" {
 			data["config_default_model"] = configDefaultModel
 		}
+		// Expose recursion config state so API consumers know if rlm-go is configured
+		data["recursion_enabled"] = cfg.Recursion.Enabled
 	}
 
 	// Primary detection: read PID file and check if process is alive.

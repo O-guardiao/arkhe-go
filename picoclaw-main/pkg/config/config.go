@@ -110,10 +110,11 @@ type ProcessHookConfig struct {
 
 // BuildInfo contains build-time version information
 type BuildInfo struct {
-	Version   string `json:"version"`
-	GitCommit string `json:"git_commit"`
-	BuildTime string `json:"build_time"`
-	GoVersion string `json:"go_version"`
+	Version      string `json:"version"`
+	GitCommit    string `json:"git_commit"`
+	BuildTime    string `json:"build_time"`
+	GoVersion    string `json:"go_version"`
+	RLMGoFusion  bool   `json:"rlm_go_fusion"`
 }
 
 // MarshalJSON implements custom JSON marshaling for Config
