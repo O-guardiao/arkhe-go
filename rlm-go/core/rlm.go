@@ -3,6 +3,7 @@ package core
 import (
 	"context"
 	"fmt"
+	"sync"
 	"time"
 
 	"github.com/O-guardiao/arkhe-go/rlm-go/clients"
@@ -44,8 +45,10 @@ type Config struct {
 type ClientFactory func(backend string, backendKwargs map[string]any) (clients.Client, error)
 
 type RLM struct {
-	config            Config
-	systemPrompt      string
+	config       Config
+	systemPrompt string
+
+	mu                sync.Mutex
 	cumulativeCost    float64
 	consecutiveErrors int
 	lastError         string
@@ -105,10 +108,12 @@ func New(config Config) (*RLM, error) {
 
 func (r *RLM) Completion(prompt any, rootPrompt string) (types.RLMChatCompletion, error) {
 	start := time.Now()
+	r.mu.Lock()
 	r.completionStart = start
 	r.consecutiveErrors = 0
 	r.lastError = ""
 	r.bestPartialAnswer = ""
+	r.mu.Unlock()
 
 	if r.config.Depth >= r.config.MaxDepth {
 		return r.fallbackAnswer(prompt)
@@ -196,7 +201,9 @@ func (r *RLM) Completion(prompt any, rootPrompt string) (types.RLMChatCompletion
 		}
 
 		if iteration.Response != "" {
+			r.mu.Lock()
 			r.bestPartialAnswer = iteration.Response
+			r.mu.Unlock()
 		}
 		if r.config.Logger != nil {
 			r.config.Logger.Log(iteration)
@@ -249,8 +256,11 @@ func (r *RLM) Completion(prompt any, rootPrompt string) (types.RLMChatCompletion
 }
 
 func (r *RLM) Close() error {
-	if r.persistentEnv != nil {
-		return r.persistentEnv.Cleanup()
+	r.mu.Lock()
+	env := r.persistentEnv
+	r.mu.Unlock()
+	if env != nil {
+		return env.Cleanup()
 	}
 	return nil
 }
@@ -289,13 +299,16 @@ func (r *RLM) spawnCompletionContext(prompt any) (*LMHandler, environments.Envir
 	}
 
 	var environment environments.Environment
-	if r.config.Persistent && r.persistentEnv != nil {
-		r.persistentEnv.UpdateHandlerAddress(address)
-		if _, err := r.persistentEnv.AddContext(prompt, nil); err != nil {
+	r.mu.Lock()
+	persistentEnv := r.persistentEnv
+	r.mu.Unlock()
+	if r.config.Persistent && persistentEnv != nil {
+		persistentEnv.UpdateHandlerAddress(address)
+		if _, err := persistentEnv.AddContext(prompt, nil); err != nil {
 			handler.Stop()
 			return nil, nil, nil, err
 		}
-		environment = r.persistentEnv
+		environment = persistentEnv
 	} else {
 		envConfig := environments.Config{
 			LMHandlerAddress:      address,
@@ -321,7 +334,9 @@ func (r *RLM) spawnCompletionContext(prompt any) (*LMHandler, environments.Envir
 		}
 		if r.config.Persistent {
 			if persistent, ok := environment.(environments.PersistentEnvironment); ok {
+				r.mu.Lock()
 				r.persistentEnv = persistent
+				r.mu.Unlock()
 			}
 		}
 	}
@@ -364,7 +379,7 @@ func (r *RLM) completionTurn(
 func (r *RLM) defaultAnswer(messageHistory []map[string]any, handler *LMHandler) (string, error) {
 	currentPrompt := append([]map[string]any{}, messageHistory...)
 	currentPrompt = append(currentPrompt, map[string]any{
-		"role":    "assistant",
+		"role":    "user",
 		"content": "Please provide a final answer to the user's question based on the information provided.",
 	})
 	response, err := handler.Completion(currentPrompt, "")
@@ -388,7 +403,9 @@ func (r *RLM) fallbackAnswer(prompt any) (types.RLMChatCompletion, error) {
 		return types.RLMChatCompletion{}, err
 	}
 	start := time.Now()
-	response, err := client.Completion(context.Background(), prompt, "")
+	ctx, cancel := r.completionContext()
+	defer cancel()
+	response, err := client.Completion(ctx, prompt, "")
 	if err != nil {
 		return types.RLMChatCompletion{}, err
 	}
@@ -427,7 +444,9 @@ func (r *RLM) subcall(prompt string, model string) (types.RLMChatCompletion, err
 			return types.RLMChatCompletion{}, err
 		}
 		start := time.Now()
-		response, err := client.Completion(context.Background(), prompt, model)
+		ctx, cancel := r.completionContext()
+		defer cancel()
+		response, err := client.Completion(ctx, prompt, model)
 		if err != nil {
 			return types.RLMChatCompletion{
 				RootModel:     resolvedModel,
@@ -448,12 +467,15 @@ func (r *RLM) subcall(prompt string, model string) (types.RLMChatCompletion, err
 
 	remainingBudget := 0.0
 	if r.config.MaxBudget > 0 {
+		r.mu.Lock()
 		remainingBudget = r.config.MaxBudget - r.cumulativeCost
+		cumulativeCost := r.cumulativeCost
+		r.mu.Unlock()
 		if remainingBudget <= 0 {
 			return types.RLMChatCompletion{
 				RootModel:     resolvedModel,
 				Prompt:        prompt,
-				Response:      fmt.Sprintf("Error: Budget exhausted (spent $%.6f of $%.6f)", r.cumulativeCost, r.config.MaxBudget),
+				Response:      fmt.Sprintf("Error: Budget exhausted (spent $%.6f of $%.6f)", cumulativeCost, r.config.MaxBudget),
 				UsageSummary:  types.UsageSummary{ModelUsageSummaries: map[string]types.ModelUsageSummary{}},
 				ExecutionTime: 0,
 			}, nil
@@ -461,7 +483,9 @@ func (r *RLM) subcall(prompt string, model string) (types.RLMChatCompletion, err
 	}
 	remainingTimeout := time.Duration(0)
 	if r.config.MaxTimeout > 0 {
+		r.mu.Lock()
 		elapsed := time.Since(r.completionStart)
+		r.mu.Unlock()
 		remainingTimeout = r.config.MaxTimeout - elapsed
 		if remainingTimeout <= 0 {
 			return types.RLMChatCompletion{
@@ -510,7 +534,9 @@ func (r *RLM) subcall(prompt string, model string) (types.RLMChatCompletion, err
 		runErr = closeErr
 	}
 	if result.UsageSummary.TotalCostValue() != nil {
+		r.mu.Lock()
 		r.cumulativeCost += *result.UsageSummary.TotalCostValue()
+		r.mu.Unlock()
 	}
 	if r.config.OnSubcallComplete != nil {
 		errString := ""
@@ -531,16 +557,35 @@ func (r *RLM) subcall(prompt string, model string) (types.RLMChatCompletion, err
 	return result, nil
 }
 
+// completionContext returns a context with timeout derived from MaxTimeout.
+// If no timeout is configured, returns context.Background().
+func (r *RLM) completionContext() (context.Context, context.CancelFunc) {
+	if r.config.MaxTimeout > 0 {
+		r.mu.Lock()
+		elapsed := time.Since(r.completionStart)
+		r.mu.Unlock()
+		remaining := r.config.MaxTimeout - elapsed
+		if remaining <= 0 {
+			remaining = time.Millisecond
+		}
+		return context.WithTimeout(context.Background(), remaining)
+	}
+	return context.Background(), func() {}
+}
+
 func (r *RLM) checkTimeout(iteration int, start time.Time) error {
 	if r.config.MaxTimeout <= 0 {
 		return nil
 	}
 	elapsed := time.Since(start)
 	if elapsed > r.config.MaxTimeout {
+		r.mu.Lock()
+		partial := r.bestPartialAnswer
+		r.mu.Unlock()
 		return utils.TimeoutExceededError{
 			Elapsed:       elapsed.Seconds(),
 			Timeout:       r.config.MaxTimeout.Seconds(),
-			PartialAnswer: r.bestPartialAnswer,
+			PartialAnswer: partial,
 			Msg: fmt.Sprintf(
 				"timeout exceeded after iteration %d: %.1fs of %.1fs limit",
 				iteration,
@@ -554,36 +599,47 @@ func (r *RLM) checkTimeout(iteration int, start time.Time) error {
 
 func (r *RLM) checkIterationLimits(iteration types.RLMIteration, iterationNum int, handler *LMHandler) error {
 	iterationHadError := false
+	lastError := ""
 	for _, codeBlock := range iteration.CodeBlocks {
 		if codeBlock.Result.Stderr != "" {
 			iterationHadError = true
-			r.lastError = codeBlock.Result.Stderr
+			lastError = codeBlock.Result.Stderr
 			break
 		}
 	}
+	r.mu.Lock()
 	if iterationHadError {
 		r.consecutiveErrors++
+		r.lastError = lastError
 	} else {
 		r.consecutiveErrors = 0
 	}
-	if r.config.MaxErrors > 0 && r.consecutiveErrors >= r.config.MaxErrors {
+	consecutiveErrors := r.consecutiveErrors
+	currentLastError := r.lastError
+	bestPartial := r.bestPartialAnswer
+	r.mu.Unlock()
+
+	if r.config.MaxErrors > 0 && consecutiveErrors >= r.config.MaxErrors {
 		return utils.ErrorThresholdExceededError{
-			ErrorCount:    r.consecutiveErrors,
+			ErrorCount:    consecutiveErrors,
 			Threshold:     r.config.MaxErrors,
-			LastError:     r.lastError,
-			PartialAnswer: r.bestPartialAnswer,
-			Msg:           fmt.Sprintf("error threshold exceeded: %d consecutive errors (limit: %d)", r.consecutiveErrors, r.config.MaxErrors),
+			LastError:     currentLastError,
+			PartialAnswer: bestPartial,
+			Msg:           fmt.Sprintf("error threshold exceeded: %d consecutive errors (limit: %d)", consecutiveErrors, r.config.MaxErrors),
 		}
 	}
 
 	currentUsage := handler.GetUsageSummary()
 	if cost := currentUsage.TotalCostValue(); cost != nil {
+		r.mu.Lock()
 		r.cumulativeCost = *cost
-		if r.config.MaxBudget > 0 && r.cumulativeCost > r.config.MaxBudget {
+		cumulativeCost := r.cumulativeCost
+		r.mu.Unlock()
+		if r.config.MaxBudget > 0 && cumulativeCost > r.config.MaxBudget {
 			return utils.BudgetExceededError{
-				Spent:  r.cumulativeCost,
+				Spent:  cumulativeCost,
 				Budget: r.config.MaxBudget,
-				Msg:    fmt.Sprintf("budget exceeded after iteration %d: spent $%.6f of $%.6f", iterationNum+1, r.cumulativeCost, r.config.MaxBudget),
+				Msg:    fmt.Sprintf("budget exceeded after iteration %d: spent $%.6f of $%.6f", iterationNum+1, cumulativeCost, r.config.MaxBudget),
 			}
 		}
 	}
@@ -627,7 +683,11 @@ func (r *RLM) compactHistory(
 	if local, ok := environment.(*environments.LocalREPL); ok {
 		local.AppendCompactionEntry(map[string]any{"type": "summary", "content": summary})
 	}
-	return append(messageHistory[:2], []map[string]any{
+	prefix := messageHistory
+	if len(messageHistory) > 2 {
+		prefix = messageHistory[:2]
+	}
+	return append(prefix, []map[string]any{
 		{"role": "assistant", "content": summary},
 		{
 			"role": "user",

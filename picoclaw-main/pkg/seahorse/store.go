@@ -2,6 +2,7 @@ package seahorse
 
 import (
 	"context"
+	"crypto/rand"
 	"database/sql"
 	"fmt"
 	"strings"
@@ -1512,7 +1513,9 @@ func (s *Store) scanSummaries(rows *sql.Rows) ([]Summary, error) {
 }
 
 func generateSummaryID(content string, t time.Time) string {
-	return fmt.Sprintf("sum_%x", t.UnixNano())
+	var rnd [4]byte
+	rand.Read(rnd[:])
+	return fmt.Sprintf("sum_%x_%x", t.UnixNano(), rnd)
 }
 
 func isUniqueViolation(err error) bool {

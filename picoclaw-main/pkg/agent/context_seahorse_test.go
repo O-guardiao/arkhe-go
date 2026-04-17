@@ -535,6 +535,12 @@ func TestSeahorseRealLoopNoDuplicateMessages(t *testing.T) {
 	msgBus := bus.NewMessageBus()
 	mockProvider := &simpleMockProvider{response: "I received your message."}
 	al := NewAgentLoop(cfg, msgBus, mockProvider)
+	// Close seahorse DB so t.TempDir cleanup can remove the file on Windows.
+	t.Cleanup(func() {
+		if cm, ok := al.contextManager.(*seahorseContextManager); ok {
+			cm.engine.Close()
+		}
+	})
 	defaultAgent := al.registry.GetDefaultAgent()
 	if defaultAgent == nil {
 		t.Fatal("expected default agent")
@@ -886,6 +892,11 @@ func TestSeahorseSteeringMessageIngested(t *testing.T) {
 	msgBus := bus.NewMessageBus()
 	mockProvider := &simpleMockProvider{response: "I received your message."}
 	al := NewAgentLoop(cfg, msgBus, mockProvider)
+	t.Cleanup(func() {
+		if cm, ok := al.contextManager.(*seahorseContextManager); ok {
+			cm.engine.Close()
+		}
+	})
 	defaultAgent := al.registry.GetDefaultAgent()
 	if defaultAgent == nil {
 		t.Fatal("expected default agent")
@@ -993,6 +1004,11 @@ func TestSeahorseSummarizeSkipsCondensedWhenBelowThreshold(t *testing.T) {
 	msgBus := bus.NewMessageBus()
 	provider := &seahorseTestProvider{}
 	al := NewAgentLoop(cfg, msgBus, provider)
+	t.Cleanup(func() {
+		if cm, ok := al.contextManager.(*seahorseContextManager); ok {
+			cm.engine.Close()
+		}
+	})
 	defaultAgent := al.registry.GetDefaultAgent()
 	if defaultAgent == nil {
 		t.Fatal("expected default agent")
@@ -1084,4 +1100,3 @@ func TestSeahorseSummarizeSkipsCondensedWhenBelowThreshold(t *testing.T) {
 		t.Errorf("BUG: condensed created when tokens (%d) < threshold (%d)", tokensBefore, threshold)
 	}
 }
-

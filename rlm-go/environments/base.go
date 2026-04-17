@@ -2,6 +2,7 @@ package environments
 
 import (
 	"fmt"
+	"reflect"
 	"sort"
 	"strings"
 
@@ -27,12 +28,10 @@ type ToolInfo struct {
 }
 
 func (t ToolInfo) IsCallable() bool {
-	switch t.Value.(type) {
-	case func(...any), func(any) string, func(string) string, func(string, string) string:
-		return true
-	default:
-		return fmt.Sprintf("%T", t.Value) != "<nil>" && strings.HasPrefix(fmt.Sprintf("%T", t.Value), "func(")
+	if t.Value == nil {
+		return false
 	}
+	return reflect.TypeOf(t.Value).Kind() == reflect.Func
 }
 
 func ParseToolEntry(name string, entry any) ToolInfo {

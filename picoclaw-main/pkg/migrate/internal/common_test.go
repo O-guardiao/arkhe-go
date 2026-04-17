@@ -30,24 +30,29 @@ func TestExpandHomeWithTilde(t *testing.T) {
 	require.NoError(t, err)
 
 	result := ExpandHome("~/path")
-	assert.Equal(t, home+"/path", result)
+	assert.Equal(t, filepath.Join(home, "path"), result)
 
 	result = ExpandHome("~")
 	assert.Equal(t, home, result)
 }
 
 func TestResolveWorkspace(t *testing.T) {
-	result := ResolveWorkspace("/home/user/.picoclaw")
-	assert.Equal(t, "/home/user/.picoclaw/workspace", result)
+	base := filepath.FromSlash("/home/user/.picoclaw")
+	result := ResolveWorkspace(base)
+	assert.Equal(t, filepath.Join(base, "workspace"), result)
 }
 
 func TestRelPath(t *testing.T) {
-	result := RelPath("/home/user/.picoclaw/workspace/file.txt", "/home/user/.picoclaw")
-	assert.Equal(t, "workspace/file.txt", result)
+	base := filepath.FromSlash("/home/user/.picoclaw")
+	full := filepath.Join(base, "workspace", "file.txt")
+	result := RelPath(full, base)
+	assert.Equal(t, filepath.Join("workspace", "file.txt"), result)
 }
 
 func TestRelPathError(t *testing.T) {
-	result := RelPath("relative/path", "/different/base")
+	// When filepath.Rel cannot compute a relative path, the function
+	// falls back to filepath.Base.
+	result := RelPath("relative/path", filepath.FromSlash("/different/base"))
 	assert.Equal(t, "path", result)
 }
 
@@ -61,9 +66,10 @@ func TestResolveTargetHome(t *testing.T) {
 }
 
 func TestResolveTargetHomeWithOverride(t *testing.T) {
-	result, err := ResolveTargetHome("/custom/path")
+	override := filepath.Join(t.TempDir(), "custom", "path")
+	result, err := ResolveTargetHome(override)
 	require.NoError(t, err)
-	assert.Equal(t, "/custom/path", result)
+	assert.Equal(t, override, result)
 }
 
 func TestCopyFile(t *testing.T) {

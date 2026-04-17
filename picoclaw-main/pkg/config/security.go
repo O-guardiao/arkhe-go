@@ -88,10 +88,18 @@ func (sec *Config) initSensitiveCache() {
 			return
 		}
 
+		// Minimum secret length to include in the replacer.
+		// This prevents replacing very short strings (e.g. "a", "ab")
+		// that would cause excessive false-positive replacements.
+		// NOTE: This is separate from Tools.FilterMinLength, which controls
+		// the minimum *content* length for the fast-path in FilterSensitiveData.
+		const minSecretLen = 4
+		minLen := minSecretLen
+
 		// Build old/new pairs for strings.Replacer
 		var pairs []string
 		for _, v := range values {
-			if len(v) > 3 {
+			if len(v) >= minLen {
 				pairs = append(pairs, v, "[FILTERED]")
 			}
 		}
@@ -173,4 +181,3 @@ func collectSensitive(v reflect.Value, values *[]string) {
 		}
 	}
 }
-

@@ -60,6 +60,7 @@ func TestLauncherDashboardAuth_URLTokenBootstrapGET(t *testing.T) {
 
 	rec := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodGet, "/?token="+tok, nil)
+	req.RemoteAddr = "127.0.0.1:18800"
 	h.ServeHTTP(rec, req)
 	if rec.Code != http.StatusSeeOther {
 		t.Fatalf("GET /?token=valid: status = %d, want %d", rec.Code, http.StatusSeeOther)
@@ -73,6 +74,7 @@ func TestLauncherDashboardAuth_URLTokenBootstrapGET(t *testing.T) {
 
 	rec1b := httptest.NewRecorder()
 	req1b := httptest.NewRequest(http.MethodGet, "/config?token="+tok+"&keep=1", nil)
+	req1b.RemoteAddr = "127.0.0.1:18800"
 	h.ServeHTTP(rec1b, req1b)
 	if rec1b.Code != http.StatusSeeOther {
 		t.Fatalf("GET /config?token=valid: status = %d", rec1b.Code)
@@ -83,6 +85,7 @@ func TestLauncherDashboardAuth_URLTokenBootstrapGET(t *testing.T) {
 
 	recBad := httptest.NewRecorder()
 	reqBad := httptest.NewRequest(http.MethodGet, "/?token=wrong", nil)
+	reqBad.RemoteAddr = "127.0.0.1:18800"
 	h.ServeHTTP(recBad, reqBad)
 	if recBad.Code != http.StatusFound || recBad.Header().Get("Location") != "/launcher-login" {
 		t.Fatalf("GET /?token=invalid: code=%d loc=%q", recBad.Code, recBad.Header().Get("Location"))
@@ -104,9 +107,47 @@ func TestLauncherDashboardAuth_URLTokenBootstrapGET(t *testing.T) {
 
 	recLogin := httptest.NewRecorder()
 	reqLogin := httptest.NewRequest(http.MethodGet, "/launcher-login?token="+tok, nil)
+	reqLogin.RemoteAddr = "127.0.0.1:18800"
 	h.ServeHTTP(recLogin, reqLogin)
 	if recLogin.Code != http.StatusSeeOther || recLogin.Header().Get("Location") != "/" {
 		t.Fatalf("GET /launcher-login?token=valid: code=%d loc=%q", recLogin.Code, recLogin.Header().Get("Location"))
+	}
+}
+
+func TestLauncherDashboardAuth_URLTokenBootstrapRejectsRemoteRequests(t *testing.T) {
+	const tok = "secret"
+	cfg := LauncherDashboardAuthConfig{ExpectedCookie: "deadbeef", Token: tok}
+	next := http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		w.WriteHeader(http.StatusTeapot)
+	})
+	h := LauncherDashboardAuth(cfg, next)
+
+	rec := httptest.NewRecorder()
+	req := httptest.NewRequest(http.MethodGet, "/?token="+tok, nil)
+	req.RemoteAddr = "198.51.100.20:18800"
+	h.ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusFound || rec.Header().Get("Location") != "/launcher-login" {
+		t.Fatalf("remote GET /?token=valid: code=%d loc=%q", rec.Code, rec.Header().Get("Location"))
+	}
+}
+
+func TestLauncherDashboardAuth_URLTokenBootstrapRejectsForwardedRequests(t *testing.T) {
+	const tok = "secret"
+	cfg := LauncherDashboardAuthConfig{ExpectedCookie: "deadbeef", Token: tok}
+	next := http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		w.WriteHeader(http.StatusTeapot)
+	})
+	h := LauncherDashboardAuth(cfg, next)
+
+	rec := httptest.NewRecorder()
+	req := httptest.NewRequest(http.MethodGet, "/?token="+tok, nil)
+	req.RemoteAddr = "127.0.0.1:18800"
+	req.Header.Set("X-Forwarded-For", "198.51.100.20")
+	h.ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusFound || rec.Header().Get("Location") != "/launcher-login" {
+		t.Fatalf("forwarded GET /?token=valid: code=%d loc=%q", rec.Code, rec.Header().Get("Location"))
 	}
 }
 

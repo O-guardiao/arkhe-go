@@ -7,6 +7,7 @@ import (
 	"net/http/httptest"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 	"time"
@@ -283,14 +284,16 @@ func TestSkillInstaller_DownloadFile(t *testing.T) {
 		}
 
 		// Check file permissions
-		info, err := os.Stat(localPath)
-		if err != nil {
-			t.Errorf("failed to stat file: %v", err)
-			return
-		}
+		if runtime.GOOS != "windows" {
+			info, err := os.Stat(localPath)
+			if err != nil {
+				t.Errorf("failed to stat file: %v", err)
+				return
+			}
 
-		if info.Mode().Perm() != 0o600 {
-			t.Errorf("file permissions = %o, want %o", info.Mode().Perm(), 0o600)
+			if info.Mode().Perm() != 0o600 {
+				t.Errorf("file permissions = %o, want %o", info.Mode().Perm(), 0o600)
+			}
 		}
 	})
 

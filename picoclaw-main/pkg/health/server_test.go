@@ -23,6 +23,7 @@ func newTestServer() *Server {
 func TestHealthHandler_ReturnsOK(t *testing.T) {
 	s := newTestServer()
 	req := httptest.NewRequest(http.MethodGet, "/health", nil)
+	req.Header.Set("Authorization", "Bearer test")
 	w := httptest.NewRecorder()
 
 	s.healthHandler(w, req)
@@ -40,6 +41,32 @@ func TestHealthHandler_ReturnsOK(t *testing.T) {
 	}
 	if resp.Uptime == "" {
 		t.Error("uptime should not be empty")
+	}
+}
+
+func TestHealthHandler_HidesDetailsWithoutAuth(t *testing.T) {
+	s := newTestServer()
+	req := httptest.NewRequest(http.MethodGet, "/health", nil)
+	w := httptest.NewRecorder()
+
+	s.healthHandler(w, req)
+
+	if w.Code != http.StatusOK {
+		t.Errorf("health status = %d, want %d", w.Code, http.StatusOK)
+	}
+
+	var resp StatusResponse
+	if err := json.NewDecoder(w.Body).Decode(&resp); err != nil {
+		t.Fatalf("failed to decode response: %v", err)
+	}
+	if resp.Status != "ok" {
+		t.Errorf("status = %q, want %q", resp.Status, "ok")
+	}
+	if resp.Uptime != "" {
+		t.Errorf("uptime = %q, want empty", resp.Uptime)
+	}
+	if resp.PID != 0 {
+		t.Errorf("pid = %d, want 0", resp.PID)
 	}
 }
 
@@ -96,6 +123,7 @@ func TestReadyHandler_FailedCheck(t *testing.T) {
 	})
 
 	req := httptest.NewRequest(http.MethodGet, "/ready", nil)
+	req.Header.Set("Authorization", "Bearer test")
 	w := httptest.NewRecorder()
 
 	s.readyHandler(w, req)
@@ -132,6 +160,7 @@ func TestReadyHandler_PassingCheck(t *testing.T) {
 	})
 
 	req := httptest.NewRequest(http.MethodGet, "/ready", nil)
+	req.Header.Set("Authorization", "Bearer test")
 	w := httptest.NewRecorder()
 
 	s.readyHandler(w, req)
@@ -249,6 +278,7 @@ func TestRegisterCheck_MultipleChecks(t *testing.T) {
 	})
 
 	req := httptest.NewRequest(http.MethodGet, "/ready", nil)
+	req.Header.Set("Authorization", "Bearer test")
 	w := httptest.NewRecorder()
 	s.readyHandler(w, req)
 
@@ -263,6 +293,36 @@ func TestRegisterCheck_MultipleChecks(t *testing.T) {
 	}
 	if len(resp.Checks) != 3 {
 		t.Errorf("checks count = %d, want 3", len(resp.Checks))
+	}
+}
+
+func TestReadyHandler_HidesChecksWithoutAuth(t *testing.T) {
+	s := newTestServer()
+	s.SetReady(true)
+	s.RegisterCheck("redis", func() (bool, string) {
+		return true, "connected"
+	})
+
+	req := httptest.NewRequest(http.MethodGet, "/ready", nil)
+	w := httptest.NewRecorder()
+	s.readyHandler(w, req)
+
+	if w.Code != http.StatusOK {
+		t.Errorf("ready status = %d, want %d", w.Code, http.StatusOK)
+	}
+
+	var resp StatusResponse
+	if err := json.NewDecoder(w.Body).Decode(&resp); err != nil {
+		t.Fatalf("failed to decode response: %v", err)
+	}
+	if resp.Status != "ready" {
+		t.Errorf("status = %q, want %q", resp.Status, "ready")
+	}
+	if len(resp.Checks) != 0 {
+		t.Errorf("checks count = %d, want 0", len(resp.Checks))
+	}
+	if resp.Uptime != "" {
+		t.Errorf("uptime = %q, want empty", resp.Uptime)
 	}
 }
 

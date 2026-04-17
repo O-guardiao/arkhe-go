@@ -4,6 +4,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 )
@@ -32,6 +33,9 @@ func TestEnsureOnboardedSkipsWhenConfigExists(t *testing.T) {
 }
 
 func TestEnsureOnboardedRunsOnboardWhenConfigMissing(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("test requires sh")
+	}
 	configPath := filepath.Join(t.TempDir(), "config.json")
 	t.Setenv("EXPECTED_CONFIG_PATH", configPath)
 
@@ -67,6 +71,9 @@ printf '{}' > "$PICOCLAW_CONFIG"`,
 }
 
 func TestEnsureOnboardedFailsWhenOnboardDoesNotCreateConfig(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("test requires sh")
+	}
 	configPath := filepath.Join(t.TempDir(), "config.json")
 
 	origExecCommand := execCommand
@@ -82,6 +89,9 @@ func TestEnsureOnboardedFailsWhenOnboardDoesNotCreateConfig(t *testing.T) {
 }
 
 func TestEnsureOnboardedIncludesOnboardOutputOnFailure(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("test requires sh")
+	}
 	configPath := filepath.Join(t.TempDir(), "config.json")
 
 	origExecCommand := execCommand

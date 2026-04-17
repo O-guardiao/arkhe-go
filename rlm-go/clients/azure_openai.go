@@ -22,7 +22,7 @@ func NewAzureOpenAIClient(config map[string]any) (*AzureOpenAIClient, error) {
 		BaseClient:      NewBaseClient(modelName, timeout),
 		apiKey:          getString(config, "api_key", os.Getenv("AZURE_OPENAI_API_KEY")),
 		azureEndpoint:   strings.TrimSuffix(getString(config, "azure_endpoint", os.Getenv("AZURE_OPENAI_ENDPOINT")), "/"),
-		apiVersion:      getString(config, "api_version", envOrFallback("", os.Getenv("AZURE_OPENAI_API_VERSION"))),
+		apiVersion:      getString(config, "api_version", os.Getenv("AZURE_OPENAI_API_VERSION")),
 		azureDeployment: getString(config, "azure_deployment", os.Getenv("AZURE_OPENAI_DEPLOYMENT")),
 	}
 	if client.apiVersion == "" {

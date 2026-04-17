@@ -23,10 +23,9 @@ func (h *Handler) effectiveLauncherPublic() bool {
 	return h.serverPublic
 }
 
+// gatewayHostOverride intentionally avoids widening the gateway bind automatically.
+// External ingress must be an explicit operator choice in config or environment.
 func (h *Handler) gatewayHostOverride() string {
-	if h.effectiveLauncherPublic() {
-		return "0.0.0.0"
-	}
 	return ""
 }
 
@@ -218,4 +217,3 @@ func (h *Handler) buildPicoEventsURL(r *http.Request) string {
 func (h *Handler) buildPicoSendURL(r *http.Request) string {
 	return requestHTTPScheme(r) + "://" + h.picoWebUIAddr(r) + "/pico/send"
 }
-

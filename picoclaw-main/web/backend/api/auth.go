@@ -36,6 +36,9 @@ type LauncherAuthRouteOpts struct {
 	// non-nil and PasswordStore is nil, the auth endpoints surface a recovery
 	// message instead of an opaque 501/503.
 	StoreError error
+	// DataDir is the directory for persisting rate limiter state across restarts.
+	// When empty, the rate limiter operates in-memory only (backward-compatible).
+	DataDir string
 }
 
 type launcherAuthLoginBody struct {
@@ -58,13 +61,19 @@ func RegisterLauncherAuthRoutes(mux *http.ServeMux, opts LauncherAuthRouteOpts) 
 	if secure == nil {
 		secure = middleware.DefaultLauncherDashboardSecureCookie
 	}
+	var limiter *loginRateLimiter
+	if opts.DataDir != "" {
+		limiter = newPersistentLoginRateLimiter(opts.DataDir)
+	} else {
+		limiter = newLoginRateLimiter()
+	}
 	h := &launcherAuthHandlers{
 		token:         opts.DashboardToken,
 		sessionCookie: opts.SessionCookie,
 		secureCookie:  secure,
 		store:         opts.PasswordStore,
 		storeErr:      opts.StoreError,
-		loginLimit:    newLoginRateLimiter(),
+		loginLimit:    limiter,
 	}
 	mux.HandleFunc("POST /api/auth/login", h.handleLogin)
 	mux.HandleFunc("POST /api/auth/logout", h.handleLogout)
@@ -202,7 +211,7 @@ func (h *launcherAuthHandlers) handleStatus(w http.ResponseWriter, r *http.Reque
 	initialized, initErr := h.isStoreInitialized(r.Context())
 	if initErr != nil {
 		w.WriteHeader(http.StatusServiceUnavailable)
-		writeErrorf(w, "%v", initErr)
+		writeErrorf(w, "service temporarily unavailable")
 		return
 	}
 	resp := launcherAuthStatusResponse{
@@ -243,7 +252,7 @@ func (h *launcherAuthHandlers) handleSetup(w http.ResponseWriter, r *http.Reques
 	initialized, initErr := h.isStoreInitialized(r.Context())
 	if initErr != nil {
 		w.WriteHeader(http.StatusServiceUnavailable)
-		writeErrorf(w, "%v", initErr)
+		writeErrorf(w, "service temporarily unavailable")
 		return
 	}
 
@@ -300,4 +309,3 @@ func writeErrorf(w http.ResponseWriter, format string, args ...any) {
 	msg, _ := json.Marshal(fmt.Sprintf(format, args...))
 	_, _ = w.Write([]byte(`{"error":` + string(msg) + `}`))
 }
-

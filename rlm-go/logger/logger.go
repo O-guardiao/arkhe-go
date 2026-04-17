@@ -41,8 +41,13 @@ func (l *RLMLogger) LogMetadata(metadata types.RLMMetadata) {
 	if l == nil || l.metadataLogged {
 		return
 	}
-	raw, _ := json.Marshal(metadata)
-	_ = json.Unmarshal(raw, &l.runMetadata)
+	raw, err := json.Marshal(metadata)
+	if err != nil {
+		return
+	}
+	if err := json.Unmarshal(raw, &l.runMetadata); err != nil {
+		return
+	}
 	l.metadataLogged = true
 	if l.saveToDisk {
 		l.writeJSONLine(map[string]any{
@@ -58,9 +63,14 @@ func (l *RLMLogger) Log(iteration types.RLMIteration) {
 		return
 	}
 	l.iterationCount++
-	raw, _ := json.Marshal(iteration)
+	raw, err := json.Marshal(iteration)
+	if err != nil {
+		return
+	}
 	payload := map[string]any{}
-	_ = json.Unmarshal(raw, &payload)
+	if err := json.Unmarshal(raw, &payload); err != nil {
+		return
+	}
 	entry := map[string]any{
 		"type":      "iteration",
 		"iteration": l.iterationCount,
@@ -101,11 +111,15 @@ func (l *RLMLogger) writeJSONLine(entry map[string]any) {
 	defer file.Close()
 
 	writer := bufio.NewWriter(file)
-	defer writer.Flush()
 	encoded, err := json.Marshal(entry)
 	if err != nil {
 		return
 	}
-	_, _ = writer.Write(encoded)
-	_, _ = writer.WriteString("\n")
+	if _, err := writer.Write(encoded); err != nil {
+		return
+	}
+	if _, err := writer.WriteString("\n"); err != nil {
+		return
+	}
+	_ = writer.Flush()
 }

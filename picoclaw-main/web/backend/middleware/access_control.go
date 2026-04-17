@@ -10,7 +10,9 @@ import (
 // IPAllowlist restricts access to requests from configured CIDR ranges.
 // Loopback addresses are always allowed for local administration.
 // Empty CIDR list means no restriction.
-func IPAllowlist(allowedCIDRs []string, next http.Handler) (http.Handler, error) {
+// trustedProxyCIDRs, when non-empty, enables proxy-aware IP extraction via
+// X-Forwarded-For; otherwise, only r.RemoteAddr is used.
+func IPAllowlist(allowedCIDRs []string, trustedProxyCIDRs []*net.IPNet, next http.Handler) (http.Handler, error) {
 	if len(allowedCIDRs) == 0 {
 		return next, nil
 	}
@@ -25,7 +27,7 @@ func IPAllowlist(allowedCIDRs []string, next http.Handler) (http.Handler, error)
 	}
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		ip := clientIPFromRemoteAddr(r.RemoteAddr)
+		ip := RealIP(r.RemoteAddr, r.Header.Get("X-Forwarded-For"), trustedProxyCIDRs)
 		if ip == nil {
 			rejectByPolicy(w, r)
 			return
@@ -43,14 +45,6 @@ func IPAllowlist(allowedCIDRs []string, next http.Handler) (http.Handler, error)
 
 		rejectByPolicy(w, r)
 	}), nil
-}
-
-func clientIPFromRemoteAddr(remoteAddr string) net.IP {
-	host := remoteAddr
-	if h, _, err := net.SplitHostPort(remoteAddr); err == nil {
-		host = h
-	}
-	return net.ParseIP(host)
 }
 
 func rejectByPolicy(w http.ResponseWriter, r *http.Request) {

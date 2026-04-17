@@ -58,12 +58,18 @@ func SocketSend(conn net.Conn, data any) error {
 	return err
 }
 
+// maxPayloadSize limits SocketRecv allocations to prevent OOM from malicious headers.
+const maxPayloadSize = 64 * 1024 * 1024 // 64 MB
+
 func SocketRecv(conn net.Conn) ([]byte, error) {
 	header := make([]byte, 4)
 	if _, err := io.ReadFull(conn, header); err != nil {
 		return nil, err
 	}
 	length := binary.BigEndian.Uint32(header)
+	if length > maxPayloadSize {
+		return nil, fmt.Errorf("payload size %d exceeds maximum allowed %d bytes", length, maxPayloadSize)
+	}
 	payload := make([]byte, length)
 	if _, err := io.ReadFull(conn, payload); err != nil {
 		return nil, err

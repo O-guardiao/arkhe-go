@@ -228,7 +228,20 @@ func (p *RLMProvider) buildCustomTools(
 				if err != nil {
 					return "Error: " + err.Error()
 				}
-				result := binding.ExecuteTool(ctxProvider(), toolName, args, metaProvider())
+				// Guard against excessively large arguments that could indicate
+				// prompt injection or resource abuse through the tool bridge.
+				if raw, marshalErr := json.Marshal(args); marshalErr == nil && len(raw) > 512*1024 {
+					return fmt.Sprintf("Error: tool %q arguments exceed 512KB size limit", toolName)
+				}
+				// Apply a per-tool timeout to prevent a single tool call from
+				// blocking the entire RLM loop indefinitely.
+				toolCtx := ctxProvider()
+				if toolCtx == nil {
+					toolCtx = context.Background()
+				}
+				toolCtx, cancel := context.WithTimeout(toolCtx, 120*time.Second)
+				defer cancel()
+				result := binding.ExecuteTool(toolCtx, toolName, args, metaProvider())
 				if strings.TrimSpace(result.Content) == "" {
 					if result.IsError {
 						return fmt.Sprintf("Error: tool %q failed without output", toolName)

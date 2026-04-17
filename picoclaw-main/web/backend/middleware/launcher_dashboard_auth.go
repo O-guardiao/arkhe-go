@@ -5,6 +5,7 @@ import (
 	"crypto/sha256"
 	"crypto/subtle"
 	"encoding/hex"
+	"net"
 	"net/http"
 	"path"
 	"strings"
@@ -14,8 +15,9 @@ import (
 // LauncherDashboardCookieName is the HttpOnly cookie set after a successful token login.
 const LauncherDashboardCookieName = "picoclaw_launcher_auth"
 
-// launcherDashboardSessionMaxAgeSec is the session cookie lifetime (7 days).
-const launcherDashboardSessionMaxAgeSec = 7 * 24 * 3600
+// launcherDashboardSessionMaxAgeSec is the session cookie lifetime (24 hours).
+// Reduced from 7 days (VULN-016) to limit window of stolen-session attacks.
+const launcherDashboardSessionMaxAgeSec = 24 * 3600
 
 const launcherSessionMACLabel = "picoclaw-launcher-v1"
 
@@ -34,6 +36,8 @@ type LauncherDashboardAuthConfig struct {
 	Token          string
 	// SecureCookie sets the session cookie's Secure flag. If nil, DefaultLauncherDashboardSecureCookie is used.
 	SecureCookie func(*http.Request) bool
+	// AllowQueryToken controls whether ?token= bootstrap is accepted. If nil, only direct loopback requests are allowed.
+	AllowQueryToken func(*http.Request) bool
 }
 
 // DefaultLauncherDashboardSecureCookie mirrors typical production HTTPS detection (TLS or X-Forwarded-Proto).
@@ -42,6 +46,26 @@ func DefaultLauncherDashboardSecureCookie(r *http.Request) bool {
 		return true
 	}
 	return strings.EqualFold(r.Header.Get("X-Forwarded-Proto"), "https")
+}
+
+// DefaultLauncherDashboardAllowQueryToken only allows ?token= bootstrap on direct loopback requests.
+func DefaultLauncherDashboardAllowQueryToken(r *http.Request) bool {
+	if strings.TrimSpace(r.Header.Get("X-Forwarded-For")) != "" ||
+		strings.TrimSpace(r.Header.Get("X-Real-IP")) != "" ||
+		strings.TrimSpace(r.Header.Get("Forwarded")) != "" {
+		return false
+	}
+
+	host, _, err := net.SplitHostPort(strings.TrimSpace(r.RemoteAddr))
+	if err != nil {
+		host = strings.TrimSpace(r.RemoteAddr)
+	}
+	if host == "" {
+		return false
+	}
+
+	ip := net.ParseIP(host)
+	return ip != nil && ip.IsLoopback()
 }
 
 // SetLauncherDashboardSessionCookie writes the HttpOnly session cookie after successful dashboard token login.
@@ -60,7 +84,7 @@ func SetLauncherDashboardSessionCookie(
 		Path:     "/",
 		MaxAge:   launcherDashboardSessionMaxAgeSec,
 		HttpOnly: true,
-		SameSite: http.SameSiteLaxMode,
+		SameSite: http.SameSiteStrictMode, // VULN-017: Strict prevents cross-site cookie sending
 		Secure:   secure(r),
 	})
 }
@@ -76,7 +100,7 @@ func ClearLauncherDashboardSessionCookie(w http.ResponseWriter, r *http.Request,
 		Path:     "/",
 		MaxAge:   -1,
 		HttpOnly: true,
-		SameSite: http.SameSiteLaxMode,
+		SameSite: http.SameSiteStrictMode, // VULN-017
 		Secure:   secure(r),
 		Expires:  time.Unix(0, 0),
 	})
@@ -95,6 +119,9 @@ func LauncherDashboardAuth(cfg LauncherDashboardAuthConfig, next http.Handler) h
 			return
 		}
 		if validLauncherDashboardAuth(r, cfg) {
+			// VULN-016: Sliding-window session rotation — re-issue cookie on each
+			// authenticated request so the TTL resets and session freshness is enforced.
+			SetLauncherDashboardSessionCookie(w, r, cfg.ExpectedCookie, cfg.SecureCookie)
 			next.ServeHTTP(w, r)
 			return
 		}
@@ -123,6 +150,14 @@ func tryLauncherQueryTokenLogin(
 	qToken := strings.TrimSpace(r.URL.Query().Get("token"))
 	if qToken == "" {
 		return false
+	}
+	allowQueryToken := cfg.AllowQueryToken
+	if allowQueryToken == nil {
+		allowQueryToken = DefaultLauncherDashboardAllowQueryToken
+	}
+	if !allowQueryToken(r) {
+		rejectLauncherDashboardAuth(w, r, canonicalPath)
+		return true
 	}
 	if len(qToken) != len(cfg.Token) || subtle.ConstantTimeCompare([]byte(qToken), []byte(cfg.Token)) != 1 {
 		rejectLauncherDashboardAuth(w, r, canonicalPath)

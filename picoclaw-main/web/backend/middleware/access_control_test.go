@@ -7,7 +7,7 @@ import (
 )
 
 func TestIPAllowlist_EmptyCIDRsAllowsAll(t *testing.T) {
-	h, err := IPAllowlist(nil, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	h, err := IPAllowlist(nil, nil, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 	}))
 	if err != nil {
@@ -25,7 +25,7 @@ func TestIPAllowlist_EmptyCIDRsAllowsAll(t *testing.T) {
 }
 
 func TestIPAllowlist_RejectsOutsideCIDR(t *testing.T) {
-	h, err := IPAllowlist([]string{"192.168.1.0/24"}, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	h, err := IPAllowlist([]string{"192.168.1.0/24"}, nil, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 	}))
 	if err != nil {
@@ -43,7 +43,7 @@ func TestIPAllowlist_RejectsOutsideCIDR(t *testing.T) {
 }
 
 func TestIPAllowlist_AllowsInsideCIDR(t *testing.T) {
-	h, err := IPAllowlist([]string{"192.168.1.0/24"}, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	h, err := IPAllowlist([]string{"192.168.1.0/24"}, nil, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 	}))
 	if err != nil {
@@ -61,7 +61,7 @@ func TestIPAllowlist_AllowsInsideCIDR(t *testing.T) {
 }
 
 func TestIPAllowlist_AlwaysAllowsLoopback(t *testing.T) {
-	h, err := IPAllowlist([]string{"192.168.1.0/24"}, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	h, err := IPAllowlist([]string{"192.168.1.0/24"}, nil, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 	}))
 	if err != nil {
@@ -79,7 +79,7 @@ func TestIPAllowlist_AlwaysAllowsLoopback(t *testing.T) {
 }
 
 func TestIPAllowlist_InvalidCIDR(t *testing.T) {
-	_, err := IPAllowlist([]string{"bad-cidr"}, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {}))
+	_, err := IPAllowlist([]string{"bad-cidr"}, nil, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {}))
 	if err == nil {
 		t.Fatal("IPAllowlist() expected error for invalid CIDR")
 	}

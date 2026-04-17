@@ -108,6 +108,16 @@ var gatewayHealthGet = func(url string, timeout time.Duration) (*http.Response, 
 	return client.Get(url)
 }
 
+var gatewayHealthGetAuthorized = func(url, token string, timeout time.Duration) (*http.Response, error) {
+	client := http.Client{Timeout: timeout}
+	req, err := http.NewRequest(http.MethodGet, url, nil)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Authorization", "Bearer "+token)
+	return client.Do(req)
+}
+
 var gatewayProcessMatcher = isLikelyGatewayProcess
 
 // getGatewayHealth checks the gateway health endpoint and returns the status response.
@@ -116,10 +126,12 @@ func (h *Handler) getGatewayHealth(cfg *config.Config, timeout time.Duration) (*
 	// Prefer port/host from pidData when available.
 	var port int
 	var host string
+	var token string
 	gateway.mu.Lock()
 	if d := gateway.pidData; d != nil && d.Port > 0 {
 		port = d.Port
 		host = gatewayProbeHost(d.Host)
+		token = strings.TrimSpace(d.Token)
 	}
 	gateway.mu.Unlock()
 	if port == 0 {
@@ -134,11 +146,19 @@ func (h *Handler) getGatewayHealth(cfg *config.Config, timeout time.Duration) (*
 
 	url := "http://" + net.JoinHostPort(host, strconv.Itoa(port)) + "/health"
 
-	return getGatewayHealthByURL(url, timeout)
+	return getGatewayHealthByURL(url, timeout, token)
 }
 
-func getGatewayHealthByURL(url string, timeout time.Duration) (*health.StatusResponse, int, error) {
-	resp, err := gatewayHealthGet(url, timeout)
+func getGatewayHealthByURL(url string, timeout time.Duration, token string) (*health.StatusResponse, int, error) {
+	var (
+		resp *http.Response
+		err  error
+	)
+	if strings.TrimSpace(token) != "" {
+		resp, err = gatewayHealthGetAuthorized(url, token, timeout)
+	} else {
+		resp, err = gatewayHealthGet(url, timeout)
+	}
 	if err != nil {
 		return nil, 0, err
 	}
@@ -248,7 +268,7 @@ func (h *Handler) getGatewayHealthForPidData(
 	}
 
 	url := "http://" + net.JoinHostPort(host, strconv.Itoa(port)) + "/health"
-	return getGatewayHealthByURL(url, timeout)
+	return getGatewayHealthByURL(url, timeout, strings.TrimSpace(pidData.Token))
 }
 
 func (h *Handler) validateGatewayPidData(
@@ -1209,4 +1229,3 @@ func scanPipe(r io.Reader, buf *LogBuffer) {
 		buf.Append(scanner.Text())
 	}
 }
-

@@ -210,6 +210,7 @@ picoclaw-launcher
 > ```bash
 > picoclaw-launcher -public
 > ```
+> Isso expõe o console web em `18800`, não o Gateway. Só abra o Gateway separadamente quando precisar receber tráfego de entrada, como webhooks.
 
 <p align="center">
 <img src="assets/launcher-webui.jpg" alt="WebUI Launcher" width="600">
@@ -247,7 +248,7 @@ docker compose -f docker/docker-compose.yml --profile launcher up -d
 # Abra http://localhost:18800
 ```
 
-> **Usuários de Docker / VM:** O Gateway escuta em `127.0.0.1` por padrão. Defina `PICOCLAW_GATEWAY_HOST=0.0.0.0` ou use a flag `-public` para torná-lo acessível pelo host.
+> **Usuários de Docker / VM:** O Gateway escuta em `127.0.0.1` por padrão e deve continuar assim na maioria dos casos. Use `-public` apenas para expor o console web. Só defina `PICOCLAW_GATEWAY_HOST=0.0.0.0` e publique `18790` quando realmente precisar receber webhooks ou outra entrada externa direta no Gateway.
 
 ```bash
 # Verificar logs

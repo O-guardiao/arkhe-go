@@ -3,6 +3,7 @@ package auth
 import (
 	"os"
 	"path/filepath"
+	"runtime"
 	"testing"
 	"time"
 )
@@ -52,9 +53,7 @@ func TestAuthCredentialNeedsRefresh(t *testing.T) {
 
 func TestStoreRoundtrip(t *testing.T) {
 	tmpDir := t.TempDir()
-	origHome := os.Getenv("HOME")
-	t.Setenv("HOME", tmpDir)
-	defer os.Setenv("HOME", origHome)
+	t.Setenv("PICOCLAW_HOME", filepath.Join(tmpDir, ".picoclaw"))
 
 	cred := &AuthCredential{
 		AccessToken:  "test-access-token",
@@ -88,10 +87,12 @@ func TestStoreRoundtrip(t *testing.T) {
 }
 
 func TestStoreFilePermissions(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("Windows does not support Unix file permission bits")
+	}
 	tmpDir := t.TempDir()
-	origHome := os.Getenv("HOME")
-	t.Setenv("HOME", tmpDir)
-	defer os.Setenv("HOME", origHome)
+	picoclawHome := filepath.Join(tmpDir, ".picoclaw")
+	t.Setenv("PICOCLAW_HOME", picoclawHome)
 
 	cred := &AuthCredential{
 		AccessToken: "secret-token",
@@ -102,7 +103,7 @@ func TestStoreFilePermissions(t *testing.T) {
 		t.Fatalf("SetCredential() error: %v", err)
 	}
 
-	path := filepath.Join(tmpDir, ".picoclaw", "auth.json")
+	path := filepath.Join(picoclawHome, "auth.json")
 	info, err := os.Stat(path)
 	if err != nil {
 		t.Fatalf("Stat() error: %v", err)
@@ -115,9 +116,7 @@ func TestStoreFilePermissions(t *testing.T) {
 
 func TestStoreMultiProvider(t *testing.T) {
 	tmpDir := t.TempDir()
-	origHome := os.Getenv("HOME")
-	t.Setenv("HOME", tmpDir)
-	defer os.Setenv("HOME", origHome)
+	t.Setenv("PICOCLAW_HOME", filepath.Join(tmpDir, ".picoclaw"))
 
 	openaiCred := &AuthCredential{AccessToken: "openai-token", Provider: "openai", AuthMethod: "oauth"}
 	anthropicCred := &AuthCredential{AccessToken: "anthropic-token", Provider: "anthropic", AuthMethod: "token"}
@@ -148,9 +147,7 @@ func TestStoreMultiProvider(t *testing.T) {
 
 func TestDeleteCredential(t *testing.T) {
 	tmpDir := t.TempDir()
-	origHome := os.Getenv("HOME")
-	t.Setenv("HOME", tmpDir)
-	defer os.Setenv("HOME", origHome)
+	t.Setenv("PICOCLAW_HOME", filepath.Join(tmpDir, ".picoclaw"))
 
 	cred := &AuthCredential{AccessToken: "to-delete", Provider: "openai", AuthMethod: "oauth"}
 	if err := SetCredential("openai", cred); err != nil {
@@ -172,9 +169,7 @@ func TestDeleteCredential(t *testing.T) {
 
 func TestLoadStoreEmpty(t *testing.T) {
 	tmpDir := t.TempDir()
-	origHome := os.Getenv("HOME")
-	t.Setenv("HOME", tmpDir)
-	defer os.Setenv("HOME", origHome)
+	t.Setenv("PICOCLAW_HOME", filepath.Join(tmpDir, ".picoclaw"))
 
 	store, err := LoadStore()
 	if err != nil {

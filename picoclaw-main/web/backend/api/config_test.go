@@ -379,7 +379,7 @@ func TestHandlePatchConfig_SavesDiscordTokenFromPayload(t *testing.T) {
 	}
 }
 
-func TestHandlePatchConfig_AllowsInvalidDenyRegexPatternsWhenDenyPatternsDisabled(t *testing.T) {
+func TestHandlePatchConfig_RejectsDisablingDenyPatterns(t *testing.T) {
 	configPath, cleanup := setupOAuthTestEnv(t)
 	defer cleanup()
 
@@ -400,8 +400,11 @@ func TestHandlePatchConfig_AllowsInvalidDenyRegexPatternsWhenDenyPatternsDisable
 
 	rec := httptest.NewRecorder()
 	mux.ServeHTTP(rec, req)
-	if rec.Code != http.StatusOK {
-		t.Fatalf("status = %d, want %d, body=%s", rec.Code, http.StatusOK, rec.Body.String())
+	if rec.Code != http.StatusBadRequest {
+		t.Fatalf("status = %d, want %d, body=%s", rec.Code, http.StatusBadRequest, rec.Body.String())
+	}
+	if !bytes.Contains(rec.Body.Bytes(), []byte("enable_deny_patterns cannot be disabled")) {
+		t.Fatalf("expected deny-patterns rejection error, got: %s", rec.Body.String())
 	}
 }
 
@@ -571,4 +574,3 @@ func TestHandleTestCommandPatterns_InvalidJSON(t *testing.T) {
 		t.Fatalf("status = %d, want %d, body=%s", rec.Code, http.StatusBadRequest, rec.Body.String())
 	}
 }
-

@@ -1,6 +1,7 @@
 package core_test
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
@@ -28,7 +29,11 @@ func TestLMHandlerSingleRequest(t *testing.T) {
 }
 
 func TestLMHandlerBatchedRequest(t *testing.T) {
-	mock := clients.NewMockClient("mock-model", []string{"r0", "r1", "r2"}, nil)
+	// Use a prompt-based response function instead of a FIFO queue so that
+	// the result is deterministic regardless of goroutine scheduling order.
+	mock := clients.NewMockClient("mock-model", nil, func(prompt any) string {
+		return "r-" + fmt.Sprint(prompt)
+	})
 	handler := core.NewLMHandler(mock, "127.0.0.1", nil, 2)
 	address, err := handler.Start()
 	if err != nil {
@@ -44,8 +49,9 @@ func TestLMHandlerBatchedRequest(t *testing.T) {
 		if !response.Success() {
 			t.Fatalf("response %d failed: %s", i, response.Error)
 		}
-		if response.ChatCompletion == nil || response.ChatCompletion.Response != "r"+string(rune('0'+i)) {
-			t.Fatalf("unexpected response %d: %#v", i, response.ChatCompletion)
+		expected := "r-p" + string(rune('0'+i))
+		if response.ChatCompletion == nil || response.ChatCompletion.Response != expected {
+			t.Fatalf("unexpected response %d: got %q, want %q", i, response.ChatCompletion.Response, expected)
 		}
 	}
 }

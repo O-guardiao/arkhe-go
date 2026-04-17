@@ -68,6 +68,7 @@ func (h *Handler) handleUpdateConfig(w http.ResponseWriter, r *http.Request) {
 	if execAllowRemoteOmitted(body) {
 		cfg.Tools.Exec.AllowRemote = config.DefaultConfig().Tools.Exec.AllowRemote
 	}
+	applySecurityDefaults(&cfg, body)
 
 	// Load existing config and copy security credentials before validation,
 	// so that security-managed fields (e.g. pico token) are available.
@@ -114,6 +115,30 @@ func execAllowRemoteOmitted(body []byte) bool {
 		return false
 	}
 	return raw.Tools == nil || raw.Tools.Exec == nil || raw.Tools.Exec.AllowRemote == nil
+}
+
+// applySecurityDefaults ensures security-critical boolean fields that were omitted
+// from the request body default to the secure value (true), preventing the Go zero
+// value from being interpreted as an explicit "disable" request.
+func applySecurityDefaults(cfg *config.Config, body []byte) {
+	var raw struct {
+		Tools *struct {
+			FilterSensitiveData *bool `json:"filter_sensitive_data"`
+			Exec                *struct {
+				EnableDenyPatterns *bool `json:"enable_deny_patterns"`
+			} `json:"exec"`
+		} `json:"tools"`
+	}
+	if err := json.Unmarshal(body, &raw); err != nil {
+		return
+	}
+	defaults := config.DefaultConfig()
+	if raw.Tools == nil || raw.Tools.FilterSensitiveData == nil {
+		cfg.Tools.FilterSensitiveData = defaults.Tools.FilterSensitiveData
+	}
+	if raw.Tools == nil || raw.Tools.Exec == nil || raw.Tools.Exec.EnableDenyPatterns == nil {
+		cfg.Tools.Exec.EnableDenyPatterns = defaults.Tools.Exec.EnableDenyPatterns
+	}
 }
 
 // handlePatchConfig partially updates the system configuration using JSON Merge Patch (RFC 7396).
@@ -265,10 +290,29 @@ func (h *Handler) handleTestCommandPatterns(w http.ResponseWriter, r *http.Reque
 	json.NewEncoder(w).Encode(resp)
 }
 
+// immutableSecurityFields enforces that security-critical config fields cannot be
+// weakened via the API. Each check returns an error string when a field has been
+// set to an unsafe value. The defaults come from config.DefaultConfig().
+func immutableSecurityFields(cfg *config.Config) []string {
+	var errs []string
+	// Deny patterns must remain enabled — disabling them removes all command safety guards.
+	if cfg.Tools.Exec.Enabled && !cfg.Tools.Exec.EnableDenyPatterns {
+		errs = append(errs, "tools.exec.enable_deny_patterns cannot be disabled via the API")
+	}
+	// Sensitive data filtering must remain enabled.
+	if !cfg.Tools.FilterSensitiveData {
+		errs = append(errs, "tools.filter_sensitive_data cannot be disabled via the API")
+	}
+	return errs
+}
+
 // validateConfig checks the config for common errors before saving.
 // Returns a list of human-readable error strings; empty means valid.
 func validateConfig(cfg *config.Config) []string {
 	var errs []string
+
+	// Enforce security-critical field immutability first.
+	errs = append(errs, immutableSecurityFields(cfg)...)
 
 	// Validate model_list entries
 	if err := cfg.ValidateModelList(); err != nil {
@@ -278,6 +322,11 @@ func validateConfig(cfg *config.Config) []string {
 	// Gateway port range
 	if cfg.Gateway.Port != 0 && (cfg.Gateway.Port < 1 || cfg.Gateway.Port > 65535) {
 		errs = append(errs, fmt.Sprintf("gateway.port %d is out of valid range (1-65535)", cfg.Gateway.Port))
+	}
+
+	// Warn when binding to all interfaces — this exposes the dashboard to the LAN/Internet.
+	if cfg.Gateway.Host == "0.0.0.0" || cfg.Gateway.Host == "::" {
+		errs = append(errs, "gateway.host is set to a wildcard address ("+cfg.Gateway.Host+"); consider binding to 127.0.0.1 to avoid exposing the dashboard to the network")
 	}
 
 	// Pico channel: token required when enabled
@@ -490,4 +539,3 @@ func applyConfigSecretsFromMap(cfg *config.Config, raw map[string]any) {
 		}
 	}
 }
-

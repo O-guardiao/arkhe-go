@@ -10,10 +10,11 @@ import (
 	"time"
 
 	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
+	ppid "github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/pid"
 	"github.com/O-guardiao/arkhe-go/picoclaw-main/web/backend/launcherconfig"
 )
 
-func TestGatewayHostOverrideUsesExplicitRuntimePublic(t *testing.T) {
+func TestGatewayHostOverrideDoesNotAutoExposeGateway(t *testing.T) {
 	configPath := filepath.Join(t.TempDir(), "config.json")
 	launcherPath := launcherconfig.PathForAppConfig(configPath)
 	if err := launcherconfig.Save(launcherPath, launcherconfig.Config{
@@ -26,8 +27,8 @@ func TestGatewayHostOverrideUsesExplicitRuntimePublic(t *testing.T) {
 	h := NewHandler(configPath)
 	h.SetServerOptions(18800, true, true, nil)
 
-	if got := h.gatewayHostOverride(); got != "0.0.0.0" {
-		t.Fatalf("gatewayHostOverride() = %q, want %q", got, "0.0.0.0")
+	if got := h.gatewayHostOverride(); got != "" {
+		t.Fatalf("gatewayHostOverride() = %q, want empty", got)
 	}
 }
 
@@ -142,6 +143,49 @@ func TestGetGatewayHealthUsesProbeHostForPublicLauncher(t *testing.T) {
 	}
 }
 
+func TestGetGatewayHealthUsesPidTokenForAuthorizedProbe(t *testing.T) {
+	resetGatewayTestState(t)
+
+	configPath := filepath.Join(t.TempDir(), "config.json")
+	h := NewHandler(configPath)
+
+	originalHealthGet := gatewayHealthGet
+	originalHealthGetAuthorized := gatewayHealthGetAuthorized
+	t.Cleanup(func() {
+		gatewayHealthGet = originalHealthGet
+		gatewayHealthGetAuthorized = originalHealthGetAuthorized
+	})
+
+	gateway.mu.Lock()
+	gateway.pidData = &ppid.PidFileData{
+		Host:  "127.0.0.1",
+		Port:  18790,
+		Token: "pid-secret",
+	}
+	gateway.mu.Unlock()
+
+	var requestedURL string
+	var requestedToken string
+	gatewayHealthGet = func(string, time.Duration) (*http.Response, error) {
+		t.Fatal("plain health probe should not be used when pid token is available")
+		return nil, nil
+	}
+	gatewayHealthGetAuthorized = func(url, token string, timeout time.Duration) (*http.Response, error) {
+		requestedURL = url
+		requestedToken = token
+		return nil, errors.New("probe failed")
+	}
+
+	_, _, _ = h.getGatewayHealth(config.DefaultConfig(), time.Second)
+
+	if requestedURL != "http://127.0.0.1:18790/health" {
+		t.Fatalf("health url = %q, want %q", requestedURL, "http://127.0.0.1:18790/health")
+	}
+	if requestedToken != "pid-secret" {
+		t.Fatalf("health token = %q, want %q", requestedToken, "pid-secret")
+	}
+}
+
 func TestBuildWsURLUsesWSSWhenForwardedProtoIsHTTPS(t *testing.T) {
 	configPath := filepath.Join(t.TempDir(), "config.json")
 	h := NewHandler(configPath)
@@ -240,4 +284,3 @@ func TestBuildWsURLUsesRequestHostNotGatewayBindLoopback(t *testing.T) {
 		t.Fatalf("buildWsURL() = %q, want %q", got, "ws://localhost:18800/pico/ws")
 	}
 }
-

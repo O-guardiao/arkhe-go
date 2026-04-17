@@ -16,7 +16,7 @@ func TestSanitizeFTS5Query(t *testing.T) {
 
 		// FTS5 operators neutralized
 		{"sub-agent", `"sub-agent"`},
-		{"agent:main", `"agent:main"`},
+		{"agent:main", `"agent" "main"`},
 		{"+required", `"+required"`},
 		{"prefix*", `"prefix*"`},
 		{"^initial", `"^initial"`},

@@ -16,12 +16,14 @@ import (
 type LMHandler struct {
 	defaultClient      clients.Client
 	otherBackendClient clients.Client
-	clients            map[string]clients.Client
 	host               string
 	port               int
 	listener           net.Listener
 	wg                 sync.WaitGroup
 	batchMaxConcurrent int
+
+	clientsMu sync.RWMutex
+	clients   map[string]clients.Client
 }
 
 func NewLMHandler(
@@ -51,12 +53,17 @@ func (h *LMHandler) RegisterClient(modelName string, client clients.Client) {
 	if modelName == "" || client == nil {
 		return
 	}
+	h.clientsMu.Lock()
 	h.clients[modelName] = client
+	h.clientsMu.Unlock()
 }
 
 func (h *LMHandler) GetClient(model string, depth int) clients.Client {
 	if model != "" {
-		if client, ok := h.clients[model]; ok {
+		h.clientsMu.RLock()
+		client, ok := h.clients[model]
+		h.clientsMu.RUnlock()
+		if ok {
 			return client
 		}
 	}
@@ -112,25 +119,62 @@ func (h *LMHandler) Address() string {
 }
 
 func (h *LMHandler) Completion(prompt any, model string) (string, error) {
-	return h.GetClient(model, 0).Completion(context.Background(), prompt, model)
+	ctx, cancel := context.WithTimeout(context.Background(), 300*time.Second)
+	defer cancel()
+	return h.GetClient(model, 0).Completion(ctx, prompt, model)
 }
 
 func (h *LMHandler) GetUsageSummary() types.UsageSummary {
 	merged := map[string]types.ModelUsageSummary{}
+	h.clientsMu.RLock()
 	for _, client := range h.clients {
 		for model, usage := range client.GetUsageSummary().ModelUsageSummaries {
-			merged[model] = usage
+			if existing, ok := merged[model]; ok {
+				existing.TotalCalls += usage.TotalCalls
+				existing.TotalInputTokens += usage.TotalInputTokens
+				existing.TotalOutputTokens += usage.TotalOutputTokens
+				if usage.TotalCost != nil {
+					if existing.TotalCost == nil {
+						cost := *usage.TotalCost
+						existing.TotalCost = &cost
+					} else {
+						*existing.TotalCost += *usage.TotalCost
+					}
+				}
+				merged[model] = existing
+			} else {
+				merged[model] = usage
+			}
 		}
 	}
+	h.clientsMu.RUnlock()
 	if h.otherBackendClient != nil {
 		for model, usage := range h.otherBackendClient.GetUsageSummary().ModelUsageSummaries {
-			merged[model] = usage
+			if existing, ok := merged[model]; ok {
+				existing.TotalCalls += usage.TotalCalls
+				existing.TotalInputTokens += usage.TotalInputTokens
+				existing.TotalOutputTokens += usage.TotalOutputTokens
+				if usage.TotalCost != nil {
+					if existing.TotalCost == nil {
+						cost := *usage.TotalCost
+						existing.TotalCost = &cost
+					} else {
+						*existing.TotalCost += *usage.TotalCost
+					}
+				}
+				merged[model] = existing
+			} else {
+				merged[model] = usage
+			}
 		}
 	}
 	return types.UsageSummary{ModelUsageSummaries: merged}
 }
 
 func (h *LMHandler) handleConnection(conn net.Conn) {
+	// Set a read/write deadline to prevent goroutine leaks from stalled clients.
+	_ = conn.SetDeadline(time.Now().Add(600 * time.Second))
+
 	payload, err := protocol.SocketRecv(conn)
 	if err != nil {
 		_ = protocol.SocketSend(conn, protocol.ErrorResponse(err.Error()))
@@ -151,13 +195,17 @@ func (h *LMHandler) handleConnection(conn net.Conn) {
 	} else {
 		response = protocol.ErrorResponse("missing prompt or prompts")
 	}
+	// Deadline refresh before writing response.
+	_ = conn.SetDeadline(time.Now().Add(30 * time.Second))
 	_ = protocol.SocketSend(conn, response)
 }
 
 func (h *LMHandler) handleSingle(request protocol.LMRequest) protocol.LMResponse {
 	client := h.GetClient(request.Model, request.Depth)
 	start := time.Now()
-	content, err := client.Completion(context.Background(), request.Prompt, request.Model)
+	ctx, cancel := context.WithTimeout(context.Background(), 300*time.Second)
+	defer cancel()
+	content, err := client.Completion(ctx, request.Prompt, request.Model)
 	if err != nil {
 		return protocol.ErrorResponse(err.Error())
 	}

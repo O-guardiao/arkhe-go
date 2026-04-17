@@ -95,7 +95,19 @@ func LoginBrowser(cfg OAuthProviderConfig) (*AuthCredential, error) {
 		return nil, fmt.Errorf("generating state: %w", err)
 	}
 
-	redirectURI := fmt.Sprintf("http://localhost:%d/auth/callback", cfg.Port)
+	// VULN-010: Use ephemeral port (:0) to avoid port-hijacking on multi-user machines.
+	// Falls back to the configured port if ephemeral binding fails (e.g. firewall rules).
+	listenAddr := "127.0.0.1:0"
+	listener, err := net.Listen("tcp", listenAddr)
+	if err != nil {
+		// Fallback to configured port.
+		listener, err = net.Listen("tcp", fmt.Sprintf("127.0.0.1:%d", cfg.Port))
+		if err != nil {
+			return nil, fmt.Errorf("starting callback server: %w", err)
+		}
+	}
+	actualPort := listener.Addr().(*net.TCPAddr).Port
+	redirectURI := fmt.Sprintf("http://localhost:%d/auth/callback", actualPort)
 
 	authURL := buildAuthorizeURL(cfg, pkce, state, redirectURI)
 
@@ -122,11 +134,6 @@ func LoginBrowser(cfg OAuthProviderConfig) (*AuthCredential, error) {
 		resultCh <- callbackResult{code: code}
 	})
 
-	listener, err := net.Listen("tcp", fmt.Sprintf("127.0.0.1:%d", cfg.Port))
-	if err != nil {
-		return nil, fmt.Errorf("starting callback server on port %d: %w", cfg.Port, err)
-	}
-
 	server := &http.Server{Handler: mux}
 	go server.Serve(listener)
 	defer func() {
@@ -143,7 +150,7 @@ func LoginBrowser(cfg OAuthProviderConfig) (*AuthCredential, error) {
 
 	fmt.Printf(
 		"Wait! If you are in a headless environment (like Coolify/VPS) and cannot reach localhost:%d,\n",
-		cfg.Port,
+		actualPort,
 	)
 	fmt.Println(
 		"please complete the login in your local browser and then PASTE the final redirect URL (or just the code) here.",

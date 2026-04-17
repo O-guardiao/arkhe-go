@@ -3,6 +3,7 @@ package launcherconfig
 import (
 	"os"
 	"path/filepath"
+	"runtime"
 	"testing"
 
 	"github.com/O-guardiao/arkhe-go/picoclaw-main/web/backend/middleware"
@@ -57,8 +58,10 @@ func TestSaveAndLoadRoundTrip(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Stat() error = %v", err)
 	}
-	if perm := stat.Mode().Perm(); perm != 0o600 {
-		t.Fatalf("file perm = %o, want 600", perm)
+	if runtime.GOOS != "windows" {
+		if perm := stat.Mode().Perm(); perm != 0o600 {
+			t.Fatalf("file perm = %o, want 600", perm)
+		}
 	}
 }
 
@@ -153,4 +156,3 @@ func TestNormalizeCIDRs(t *testing.T) {
 		}
 	}
 }
-

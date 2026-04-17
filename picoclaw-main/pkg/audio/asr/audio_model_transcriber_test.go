@@ -6,6 +6,7 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
@@ -196,9 +197,10 @@ func TestAudioModelTranscriberTranscribe(t *testing.T) {
 		if err == nil {
 			t.Fatal("expected error for unsupported audio format, got nil")
 		}
-		if got := err.Error(); got != `unsupported audio format for "`+badPath+`"` {
+		// %q in fmt.Errorf escapes backslashes on Windows, so use Contains
+		// instead of exact match.
+		if got := err.Error(); !strings.Contains(got, "unsupported audio format for") {
 			t.Fatalf("error = %q, want unsupported format error", got)
 		}
 	})
 }
-

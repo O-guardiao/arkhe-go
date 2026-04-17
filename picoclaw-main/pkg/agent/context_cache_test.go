@@ -449,7 +449,8 @@ Updated content.`
 // (~/.picoclaw/skills) invalidates the cached system prompt.
 func TestGlobalSkillFileContentChange(t *testing.T) {
 	tmpHome := t.TempDir()
-	t.Setenv("HOME", tmpHome)
+	// Use PICOCLAW_HOME instead of HOME — os.UserHomeDir() ignores HOME on Windows.
+	t.Setenv("PICOCLAW_HOME", filepath.Join(tmpHome, ".picoclaw"))
 
 	tmpDir := setupWorkspace(t, nil)
 	defer os.RemoveAll(tmpDir)
@@ -506,7 +507,7 @@ description: global-v2
 // invalidates the cached system prompt.
 func TestBuiltinSkillFileContentChange(t *testing.T) {
 	tmpHome := t.TempDir()
-	t.Setenv("HOME", tmpHome)
+	t.Setenv("PICOCLAW_HOME", filepath.Join(tmpHome, ".picoclaw"))
 
 	tmpDir := setupWorkspace(t, nil)
 	defer os.RemoveAll(tmpDir)
@@ -761,4 +762,3 @@ func BenchmarkBuildMessagesWithCache(b *testing.B) {
 		_ = cb.BuildMessages(history, "summary", "new message", nil, "cli", "test", "", "")
 	}
 }
-

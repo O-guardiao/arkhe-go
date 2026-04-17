@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"os/exec"
@@ -39,7 +40,8 @@ func (h *Handler) registerStartupRoutes(mux *http.ServeMux) {
 func (h *Handler) handleGetAutoStart(w http.ResponseWriter, r *http.Request) {
 	enabled, supported, message, err := h.getAutoStartStatus()
 	if err != nil {
-		http.Error(w, fmt.Sprintf("Failed to read startup setting: %v", err), http.StatusInternalServerError)
+		log.Printf("[startup] failed to read autostart status: %v", err)
+		http.Error(w, "Failed to read startup setting", http.StatusInternalServerError)
 		return
 	}
 
@@ -55,7 +57,7 @@ func (h *Handler) handleGetAutoStart(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) handleSetAutoStart(w http.ResponseWriter, r *http.Request) {
 	var req autoStartRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, fmt.Sprintf("Invalid JSON: %v", err), http.StatusBadRequest)
+		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
 
@@ -64,13 +66,15 @@ func (h *Handler) handleSetAutoStart(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
-		http.Error(w, fmt.Sprintf("Failed to update startup setting: %v", err), http.StatusInternalServerError)
+		log.Printf("[startup] failed to update autostart: %v", err)
+		http.Error(w, "Failed to update startup setting", http.StatusInternalServerError)
 		return
 	}
 
 	enabled, supported, message, err := h.getAutoStartStatus()
 	if err != nil {
-		http.Error(w, fmt.Sprintf("Failed to verify startup setting: %v", err), http.StatusInternalServerError)
+		log.Printf("[startup] failed to verify autostart: %v", err)
+		http.Error(w, "Failed to verify startup setting", http.StatusInternalServerError)
 		return
 	}
 

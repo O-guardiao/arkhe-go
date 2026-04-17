@@ -245,8 +245,13 @@ func TestSetDefaultModel_ModelWithoutAPIKey(t *testing.T) {
 }
 
 func TestSetDefaultModel_SaveConfigError(t *testing.T) {
-	// Use an invalid path to trigger save error
-	invalidPath := "/nonexistent/directory/config.json"
+	// Place a regular file where MkdirAll expects a directory, making the
+	// write truly impossible on every OS.
+	blocker := filepath.Join(t.TempDir(), "blocker")
+	if err := os.WriteFile(blocker, []byte("x"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	invalidPath := filepath.Join(blocker, "sub", "config.json")
 
 	cfg := &config.Config{
 		Agents: config.AgentsConfig{
@@ -406,4 +411,3 @@ func TestListAvailableModels_MarkerLogic(t *testing.T) {
 	assert.Contains(t, output, "> - middle-model (openai/middle)")
 	assert.Contains(t, output, "  - last-model (openai/last)")
 }
-

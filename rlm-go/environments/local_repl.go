@@ -2,7 +2,6 @@ package environments
 
 import (
 	"bytes"
-	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -19,6 +18,15 @@ import (
 	"github.com/O-guardiao/arkhe-go/rlm-go/types"
 	"github.com/traefik/yaegi/interp"
 	"github.com/traefik/yaegi/stdlib"
+)
+
+// Pre-compiled regexes (moved out of hot loops for performance).
+var (
+	reCustomExportName = regexp.MustCompile(`[^a-zA-Z0-9]`)
+	reDefinedVar       = regexp.MustCompile(`(?m)^\s*var\s+([A-Za-z_][A-Za-z0-9_]*)`)
+	reDefinedConst     = regexp.MustCompile(`(?m)^\s*const\s+([A-Za-z_][A-Za-z0-9_]*)`)
+	reDefinedFunc      = regexp.MustCompile(`(?m)^\s*func\s+([A-Za-z_][A-Za-z0-9_]*)`)
+	reDefinedShortVar  = regexp.MustCompile(`(?m)\b([A-Za-z_][A-Za-z0-9_]*)\s*:=`)
 )
 
 type LocalREPL struct {
@@ -135,7 +143,11 @@ func NewLocalREPL(config Config) (*LocalREPL, error) {
 		}
 	}
 	if config.SetupCode != "" {
-		repl.ExecuteCode(config.SetupCode)
+		result := repl.ExecuteCode(config.SetupCode)
+		if result.Stderr != "" {
+			_ = repl.Cleanup()
+			return nil, fmt.Errorf("setup code failed: %s", result.Stderr)
+		}
 	}
 	return repl, nil
 }
@@ -220,7 +232,7 @@ func (r *LocalREPL) installCustomTools() error {
 }
 
 func customExportName(name string) string {
-	name = regexp.MustCompile(`[^a-zA-Z0-9]`).ReplaceAllString(name, "_")
+	name = reCustomExportName.ReplaceAllString(name, "_")
 	if name == "" {
 		return "ToolValue"
 	}
@@ -607,13 +619,22 @@ func (r *LocalREPL) setValueLocked(name string, expression string, declareIfMiss
 }
 
 func (r *LocalREPL) restoreScaffoldLocked() {
-	_, _ = r.setValueLocked("FINAL_VAR", "RLMFinalVar", false)
-	_, _ = r.setValueLocked("SHOW_VARS", "RLMShowVars", false)
-	_, _ = r.setValueLocked("llm_query", "RLMQuery", false)
-	_, _ = r.setValueLocked("llm_query_batched", "RLMQueryBatched", false)
-	_, _ = r.setValueLocked("rlm_query", "RLMRecursiveQuery", false)
-	_, _ = r.setValueLocked("rlm_query_batched", "RLMRecursiveQueryBatched", false)
-	_, _ = r.setValueLocked("print", "RLMPrint", false)
+	// Best-effort restore of scaffold functions. Errors are logged to stderr
+	// so they surface in REPL output rather than being silently lost.
+	scaffolds := [][2]string{
+		{"FINAL_VAR", "RLMFinalVar"},
+		{"SHOW_VARS", "RLMShowVars"},
+		{"llm_query", "RLMQuery"},
+		{"llm_query_batched", "RLMQueryBatched"},
+		{"rlm_query", "RLMRecursiveQuery"},
+		{"rlm_query_batched", "RLMRecursiveQueryBatched"},
+		{"print", "RLMPrint"},
+	}
+	for _, pair := range scaffolds {
+		if _, err := r.setValueLocked(pair[0], pair[1], false); err != nil {
+			fmt.Fprintf(r.stderrProxy, "warning: failed to restore scaffold %s: %v\n", pair[0], err)
+		}
+	}
 	if _, ok := r.trackedNames["context_0"]; ok {
 		_, _ = r.setValueLocked("context", "context_0", true)
 	}
@@ -660,10 +681,10 @@ func (r *LocalREPL) availableVariableNames() []string {
 
 func extractDefinedNames(code string) []string {
 	patterns := []*regexp.Regexp{
-		regexp.MustCompile(`(?m)^\s*var\s+([A-Za-z_][A-Za-z0-9_]*)`),
-		regexp.MustCompile(`(?m)^\s*const\s+([A-Za-z_][A-Za-z0-9_]*)`),
-		regexp.MustCompile(`(?m)^\s*func\s+([A-Za-z_][A-Za-z0-9_]*)`),
-		regexp.MustCompile(`(?m)\b([A-Za-z_][A-Za-z0-9_]*)\s*:=`),
+		reDefinedVar,
+		reDefinedConst,
+		reDefinedFunc,
+		reDefinedShortVar,
 	}
 	seen := map[string]struct{}{}
 	for _, pattern := range patterns {
@@ -724,7 +745,11 @@ func goLiteralOrJSON(value any) string {
 	if literal, err := goLiteral(value); err == nil {
 		return literal
 	}
-	raw, _ := json.Marshal(value)
+	raw, err := json.Marshal(value)
+	if err != nil {
+		// Fallback to fmt representation if marshal fails.
+		return fmt.Sprintf("%q", fmt.Sprintf("%v", value))
+	}
 	return fmt.Sprintf(`RLMDecodeJSON(%q)`, string(raw))
 }
 
@@ -849,4 +874,3 @@ func emptyToNone(value string) string {
 }
 
 var _ PersistentEnvironment = (*LocalREPL)(nil)
-var _ = context.Background

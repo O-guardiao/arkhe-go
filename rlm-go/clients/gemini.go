@@ -67,11 +67,13 @@ func (c *GeminiClient) Completion(ctx context.Context, prompt any, model string)
 	}
 
 	url := fmt.Sprintf(
-		"https://generativelanguage.googleapis.com/v1beta/models/%s:generateContent?key=%s",
+		"https://generativelanguage.googleapis.com/v1beta/models/%s:generateContent",
 		model,
-		c.apiKey,
 	)
-	payload, err := doJSONRequest(ctx, c.httpClient, "POST", url, nil, body)
+	headers := map[string]string{
+		"x-goog-api-key": c.apiKey,
+	}
+	payload, err := doJSONRequest(ctx, c.httpClient, "POST", url, headers, body)
 	if err != nil {
 		return "", err
 	}

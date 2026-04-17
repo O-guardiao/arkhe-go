@@ -44,13 +44,24 @@ func SanitizeFTS5Query(raw string) string {
 		for _, t := range strings.Fields(before) {
 			t = strings.ReplaceAll(t, `"`, "")
 			if t != "" {
-				parts = append(parts, `"`+t+`"`)
+				for _, sub := range strings.Split(t, ":") {
+					sub = strings.TrimSpace(sub)
+					if sub != "" {
+						parts = append(parts, `"`+sub+`"`)
+					}
+				}
 			}
 		}
-		// Preserve the phrase as-is (strip internal quotes for safety)
+		// Preserve the phrase as-is (strip internal quotes and colons for safety)
 		phrase := strings.TrimSpace(strings.ReplaceAll(raw[loc[0]+1:loc[1]-1], `"`, ""))
 		if phrase != "" {
-			parts = append(parts, `"`+phrase+`"`)
+			// Colons inside quoted phrases also trigger column filter; split them.
+			for _, sub := range strings.Split(phrase, ":") {
+				sub = strings.TrimSpace(sub)
+				if sub != "" {
+					parts = append(parts, `"`+sub+`"`)
+				}
+			}
 		}
 		lastIndex = loc[1]
 	}
@@ -59,7 +70,14 @@ func SanitizeFTS5Query(raw string) string {
 	for _, t := range strings.Fields(raw[lastIndex:]) {
 		t = strings.ReplaceAll(t, `"`, "")
 		if t != "" {
-			parts = append(parts, `"`+t+`"`)
+			// Colon is a column filter in FTS5 even inside quotes;
+			// split on colon so each part is searched as a literal token.
+			for _, sub := range strings.Split(t, ":") {
+				sub = strings.TrimSpace(sub)
+				if sub != "" {
+					parts = append(parts, `"`+sub+`"`)
+				}
+			}
 		}
 	}
 

@@ -31,7 +31,7 @@ type Check struct {
 
 type StatusResponse struct {
 	Status string           `json:"status"`
-	Uptime string           `json:"uptime"`
+	Uptime string           `json:"uptime,omitempty"`
 	PID    int              `json:"pid,omitempty"`
 	Checks map[string]Check `json:"checks,omitempty"`
 }
@@ -168,11 +168,12 @@ func (s *Server) healthHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 
-	uptime := time.Since(s.startTime)
 	resp := StatusResponse{
 		Status: "ok",
-		Uptime: uptime.String(),
-		PID:    os.Getpid(),
+	}
+	if s.isAuthorized(r) {
+		resp.Uptime = time.Since(s.startTime).String()
+		resp.PID = os.Getpid()
 	}
 
 	json.NewEncoder(w).Encode(resp)
@@ -186,34 +187,54 @@ func (s *Server) readyHandler(w http.ResponseWriter, r *http.Request) {
 	checks := make(map[string]Check)
 	maps.Copy(checks, s.checks)
 	s.mu.RUnlock()
+	detailed := s.isAuthorized(r)
 
 	if !ready {
+		resp := StatusResponse{Status: "not ready"}
+		if detailed {
+			resp.Checks = checks
+		}
 		w.WriteHeader(http.StatusServiceUnavailable)
-		json.NewEncoder(w).Encode(StatusResponse{
-			Status: "not ready",
-			Checks: checks,
-		})
+		json.NewEncoder(w).Encode(resp)
 		return
 	}
 
 	for _, check := range checks {
 		if check.Status == "fail" {
+			resp := StatusResponse{Status: "not ready"}
+			if detailed {
+				resp.Checks = checks
+			}
 			w.WriteHeader(http.StatusServiceUnavailable)
-			json.NewEncoder(w).Encode(StatusResponse{
-				Status: "not ready",
-				Checks: checks,
-			})
+			json.NewEncoder(w).Encode(resp)
 			return
 		}
 	}
 
 	w.WriteHeader(http.StatusOK)
-	uptime := time.Since(s.startTime)
-	json.NewEncoder(w).Encode(StatusResponse{
-		Status: "ready",
-		Uptime: uptime.String(),
-		Checks: checks,
-	})
+	resp := StatusResponse{Status: "ready"}
+	if detailed {
+		resp.Uptime = time.Since(s.startTime).String()
+		resp.Checks = checks
+	}
+	json.NewEncoder(w).Encode(resp)
+}
+
+func (s *Server) isAuthorized(r *http.Request) bool {
+	s.mu.RLock()
+	requiredToken := s.authToken
+	s.mu.RUnlock()
+
+	if requiredToken == "" {
+		return true
+	}
+
+	given := extractBearerToken(r.Header.Get("Authorization"))
+	if given == "" {
+		return false
+	}
+
+	return subtle.ConstantTimeCompare([]byte(given), []byte(requiredToken)) == 1
 }
 
 // HandlerMux is the interface for registering HTTP handlers, used by

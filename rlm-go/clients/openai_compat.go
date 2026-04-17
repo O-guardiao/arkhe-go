@@ -3,6 +3,8 @@ package clients
 import (
 	"context"
 	"fmt"
+	"net/url"
+	"strings"
 )
 
 type OpenAICompatibleClient struct {
@@ -74,14 +76,13 @@ func stringsWithQuery(baseURL string, query map[string]string) string {
 	if len(query) == 0 {
 		return baseURL
 	}
-	params := "?"
-	first := true
+	params := url.Values{}
 	for key, value := range query {
-		if !first {
-			params += "&"
-		}
-		first = false
-		params += key + "=" + value
+		params.Set(key, value)
 	}
-	return baseURL + params
+	separator := "?"
+	if strings.Contains(baseURL, "?") {
+		separator = "&"
+	}
+	return baseURL + separator + params.Encode()
 }

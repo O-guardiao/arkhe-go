@@ -262,6 +262,7 @@ func main() {
 		SessionCookie:  dashboardSessionCookie,
 		PasswordStore:  passwordStore,
 		StoreError:     authStoreErr,
+		DataDir:        filepath.Dir(absPath),
 	})
 
 	// API Routes (e.g. /api/status)
@@ -276,7 +277,7 @@ func main() {
 	// Frontend Embedded Assets
 	registerEmbedRoutes(mux)
 
-	accessControlledMux, err := middleware.IPAllowlist(launcherCfg.AllowedCIDRs, mux)
+	accessControlledMux, err := middleware.IPAllowlist(launcherCfg.AllowedCIDRs, nil, mux)
 	if err != nil {
 		logger.Fatalf("Invalid allowed CIDR configuration: %v", err)
 	}
@@ -289,8 +290,10 @@ func main() {
 	// Apply middleware stack
 	handler := middleware.Recoverer(
 		middleware.Logger(
-			middleware.ReferrerPolicyNoReferrer(
-				middleware.JSONContentType(dashAuth),
+			middleware.SecurityHeaders(
+				middleware.ReferrerPolicyNoReferrer(
+					middleware.JSONContentType(dashAuth),
+				),
 			),
 		),
 	)
@@ -392,4 +395,3 @@ func main() {
 		runTray()
 	}
 }
-

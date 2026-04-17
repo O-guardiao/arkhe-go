@@ -24,7 +24,7 @@ docker compose -f docker/docker-compose.yml --profile gateway up -d
 ```
 
 > [!TIP]
-> **Usuários Docker**: Por padrão, o Gateway escuta em `127.0.0.1`, que não é acessível a partir do host. Se você precisar acessar os endpoints de saúde ou expor portas, defina `PICOCLAW_GATEWAY_HOST=0.0.0.0` no seu ambiente ou atualize o `config.json`.
+> **Usuários Docker**: Por padrão, o Gateway escuta em `127.0.0.1` e permanece fechado para a rede externa. Só defina `PICOCLAW_GATEWAY_HOST=0.0.0.0` quando realmente precisar receber conexões de entrada, como webhooks externos. Para checagens locais e uso via launcher, deixe fechado.
 
 ```bash
 # 5. Verificar logs
@@ -44,8 +44,11 @@ docker compose -f docker/docker-compose.yml --profile launcher up -d
 
 Abra http://localhost:18800 no seu navegador. O launcher gerencia o processo do gateway automaticamente.
 
+> [!IMPORTANT]
+> O console web exige autenticação por token. Se `PICOCLAW_LAUNCHER_TOKEN` não for definido, o launcher gera um token aleatório a cada inicialização e o imprime no console.
+
 > [!WARNING]
-> O console web ainda não suporta autenticação. Evite expô-lo na internet pública.
+> O profile `launcher` publica apenas a porta `18800` por padrão. Se você precisar expor o Gateway para webhooks, publique `18790` explicitamente e defina `PICOCLAW_GATEWAY_HOST=0.0.0.0`; não abra essa porta sem necessidade.
 
 ### Modo Agent (One-shot)
 

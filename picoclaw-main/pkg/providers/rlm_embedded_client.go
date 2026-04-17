@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"time"
 
-	rlmclients "github.com/O-guardiao/arkhe-go/rlm-go/clients"
 	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/providers/openai_compat"
+	rlmclients "github.com/O-guardiao/arkhe-go/rlm-go/clients"
 )
 
 type rlmEmbeddedClient struct {
@@ -60,6 +60,9 @@ func (c *rlmEmbeddedClient) Completion(ctx context.Context, prompt any, model st
 	response, err := c.provider.Chat(ctx, messages, nil, model, nil)
 	if err != nil {
 		return "", err
+	}
+	if response == nil {
+		return "", fmt.Errorf("embedded rlm client received nil response for model %q", model)
 	}
 	inputTokens := 0
 	outputTokens := 0
@@ -249,4 +252,3 @@ func rlmStringSlice(raw any) []string {
 		return nil
 	}
 }
-
