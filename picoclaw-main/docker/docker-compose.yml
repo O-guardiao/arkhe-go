@@ -49,6 +49,7 @@ services:
       - gateway
     environment:
       - PICOCLAW_GATEWAY_HOST=0.0.0.0
+      - PICOCLAW_RECURSION_ENABLED=true
     volumes:
       - ./data:/root/.picoclaw
 
@@ -68,6 +69,8 @@ services:
       - launcher
     environment:
       - PICOCLAW_GATEWAY_HOST=0.0.0.0
+      # RLM recursion engine (rlm-go fusion)
+      - PICOCLAW_RECURSION_ENABLED=true
       # Set a fixed token instead of a random one each restart:
       # - PICOCLAW_LAUNCHER_TOKEN=your-secret-token-here
     # Use port 18790 — Hostinger blocks non-standard ports like 18800
