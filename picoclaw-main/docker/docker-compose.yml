@@ -44,10 +44,9 @@ services:
     container_name: arkhe-gateway
     restart: unless-stopped
     pull_policy: never
+    network_mode: host
     profiles:
       - gateway
-    ports:
-      - "18790:18790"
     environment:
       - PICOCLAW_GATEWAY_HOST=0.0.0.0
     volumes:
@@ -55,6 +54,8 @@ services:
 
   # ─────────────────────────────────────────────
   # Launcher (Web Console + Gateway)
+  #   Runs on host network so it binds directly to
+  #   ports 18800 (web UI) and 18790 (gateway).
   # ─────────────────────────────────────────────
   arkhe-launcher:
     build: *arkhe_launcher_build
@@ -62,11 +63,9 @@ services:
     container_name: arkhe-launcher
     restart: unless-stopped
     pull_policy: never
+    network_mode: host
     profiles:
       - launcher
-    ports:
-      - "18800:18800"
-      - "18790:18790"
     environment:
       - PICOCLAW_GATEWAY_HOST=0.0.0.0
       # Set a fixed token instead of a random one each restart:
