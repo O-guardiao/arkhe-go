@@ -11,6 +11,9 @@ build/
 /picoclaw
 /picoclaw-test
 cmd/**/workspace
+# But keep the onboard embedded workspace (needed for go:generate / go:embed)
+!cmd/picoclaw/internal/onboard/workspace/
+!cmd/picoclaw/internal/onboard/workspace/**
 
 # Picoclaw specific
 
@@ -26,7 +29,7 @@ build/
 .env
 config/config.json
 .security.yml
-onboard
+/onboard
 
 
 # Test
