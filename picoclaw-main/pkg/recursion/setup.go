@@ -17,7 +17,16 @@ import (
 // If recursion is not enabled in config, this is a no-op.
 func Setup(al *agent.AgentLoop) *Supervisor {
 	cfg := al.GetConfig()
-	if cfg == nil || !cfg.Recursion.Enabled {
+	if cfg == nil {
+		logger.WarnCF("recursion", "Setup called with nil config — skipping", nil)
+		return nil
+	}
+
+	logger.InfoCF("recursion", "Recursion config check", map[string]any{
+		"enabled": cfg.Recursion.Enabled,
+	})
+
+	if !cfg.Recursion.Enabled {
 		return nil
 	}
 
