@@ -67,9 +67,9 @@ func Setup(al *agent.AgentLoop) *Supervisor {
 
 	logger.InfoCF("recursion", "Recursion engine initialized", map[string]any{
 		"gate_mode":       string(rc.GateMode),
-		"mcts_branches":    rc.MCTSBranches,
-		"max_iterations":   rc.MaxIterations,
-		"max_exec_time_s":  int(rc.MaxExecutionTime.Seconds()),
+		"mcts_branches":   rc.MCTSBranches,
+		"max_iterations":  rc.MaxIterations,
+		"max_exec_time_s": int(rc.MaxExecutionTime.Seconds()),
 	})
 
 	return supervisor
@@ -105,4 +105,3 @@ func configFromSettings(s config.RecursionConfig) RecursionConfig {
 
 	return rc
 }
-
