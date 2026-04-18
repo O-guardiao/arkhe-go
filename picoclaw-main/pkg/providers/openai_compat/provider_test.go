@@ -1281,7 +1281,7 @@ func TestSerializeMessages_StripsSystemParts(t *testing.T) {
 
 func TestApplyOpenAICompatThinking_QwenEndpoint(t *testing.T) {
 	body := map[string]any{}
-	applyOpenAICompatThinking(body, "qwen-plus", "https://dashscope.aliyuncs.com/compatible-mode/v1", "xhigh")
+	applyOpenAICompatThinking(body, "qwen-plus", "https://dashscope.aliyuncs.com/compatible-mode/v1", "xhigh", false)
 
 	if body["enable_thinking"] != true {
 		t.Fatalf("expected enable_thinking=true, got %v", body["enable_thinking"])
@@ -1293,7 +1293,7 @@ func TestApplyOpenAICompatThinking_QwenEndpoint(t *testing.T) {
 
 func TestApplyOpenAICompatThinking_QwenModel(t *testing.T) {
 	body := map[string]any{}
-	applyOpenAICompatThinking(body, "qwen3-235b-a22b", "http://localhost:11434/v1", "high")
+	applyOpenAICompatThinking(body, "qwen3-235b-a22b", "http://localhost:11434/v1", "high", false)
 
 	if body["enable_thinking"] != true {
 		t.Fatalf("expected enable_thinking=true, got %v", body["enable_thinking"])
@@ -1316,7 +1316,7 @@ func TestApplyOpenAICompatThinking_QwenLevels(t *testing.T) {
 	}
 	for _, tt := range tests {
 		body := map[string]any{}
-		applyOpenAICompatThinking(body, "qwen3-plus", "https://dashscope.aliyuncs.com/compatible-mode/v1", tt.level)
+		applyOpenAICompatThinking(body, "qwen3-plus", "https://dashscope.aliyuncs.com/compatible-mode/v1", tt.level, false)
 		if body["thinking_budget"] != tt.wantBudget {
 			t.Errorf("level=%s: thinking_budget = %v, want %d", tt.level, body["thinking_budget"], tt.wantBudget)
 		}
@@ -1325,7 +1325,7 @@ func TestApplyOpenAICompatThinking_QwenLevels(t *testing.T) {
 
 func TestApplyOpenAICompatThinking_OpenAIEndpoint(t *testing.T) {
 	body := map[string]any{}
-	applyOpenAICompatThinking(body, "o1-preview", "https://api.openai.com/v1", "high")
+	applyOpenAICompatThinking(body, "o1-preview", "https://api.openai.com/v1", "high", false)
 
 	if body["reasoning_effort"] != "high" {
 		t.Fatalf("expected reasoning_effort=high, got %v", body["reasoning_effort"])
@@ -1337,7 +1337,8 @@ func TestApplyOpenAICompatThinking_OpenAIEndpoint(t *testing.T) {
 
 func TestApplyOpenAICompatThinking_OpenAI_XHighMapsToHigh(t *testing.T) {
 	body := map[string]any{}
-	applyOpenAICompatThinking(body, "o3-mini", "https://api.openai.com/v1", "xhigh")
+	// o3 without tools: reasoning_effort allowed.
+	applyOpenAICompatThinking(body, "o3-mini", "https://api.openai.com/v1", "xhigh", false)
 
 	if body["reasoning_effort"] != "high" {
 		t.Fatalf("expected reasoning_effort=high for xhigh, got %v", body["reasoning_effort"])
@@ -1346,7 +1347,7 @@ func TestApplyOpenAICompatThinking_OpenAI_XHighMapsToHigh(t *testing.T) {
 
 func TestApplyOpenAICompatThinking_DeepSeek(t *testing.T) {
 	body := map[string]any{}
-	applyOpenAICompatThinking(body, "deepseek-r1", "https://api.deepseek.com/v1", "xhigh")
+	applyOpenAICompatThinking(body, "deepseek-r1", "https://api.deepseek.com/v1", "xhigh", false)
 
 	if _, has := body["enable_thinking"]; has {
 		t.Fatal("enable_thinking should not be set for DeepSeek")
@@ -1358,7 +1359,7 @@ func TestApplyOpenAICompatThinking_DeepSeek(t *testing.T) {
 
 func TestApplyOpenAICompatThinking_GenericProvider(t *testing.T) {
 	body := map[string]any{}
-	applyOpenAICompatThinking(body, "some-model", "https://api.groq.com/openai/v1", "medium")
+	applyOpenAICompatThinking(body, "some-model", "https://api.groq.com/openai/v1", "medium", false)
 
 	if body["reasoning_effort"] != "medium" {
 		t.Fatalf("expected reasoning_effort=medium for generic, got %v", body["reasoning_effort"])
@@ -1367,7 +1368,7 @@ func TestApplyOpenAICompatThinking_GenericProvider(t *testing.T) {
 
 func TestApplyOpenAICompatThinking_OffLevel(t *testing.T) {
 	body := map[string]any{}
-	applyOpenAICompatThinking(body, "qwen3-plus", "https://dashscope.aliyuncs.com/compatible-mode/v1", "off")
+	applyOpenAICompatThinking(body, "qwen3-plus", "https://dashscope.aliyuncs.com/compatible-mode/v1", "off", false)
 
 	if len(body) != 0 {
 		t.Fatalf("expected empty body for off level, got %v", body)
@@ -1376,7 +1377,7 @@ func TestApplyOpenAICompatThinking_OffLevel(t *testing.T) {
 
 func TestApplyOpenAICompatThinking_EmptyLevel(t *testing.T) {
 	body := map[string]any{}
-	applyOpenAICompatThinking(body, "qwen3-plus", "https://dashscope.aliyuncs.com/compatible-mode/v1", "")
+	applyOpenAICompatThinking(body, "qwen3-plus", "https://dashscope.aliyuncs.com/compatible-mode/v1", "", false)
 
 	if len(body) != 0 {
 		t.Fatalf("expected empty body for empty level, got %v", body)
@@ -1419,5 +1420,102 @@ func TestBuildRequestBody_ThinkingLevelQwen(t *testing.T) {
 	}
 	if body["thinking_budget"] != 65536 {
 		t.Fatalf("expected thinking_budget=65536 in request body, got %v", body["thinking_budget"])
+	}
+}
+
+// TestApplyOpenAICompatThinking_OpenAI_GPT5_WithTools_OmitsReasoning is a
+// regression test for the 400 observed on /v1/chat/completions:
+//
+//	"Function tools with reasoning_effort are not supported for gpt-5*-mini"
+//
+// When tools are present AND model is gpt-5*, reasoning_effort MUST be
+// omitted to avoid the 400; the unified thinking_level is silently skipped
+// on this endpoint (the Responses API is the correct route for that combo).
+func TestApplyOpenAICompatThinking_OpenAI_GPT5_WithTools_OmitsReasoning(t *testing.T) {
+	cases := []string{
+		"gpt-5",
+		"gpt-5-mini",
+		"gpt-5.4-mini",
+		"gpt-5-nano",
+	}
+	for _, model := range cases {
+		body := map[string]any{}
+		applyOpenAICompatThinking(body, model, "https://api.openai.com/v1", "high", true)
+		if _, has := body["reasoning_effort"]; has {
+			t.Errorf("model=%s hasTools=true: reasoning_effort must be omitted on Chat Completions, got %v", model, body["reasoning_effort"])
+		}
+	}
+}
+
+// TestApplyOpenAICompatThinking_OpenAI_GPT5_NoTools_KeepsReasoning verifies
+// that without tools, gpt-5 models still receive reasoning_effort (the 400
+// only triggers with function tools + reasoning_effort on Chat Completions).
+func TestApplyOpenAICompatThinking_OpenAI_GPT5_NoTools_KeepsReasoning(t *testing.T) {
+	body := map[string]any{}
+	applyOpenAICompatThinking(body, "gpt-5-mini", "https://api.openai.com/v1", "medium", false)
+	if body["reasoning_effort"] != "medium" {
+		t.Fatalf("expected reasoning_effort=medium without tools, got %v", body["reasoning_effort"])
+	}
+}
+
+// TestApplyOpenAICompatThinking_OpenAI_O3_WithTools_OmitsReasoning — same
+// restriction has been observed on o3/o4 revisions.
+func TestApplyOpenAICompatThinking_OpenAI_O3_WithTools_OmitsReasoning(t *testing.T) {
+	body := map[string]any{}
+	applyOpenAICompatThinking(body, "o3-mini", "https://api.openai.com/v1", "high", true)
+	if _, has := body["reasoning_effort"]; has {
+		t.Fatalf("o3-mini with tools: reasoning_effort must be omitted, got %v", body["reasoning_effort"])
+	}
+}
+
+// TestApplyOpenAICompatThinking_OpenAI_O1_WithTools_StillSendsReasoning —
+// the o1 family is documented to accept reasoning_effort with tools on
+// Chat Completions, so we don't strip it there.
+func TestApplyOpenAICompatThinking_OpenAI_O1_WithTools_StillSendsReasoning(t *testing.T) {
+	body := map[string]any{}
+	applyOpenAICompatThinking(body, "o1-preview", "https://api.openai.com/v1", "high", true)
+	if body["reasoning_effort"] != "high" {
+		t.Fatalf("o1-preview with tools: expected reasoning_effort=high, got %v", body["reasoning_effort"])
+	}
+}
+
+// TestApplyOpenAICompatThinking_Qwen_WithTools_KeepsThinking — the
+// gpt-5/o3 restriction is OpenAI-endpoint specific; Qwen still honors
+// thinking_level even when tools are present.
+func TestApplyOpenAICompatThinking_Qwen_WithTools_KeepsThinking(t *testing.T) {
+	body := map[string]any{}
+	applyOpenAICompatThinking(body, "qwen3-plus", "https://dashscope.aliyuncs.com/compatible-mode/v1", "xhigh", true)
+	if body["enable_thinking"] != true {
+		t.Fatalf("Qwen with tools: expected enable_thinking=true, got %v", body["enable_thinking"])
+	}
+	if body["thinking_budget"] != 65536 {
+		t.Fatalf("Qwen with tools: expected thinking_budget=65536, got %v", body["thinking_budget"])
+	}
+}
+
+// TestBuildRequestBody_GPT5WithTools_StripsReasoningEffort is the end-to-end
+// assertion from the observed VPS failure path: buildRequestBody must not
+// emit reasoning_effort when the agent (which always passes tools) targets
+// gpt-5*-mini on OpenAI's Chat Completions endpoint.
+func TestBuildRequestBody_GPT5WithTools_StripsReasoningEffort(t *testing.T) {
+	p := NewProvider("key", "https://api.openai.com/v1", "")
+	tools := []ToolDefinition{
+		{
+			Type: "function",
+			Function: ToolFunctionDefinition{
+				Name:        "ping",
+				Description: "ping tool",
+				Parameters:  map[string]any{"type": "object"},
+			},
+		},
+	}
+	body := p.buildRequestBody(
+		[]Message{{Role: "user", Content: "hi"}},
+		tools,
+		"gpt-5.4-mini",
+		map[string]any{"thinking_level": "high"},
+	)
+	if _, has := body["reasoning_effort"]; has {
+		t.Fatalf("buildRequestBody(gpt-5.4-mini + tools + thinking_level=high) must NOT include reasoning_effort on Chat Completions, got %v", body["reasoning_effort"])
 	}
 }

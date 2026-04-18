@@ -188,7 +188,7 @@ func (p *Provider) buildRequestBody(
 	//   - DeepSeek:         thinking is implicit in R1 models; no parameter needed
 	//   - Generic:          reasoning_effort as best-effort passthrough
 	if level, ok := options["thinking_level"].(string); ok && level != "" && level != "off" {
-		applyOpenAICompatThinking(requestBody, model, p.apiBase, level)
+		applyOpenAICompatThinking(requestBody, model, p.apiBase, level, len(tools) > 0)
 	}
 
 	// Merge extra body fields configured per-provider/model.
@@ -505,10 +505,22 @@ func supportsPromptCacheKey(apiBase string) bool {
 // Provider mappings:
 //
 //	Qwen/DashScope:  enable_thinking=true + thinking_budget=N
-//	OpenAI (o-series): reasoning_effort="low"|"medium"|"high"
+//	OpenAI (o-series / gpt-5): reasoning_effort="low"|"medium"|"high"
 //	DeepSeek R1:     thinking is implicit; no parameter injected
 //	Generic:         reasoning_effort as best-effort passthrough
-func applyOpenAICompatThinking(body map[string]any, model, apiBase, level string) {
+//
+// hasTools signals whether the outbound request carries function tools.
+// OpenAI's Chat Completions endpoint rejects `reasoning_effort` together
+// with function tools for gpt-5* (and some o-series revisions) with:
+//
+//	400 Function tools with reasoning_effort are not supported for
+//	gpt-5*-mini in /v1/chat/completions.
+//
+// When that combination is detected, we omit `reasoning_effort` instead
+// of failing the turn. `thinking_level` still influences providers that
+// are not subject to this restriction (Qwen, Anthropic, Gemini, Responses
+// API via codex_provider).
+func applyOpenAICompatThinking(body map[string]any, model, apiBase, level string, hasTools bool) {
 	level = strings.ToLower(strings.TrimSpace(level))
 	if level == "" || level == "off" {
 		return
@@ -532,11 +544,18 @@ func applyOpenAICompatThinking(body map[string]any, model, apiBase, level string
 		log.Printf("openai_compat: thinking level=%s noted for DeepSeek (implicit reasoning)", level)
 
 	case isOpenAIEndpoint(lowerBase):
-		// OpenAI o-series models use reasoning_effort (low/medium/high).
+		// OpenAI Chat Completions rejects reasoning_effort + function tools
+		// for gpt-5* and certain o-series revisions. Skip silently in that
+		// case; the unified thinking_level still applies to other providers
+		// and to OpenAI via the Responses API (codex_provider).
+		if hasTools && openAIChatCompletionsBlocksReasoningWithTools(lowerModel) {
+			log.Printf("openai_compat: skipping reasoning_effort for %s on Chat Completions (function tools + reasoning_effort not supported; use Responses API for that combo)", model)
+			return
+		}
 		if effort := mapReasoningEffort(level); effort != "" {
 			body["reasoning_effort"] = effort
+			log.Printf("openai_compat: reasoning_effort=%s for OpenAI reasoning model", effort)
 		}
-		log.Printf("openai_compat: reasoning_effort=%s for OpenAI o-series", mapReasoningEffort(level))
 
 	default:
 		// Generic OpenAI-compatible: try reasoning_effort as best-effort.
@@ -547,6 +566,27 @@ func applyOpenAICompatThinking(body map[string]any, model, apiBase, level string
 		}
 		log.Printf("openai_compat: reasoning_effort=%s for generic provider (best-effort)", mapReasoningEffort(level))
 	}
+}
+
+// openAIChatCompletionsBlocksReasoningWithTools reports whether the given
+// OpenAI model rejects `reasoning_effort` together with function tools on
+// the /v1/chat/completions endpoint. The restriction is model-family wide
+// for gpt-5.* and has been observed on newer o-series revisions as well.
+// Any model matching these families MUST use the Responses API to combine
+// extended thinking with function calling.
+func openAIChatCompletionsBlocksReasoningWithTools(lowerModel string) bool {
+	// gpt-5 family (gpt-5, gpt-5-mini, gpt-5.4-mini, gpt-5-nano, etc.)
+	if strings.HasPrefix(lowerModel, "gpt-5") {
+		return true
+	}
+	// o-series reasoning models that documented the same restriction.
+	// Keep this list narrow; only add entries with confirmed 400 responses.
+	switch {
+	case strings.HasPrefix(lowerModel, "o3"),
+		strings.HasPrefix(lowerModel, "o4"):
+		return true
+	}
+	return false
 }
 
 // qwenThinkingBudget maps unified thinking levels to Qwen thinking_budget tokens.
