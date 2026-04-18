@@ -1276,3 +1276,293 @@ func TestSerializeMessages_StripsSystemParts(t *testing.T) {
 		t.Fatal("system_parts should not appear in serialized output")
 	}
 }
+
+// --- Extended Thinking / reasoning_effort tests ---
+
+func TestApplyOpenAICompatThinking_QwenEndpoint(t *testing.T) {
+	body := map[string]any{}
+	applyOpenAICompatThinking(body, "qwen-plus", "https://dashscope.aliyuncs.com/compatible-mode/v1", "xhigh")
+
+	if body["enable_thinking"] != true {
+		t.Fatalf("expected enable_thinking=true, got %v", body["enable_thinking"])
+	}
+	if body["thinking_budget"] != 65536 {
+		t.Fatalf("expected thinking_budget=65536, got %v", body["thinking_budget"])
+	}
+}
+
+func TestApplyOpenAICompatThinking_QwenModel(t *testing.T) {
+	body := map[string]any{}
+	applyOpenAICompatThinking(body, "qwen3-235b-a22b", "http://localhost:11434/v1", "high")
+
+	if body["enable_thinking"] != true {
+		t.Fatalf("expected enable_thinking=true, got %v", body["enable_thinking"])
+	}
+	if body["thinking_budget"] != 32768 {
+		t.Fatalf("expected thinking_budget=32768, got %v", body["thinking_budget"])
+	}
+}
+
+func TestApplyOpenAICompatThinking_QwenLevels(t *testing.T) {
+	tests := []struct {
+		level      string
+		wantBudget int
+	}{
+		{"low", 4096},
+		{"medium", 16384},
+		{"high", 32768},
+		{"xhigh", 65536},
+		{"adaptive", 65536},
+	}
+	for _, tt := range tests {
+		body := map[string]any{}
+		applyOpenAICompatThinking(body, "qwen3-plus", "https://dashscope.aliyuncs.com/compatible-mode/v1", tt.level)
+		if body["thinking_budget"] != tt.wantBudget {
+			t.Errorf("level=%s: thinking_budget = %v, want %d", tt.level, body["thinking_budget"], tt.wantBudget)
+		}
+	}
+}
+
+func TestApplyOpenAICompatThinking_OpenAIEndpoint(t *testing.T) {
+	body := map[string]any{}
+	applyOpenAICompatThinking(body, "o1-preview", "https://api.openai.com/v1", "high")
+
+	if body["reasoning_effort"] != "high" {
+		t.Fatalf("expected reasoning_effort=high, got %v", body["reasoning_effort"])
+	}
+	if _, has := body["enable_thinking"]; has {
+		t.Fatal("enable_thinking should not be set for OpenAI")
+	}
+}
+
+func TestApplyOpenAICompatThinking_OpenAI_XHighMapsToHigh(t *testing.T) {
+	body := map[string]any{}
+	applyOpenAICompatThinking(body, "o3-mini", "https://api.openai.com/v1", "xhigh")
+
+	if body["reasoning_effort"] != "high" {
+		t.Fatalf("expected reasoning_effort=high for xhigh, got %v", body["reasoning_effort"])
+	}
+}
+
+func TestApplyOpenAICompatThinking_DeepSeek(t *testing.T) {
+	body := map[string]any{}
+	applyOpenAICompatThinking(body, "deepseek-r1", "https://api.deepseek.com/v1", "xhigh")
+
+	if _, has := body["enable_thinking"]; has {
+		t.Fatal("enable_thinking should not be set for DeepSeek")
+	}
+	if _, has := body["reasoning_effort"]; has {
+		t.Fatal("reasoning_effort should not be set for DeepSeek")
+	}
+}
+
+func TestApplyOpenAICompatThinking_GenericProvider(t *testing.T) {
+	body := map[string]any{}
+	applyOpenAICompatThinking(body, "some-model", "https://api.groq.com/openai/v1", "medium")
+
+	if body["reasoning_effort"] != "medium" {
+		t.Fatalf("expected reasoning_effort=medium for generic, got %v", body["reasoning_effort"])
+	}
+}
+
+func TestApplyOpenAICompatThinking_OffLevel(t *testing.T) {
+	body := map[string]any{}
+	applyOpenAICompatThinking(body, "qwen3-plus", "https://dashscope.aliyuncs.com/compatible-mode/v1", "off")
+
+	if len(body) != 0 {
+		t.Fatalf("expected empty body for off level, got %v", body)
+	}
+}
+
+func TestApplyOpenAICompatThinking_EmptyLevel(t *testing.T) {
+	body := map[string]any{}
+	applyOpenAICompatThinking(body, "qwen3-plus", "https://dashscope.aliyuncs.com/compatible-mode/v1", "")
+
+	if len(body) != 0 {
+		t.Fatalf("expected empty body for empty level, got %v", body)
+	}
+}
+
+func TestBuildRequestBody_ThinkingLevelQwen(t *testing.T) {
+	var requestBody map[string]any
+
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if err := json.NewDecoder(r.Body).Decode(&requestBody); err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		resp := map[string]any{
+			"choices": []map[string]any{
+				{"message": map[string]any{"content": "ok"}, "finish_reason": "stop"},
+			},
+		}
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(resp)
+	}))
+	defer server.Close()
+
+	// Use a DashScope-like API base to trigger Qwen path
+	p := NewProvider("key", server.URL, "")
+	// Manually override apiBase for detection (provider uses server URL for HTTP,
+	// but the detection is based on p.apiBase). We test via the unit helper instead.
+	body := p.buildRequestBody(
+		[]Message{{Role: "user", Content: "hi"}},
+		nil,
+		"qwen3-plus",
+		map[string]any{"thinking_level": "xhigh"},
+	)
+
+	// Since the test server URL is localhost (not dashscope), the model-name
+	// detection path should fire: isQwenModel("qwen3-plus") = true
+	if body["enable_thinking"] != true {
+		t.Fatalf("expected enable_thinking=true in request body, got %v", body["enable_thinking"])
+	}
+	if body["thinking_budget"] != 65536 {
+		t.Fatalf("expected thinking_budget=65536 in request body, got %v", body["thinking_budget"])
+	}
+}
+
+// --- Extended Thinking / reasoning_effort tests ---
+
+func TestApplyOpenAICompatThinking_QwenEndpoint(t *testing.T) {
+	body := map[string]any{}
+	applyOpenAICompatThinking(body, "qwen-plus", "https://dashscope.aliyuncs.com/compatible-mode/v1", "xhigh")
+
+	if body["enable_thinking"] != true {
+		t.Fatalf("expected enable_thinking=true, got %v", body["enable_thinking"])
+	}
+	if body["thinking_budget"] != 65536 {
+		t.Fatalf("expected thinking_budget=65536, got %v", body["thinking_budget"])
+	}
+}
+
+func TestApplyOpenAICompatThinking_QwenModel(t *testing.T) {
+	body := map[string]any{}
+	applyOpenAICompatThinking(body, "qwen3-235b-a22b", "http://localhost:11434/v1", "high")
+
+	if body["enable_thinking"] != true {
+		t.Fatalf("expected enable_thinking=true, got %v", body["enable_thinking"])
+	}
+	if body["thinking_budget"] != 32768 {
+		t.Fatalf("expected thinking_budget=32768, got %v", body["thinking_budget"])
+	}
+}
+
+func TestApplyOpenAICompatThinking_QwenLevels(t *testing.T) {
+	tests := []struct {
+		level      string
+		wantBudget int
+	}{
+		{"low", 4096},
+		{"medium", 16384},
+		{"high", 32768},
+		{"xhigh", 65536},
+		{"adaptive", 65536},
+	}
+	for _, tt := range tests {
+		body := map[string]any{}
+		applyOpenAICompatThinking(body, "qwen3-plus", "https://dashscope.aliyuncs.com/compatible-mode/v1", tt.level)
+		if body["thinking_budget"] != tt.wantBudget {
+			t.Errorf("level=%s: thinking_budget = %v, want %d", tt.level, body["thinking_budget"], tt.wantBudget)
+		}
+	}
+}
+
+func TestApplyOpenAICompatThinking_OpenAIEndpoint(t *testing.T) {
+	body := map[string]any{}
+	applyOpenAICompatThinking(body, "o1-preview", "https://api.openai.com/v1", "high")
+
+	if body["reasoning_effort"] != "high" {
+		t.Fatalf("expected reasoning_effort=high, got %v", body["reasoning_effort"])
+	}
+	if _, has := body["enable_thinking"]; has {
+		t.Fatal("enable_thinking should not be set for OpenAI")
+	}
+}
+
+func TestApplyOpenAICompatThinking_OpenAI_XHighMapsToHigh(t *testing.T) {
+	body := map[string]any{}
+	applyOpenAICompatThinking(body, "o3-mini", "https://api.openai.com/v1", "xhigh")
+
+	if body["reasoning_effort"] != "high" {
+		t.Fatalf("expected reasoning_effort=high for xhigh, got %v", body["reasoning_effort"])
+	}
+}
+
+func TestApplyOpenAICompatThinking_DeepSeek(t *testing.T) {
+	body := map[string]any{}
+	applyOpenAICompatThinking(body, "deepseek-r1", "https://api.deepseek.com/v1", "xhigh")
+
+	if _, has := body["enable_thinking"]; has {
+		t.Fatal("enable_thinking should not be set for DeepSeek")
+	}
+	if _, has := body["reasoning_effort"]; has {
+		t.Fatal("reasoning_effort should not be set for DeepSeek")
+	}
+}
+
+func TestApplyOpenAICompatThinking_GenericProvider(t *testing.T) {
+	body := map[string]any{}
+	applyOpenAICompatThinking(body, "some-model", "https://api.groq.com/openai/v1", "medium")
+
+	if body["reasoning_effort"] != "medium" {
+		t.Fatalf("expected reasoning_effort=medium for generic, got %v", body["reasoning_effort"])
+	}
+}
+
+func TestApplyOpenAICompatThinking_OffLevel(t *testing.T) {
+	body := map[string]any{}
+	applyOpenAICompatThinking(body, "qwen3-plus", "https://dashscope.aliyuncs.com/compatible-mode/v1", "off")
+
+	if len(body) != 0 {
+		t.Fatalf("expected empty body for off level, got %v", body)
+	}
+}
+
+func TestApplyOpenAICompatThinking_EmptyLevel(t *testing.T) {
+	body := map[string]any{}
+	applyOpenAICompatThinking(body, "qwen3-plus", "https://dashscope.aliyuncs.com/compatible-mode/v1", "")
+
+	if len(body) != 0 {
+		t.Fatalf("expected empty body for empty level, got %v", body)
+	}
+}
+
+func TestBuildRequestBody_ThinkingLevelQwen(t *testing.T) {
+	var requestBody map[string]any
+
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if err := json.NewDecoder(r.Body).Decode(&requestBody); err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		resp := map[string]any{
+			"choices": []map[string]any{
+				{"message": map[string]any{"content": "ok"}, "finish_reason": "stop"},
+			},
+		}
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(resp)
+	}))
+	defer server.Close()
+
+	// Use a DashScope-like API base to trigger Qwen path
+	p := NewProvider("key", server.URL, "")
+	// Manually override apiBase for detection (provider uses server URL for HTTP,
+	// but the detection is based on p.apiBase). We test via the unit helper instead.
+	body := p.buildRequestBody(
+		[]Message{{Role: "user", Content: "hi"}},
+		nil,
+		"qwen3-plus",
+		map[string]any{"thinking_level": "xhigh"},
+	)
+
+	// Since the test server URL is localhost (not dashscope), the model-name
+	// detection path should fire: isQwenModel("qwen3-plus") = true
+	if body["enable_thinking"] != true {
+		t.Fatalf("expected enable_thinking=true in request body, got %v", body["enable_thinking"])
+	}
+	if body["thinking_budget"] != 65536 {
+		t.Fatalf("expected thinking_budget=65536 in request body, got %v", body["thinking_budget"])
+	}
+}

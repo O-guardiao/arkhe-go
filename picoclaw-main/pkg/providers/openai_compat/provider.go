@@ -180,6 +180,17 @@ func (p *Provider) buildRequestBody(
 		}
 	}
 
+	// Extended thinking / reasoning support for OpenAI-compatible providers.
+	// Translates the unified thinking_level (off/low/medium/high/xhigh/adaptive)
+	// into provider-specific parameters:
+	//   - Qwen/DashScope:   enable_thinking + thinking_budget
+	//   - OpenAI o-series:  reasoning_effort (low/medium/high)
+	//   - DeepSeek:         thinking is implicit in R1 models; no parameter needed
+	//   - Generic:          reasoning_effort as best-effort passthrough
+	if level, ok := options["thinking_level"].(string); ok && level != "" && level != "off" {
+		applyOpenAICompatThinking(requestBody, model, p.apiBase, level)
+	}
+
 	// Merge extra body fields configured per-provider/model.
 	// These are injected last so they take precedence over defaults.
 	maps.Copy(requestBody, p.extraBody)
@@ -481,6 +492,117 @@ func (p *Provider) SupportsNativeSearch() bool {
 // (Mistral, Gemini, DeepSeek, Groq, etc.) reject unknown fields with 422 errors.
 func supportsPromptCacheKey(apiBase string) bool {
 	u, err := url.Parse(apiBase)
+	if err != nil {
+		return false
+	}
+	host := u.Hostname()
+	return host == "api.openai.com" || strings.HasSuffix(host, ".openai.azure.com")
+}
+
+// applyOpenAICompatThinking injects provider-specific extended thinking
+// parameters into the request body based on the unified thinking_level.
+//
+// Provider mappings:
+//
+//	Qwen/DashScope:  enable_thinking=true + thinking_budget=N
+//	OpenAI (o-series): reasoning_effort="low"|"medium"|"high"
+//	DeepSeek R1:     thinking is implicit; no parameter injected
+//	Generic:         reasoning_effort as best-effort passthrough
+func applyOpenAICompatThinking(body map[string]any, model, apiBase, level string) {
+	level = strings.ToLower(strings.TrimSpace(level))
+	if level == "" || level == "off" {
+		return
+	}
+
+	lowerBase := strings.ToLower(apiBase)
+	lowerModel := strings.ToLower(model)
+
+	switch {
+	case isQwenEndpoint(lowerBase) || isQwenModel(lowerModel):
+		body["enable_thinking"] = true
+		if budget := qwenThinkingBudget(level); budget > 0 {
+			body["thinking_budget"] = budget
+		}
+		log.Printf("openai_compat: thinking enabled for Qwen (level=%s)", level)
+
+	case isDeepSeekEndpoint(lowerBase) || isDeepSeekModel(lowerModel):
+		// DeepSeek R1 models think implicitly; no request param to control it.
+		// DeepSeek V3 and later may accept reasoning_effort but docs don't
+		// guarantee it. Skip to avoid 422 errors.
+		log.Printf("openai_compat: thinking level=%s noted for DeepSeek (implicit reasoning)", level)
+
+	case isOpenAIEndpoint(lowerBase):
+		// OpenAI o-series models use reasoning_effort (low/medium/high).
+		if effort := mapReasoningEffort(level); effort != "" {
+			body["reasoning_effort"] = effort
+		}
+		log.Printf("openai_compat: reasoning_effort=%s for OpenAI o-series", mapReasoningEffort(level))
+
+	default:
+		// Generic OpenAI-compatible: try reasoning_effort as best-effort.
+		// Many providers silently ignore unknown fields; those that don't
+		// will return a 422, which the retry logic can handle.
+		if effort := mapReasoningEffort(level); effort != "" {
+			body["reasoning_effort"] = effort
+		}
+		log.Printf("openai_compat: reasoning_effort=%s for generic provider (best-effort)", mapReasoningEffort(level))
+	}
+}
+
+// qwenThinkingBudget maps unified thinking levels to Qwen thinking_budget tokens.
+// Values are chosen to match the Anthropic budget ladder proportionally,
+// scaled to Qwen's default max thinking length.
+func qwenThinkingBudget(level string) int {
+	switch level {
+	case "low":
+		return 4096
+	case "medium":
+		return 16384
+	case "high":
+		return 32768
+	case "xhigh":
+		return 65536
+	case "adaptive":
+		// Qwen doesn't have an "adaptive" mode; use xhigh budget
+		// and let the model decide.
+		return 65536
+	default:
+		return 0
+	}
+}
+
+// mapReasoningEffort maps unified thinking levels to OpenAI reasoning_effort values.
+func mapReasoningEffort(level string) string {
+	switch level {
+	case "low":
+		return "low"
+	case "medium":
+		return "medium"
+	case "high", "xhigh", "adaptive":
+		return "high"
+	default:
+		return ""
+	}
+}
+
+func isQwenEndpoint(lowerBase string) bool {
+	return strings.Contains(lowerBase, "dashscope")
+}
+
+func isQwenModel(lowerModel string) bool {
+	return strings.HasPrefix(lowerModel, "qwen")
+}
+
+func isDeepSeekEndpoint(lowerBase string) bool {
+	return strings.Contains(lowerBase, "deepseek")
+}
+
+func isDeepSeekModel(lowerModel string) bool {
+	return strings.HasPrefix(lowerModel, "deepseek")
+}
+
+func isOpenAIEndpoint(lowerBase string) bool {
+	u, err := url.Parse(lowerBase)
 	if err != nil {
 		return false
 	}

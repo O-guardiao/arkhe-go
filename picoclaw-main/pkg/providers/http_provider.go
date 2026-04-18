@@ -78,3 +78,9 @@ func (p *HTTPProvider) SupportsNativeSearch() bool {
 	return p.delegate.SupportsNativeSearch()
 }
 
+// SupportsThinking implements providers.ThinkingCapable.
+// Returns true so the agent loop passes thinking_level through to the
+// openai_compat buildRequestBody, which translates it to provider-specific
+// parameters (e.g., enable_thinking + thinking_budget for Qwen,
+// reasoning_effort for OpenAI o-series).
+func (p *HTTPProvider) SupportsThinking() bool { return true }

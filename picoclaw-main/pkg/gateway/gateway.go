@@ -797,4 +797,3 @@ func createHeartbeatHandler(agentLoop *agent.AgentLoop) func(prompt, channel, ch
 		return tools.SilentResult(response)
 	}
 }
-

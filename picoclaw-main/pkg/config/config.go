@@ -110,11 +110,11 @@ type ProcessHookConfig struct {
 
 // BuildInfo contains build-time version information
 type BuildInfo struct {
-	Version      string `json:"version"`
-	GitCommit    string `json:"git_commit"`
-	BuildTime    string `json:"build_time"`
-	GoVersion    string `json:"go_version"`
-	RLMGoFusion  bool   `json:"rlm_go_fusion"`
+	Version     string `json:"version"`
+	GitCommit   string `json:"git_commit"`
+	BuildTime   string `json:"build_time"`
+	GoVersion   string `json:"go_version"`
+	RLMGoFusion bool   `json:"rlm_go_fusion"`
 }
 
 // MarshalJSON implements custom JSON marshaling for Config
@@ -704,15 +704,15 @@ type ToolConfig struct {
 
 // RecursionConfig controls RLM-style recursion overlay (loop detection, MCTS, supervisor).
 type RecursionConfig struct {
-	Enabled             bool `json:"enabled"                         env:"PICOCLAW_RECURSION_ENABLED"`
+	Enabled             bool   `json:"enabled"                         env:"PICOCLAW_RECURSION_ENABLED"`
 	GateMode            string `json:"gate_mode,omitempty"            env:"PICOCLAW_RECURSION_GATE_MODE"`
-	MCTSBranches        int  `json:"mcts_branches,omitempty"         env:"PICOCLAW_RECURSION_MCTS_BRANCHES"`
-	MCTSDepthPerBranch  int  `json:"mcts_depth_per_branch,omitempty" env:"PICOCLAW_RECURSION_MCTS_DEPTH"`
-	MCTSTimeoutSec      int  `json:"mcts_timeout_sec,omitempty"      env:"PICOCLAW_RECURSION_MCTS_TIMEOUT"`
-	MaxExecutionTimeSec int  `json:"max_execution_time_sec,omitempty" env:"PICOCLAW_RECURSION_MAX_EXECUTION_TIME"`
-	MaxIterations       int  `json:"max_iterations,omitempty"        env:"PICOCLAW_RECURSION_MAX_ITERATIONS"`
-	CompactionThreshold int  `json:"compaction_threshold,omitempty"  env:"PICOCLAW_RECURSION_COMPACTION_THRESHOLD"` // percent (0-100), e.g. 85
-	CompactionKeepLast  int  `json:"compaction_keep_last,omitempty"  env:"PICOCLAW_RECURSION_COMPACTION_KEEP_LAST"`
+	MCTSBranches        int    `json:"mcts_branches,omitempty"         env:"PICOCLAW_RECURSION_MCTS_BRANCHES"`
+	MCTSDepthPerBranch  int    `json:"mcts_depth_per_branch,omitempty" env:"PICOCLAW_RECURSION_MCTS_DEPTH"`
+	MCTSTimeoutSec      int    `json:"mcts_timeout_sec,omitempty"      env:"PICOCLAW_RECURSION_MCTS_TIMEOUT"`
+	MaxExecutionTimeSec int    `json:"max_execution_time_sec,omitempty" env:"PICOCLAW_RECURSION_MAX_EXECUTION_TIME"`
+	MaxIterations       int    `json:"max_iterations,omitempty"        env:"PICOCLAW_RECURSION_MAX_ITERATIONS"`
+	CompactionThreshold int    `json:"compaction_threshold,omitempty"  env:"PICOCLAW_RECURSION_COMPACTION_THRESHOLD"` // percent (0-100), e.g. 85
+	CompactionKeepLast  int    `json:"compaction_keep_last,omitempty"  env:"PICOCLAW_RECURSION_COMPACTION_KEEP_LAST"`
 }
 
 type BraveConfig struct {
@@ -1413,4 +1413,3 @@ func (t *ToolsConfig) IsToolEnabled(name string) bool {
 		return true
 	}
 }
-
