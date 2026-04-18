@@ -282,9 +282,6 @@ func (p *RLMProvider) chatWithSession(
 
 	stateAny, _ := p.sessions.LoadOrStore(cacheKey, &rlmSessionState{})
 	state := stateAny.(*rlmSessionState)
-	state.setMeta(meta)
-	state.setContext(ctx)
-	defer state.setContext(context.Background())
 
 	engineCfg, engineSignature, resolvedModel, err := p.buildEngineConfig(
 		tools,
@@ -298,8 +295,20 @@ func (p *RLMProvider) chatWithSession(
 		return nil, err
 	}
 
+	// The per-session state.mu serializes full turns for the same sessionKey.
+	// setMeta/setContext MUST happen inside this critical section. Doing them
+	// before the Lock() creates a silent cross-contamination race: a second
+	// concurrent Chat() on the same session would overwrite currentMeta and
+	// currentCtx while the first call is still inside engine.Completion,
+	// causing in-flight tool closures to observe the wrong channel/chat_id
+	// and route bus.PublishOutbound to the wrong user, or be canceled by a
+	// foreign context. See TestRLMProviderChatWithSessionIsolatesMetaUnderConcurrency.
 	state.mu.Lock()
 	defer state.mu.Unlock()
+
+	state.setMeta(meta)
+	state.setContext(ctx)
+	defer state.setContext(context.Background())
 
 	if state.engine == nil || state.engineSignature != engineSignature {
 		if state.engine != nil {

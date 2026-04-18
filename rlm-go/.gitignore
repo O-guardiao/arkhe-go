@@ -1,0 +1,28 @@
+# Go build artifacts
+bin/
+build/
+dist/
+*.exe
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# Test/coverage
+coverage.txt
+coverage.html
+*.coverprofile
+
+# Local env / secrets
+.env
+.env.*
+!.env.example
+
+# OS / editors
+.DS_Store
+.vscode/
+.idea/
+
+# Local caches
+.cache/
