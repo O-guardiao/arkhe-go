@@ -70,5 +70,6 @@ web/backend/dist/*
 .claude/
 
 docker/data
+docker/.build.log
 
 .omc/
