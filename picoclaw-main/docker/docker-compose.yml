@@ -71,6 +71,10 @@ services:
       - PICOCLAW_GATEWAY_HOST=0.0.0.0
       # RLM recursion engine (rlm-go fusion)
       - PICOCLAW_RECURSION_ENABLED=true
+      # Telegram channel
+      - PICOCLAW_CHANNELS_TELEGRAM_ENABLED=true
+      - PICOCLAW_CHANNELS_TELEGRAM_TOKEN=COLE_SEU_NOVO_TOKEN_AQUI
+      # - PICOCLAW_CHANNELS_TELEGRAM_ALLOW_FROM=SEU_USER_ID_NUMERICO
       # Set a fixed token instead of a random one each restart:
       # - PICOCLAW_LAUNCHER_TOKEN=your-secret-token-here
     # Use port 18790 — Hostinger blocks non-standard ports like 18800
