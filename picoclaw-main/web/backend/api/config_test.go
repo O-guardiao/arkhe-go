@@ -41,7 +41,7 @@ func assertGatewayLogLevelApplied(t *testing.T, method, body string, want logger
 	}
 }
 
-func TestHandleUpdateConfig_PreservesExecAllowRemoteDefaultWhenOmitted(t *testing.T) {
+func TestHandleUpdateConfig_PreservesExecAllowRemoteDisabledWhenOmitted(t *testing.T) {
 	configPath, cleanup := setupOAuthTestEnv(t)
 	defer cleanup()
 
@@ -76,8 +76,8 @@ func TestHandleUpdateConfig_PreservesExecAllowRemoteDefaultWhenOmitted(t *testin
 	if err != nil {
 		t.Fatalf("LoadConfig() error = %v", err)
 	}
-	if !cfg.Tools.Exec.AllowRemote {
-		t.Fatal("tools.exec.allow_remote should remain true when omitted from PUT /api/config")
+	if cfg.Tools.Exec.AllowRemote {
+		t.Fatal("tools.exec.allow_remote should remain false when omitted from PUT /api/config")
 	}
 }
 

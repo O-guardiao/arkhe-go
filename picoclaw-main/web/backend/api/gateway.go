@@ -390,6 +390,15 @@ func (h *Handler) gatewayStartReady() (bool, string, error) {
 		return false, "", fmt.Errorf("failed to load config: %w", err)
 	}
 
+	if launcherGatewayPortConflict(h.serverPort, h.serverPublic, cfg.Gateway.Host, cfg.Gateway.Port) {
+		return false, fmt.Sprintf(
+			"launcher port %d conflicts with gateway bind %s:%d",
+			h.serverPort,
+			gatewayBindHostLabel(cfg.Gateway.Host),
+			cfg.Gateway.Port,
+		), nil
+	}
+
 	modelName := strings.TrimSpace(cfg.Agents.Defaults.GetModelName())
 	if modelName == "" {
 		return false, "no default model configured", nil
@@ -408,6 +417,29 @@ func (h *Handler) gatewayStartReady() (bool, string, error) {
 	}
 
 	return true, "", nil
+}
+
+func launcherGatewayPortConflict(launcherPort int, launcherPublic bool, gatewayHost string, gatewayPort int) bool {
+	if launcherPort <= 0 || gatewayPort <= 0 || launcherPort != gatewayPort {
+		return false
+	}
+	if launcherPublic {
+		return true
+	}
+	switch strings.ToLower(strings.TrimSpace(gatewayHost)) {
+	case "", "127.0.0.1", "localhost", "0.0.0.0", "::1", "::":
+		return true
+	default:
+		return false
+	}
+}
+
+func gatewayBindHostLabel(host string) string {
+	host = strings.TrimSpace(host)
+	if host == "" {
+		return "127.0.0.1"
+	}
+	return host
 }
 
 func lookupModelConfig(cfg *config.Config, modelName string) *config.ModelConfig {

@@ -135,6 +135,23 @@ func TestGatewayStartReady_NoDefaultModel(t *testing.T) {
 	}
 }
 
+func TestGatewayStartReady_LauncherPortConflict(t *testing.T) {
+	configPath := filepath.Join(t.TempDir(), "config.json")
+	h := NewHandler(configPath)
+	h.SetServerOptions(18790, false, false, nil)
+
+	ready, reason, err := h.gatewayStartReady()
+	if err != nil {
+		t.Fatalf("gatewayStartReady() error = %v", err)
+	}
+	if ready {
+		t.Fatalf("gatewayStartReady() ready = true, want false")
+	}
+	if !strings.Contains(reason, "launcher port 18790 conflicts with gateway bind 127.0.0.1:18790") {
+		t.Fatalf("gatewayStartReady() reason = %q, want conflict message", reason)
+	}
+}
+
 func TestLooksLikeGatewayCommandLine(t *testing.T) {
 	cases := []struct {
 		name    string
