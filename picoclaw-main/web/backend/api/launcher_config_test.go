@@ -122,3 +122,26 @@ func TestPutLauncherConfigRejectsInvalidCIDR(t *testing.T) {
 	}
 }
 
+func TestPutLauncherConfigRejectsGatewayPortConflict(t *testing.T) {
+	configPath := filepath.Join(t.TempDir(), "config.json")
+	h := NewHandler(configPath)
+
+	mux := http.NewServeMux()
+	h.RegisterRoutes(mux)
+
+	rec := httptest.NewRecorder()
+	req := httptest.NewRequest(
+		http.MethodPut,
+		"/api/system/launcher-config",
+		strings.NewReader(`{"port":18790,"public":false}`),
+	)
+	req.Header.Set("Content-Type", "application/json")
+	mux.ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusBadRequest {
+		t.Fatalf("status = %d, want %d, body=%s", rec.Code, http.StatusBadRequest, rec.Body.String())
+	}
+	if !strings.Contains(rec.Body.String(), "launcher port 18790 conflicts with gateway bind 127.0.0.1:18790") {
+		t.Fatalf("body = %q, want conflict message", rec.Body.String())
+	}
+}

@@ -44,6 +44,43 @@ func Default() Config {
 	return Config{Port: DefaultPort, Public: false}
 }
 
+// PortConflictsWithGateway reports whether the launcher would collide with the
+// gateway bind address for the current runtime.
+func PortConflictsWithGateway(launcherPort int, launcherPublic bool, gatewayHost string, gatewayPort int) bool {
+	if launcherPort <= 0 || gatewayPort <= 0 || launcherPort != gatewayPort {
+		return false
+	}
+	if launcherPublic {
+		return true
+	}
+	switch strings.ToLower(strings.TrimSpace(gatewayHost)) {
+	case "", "127.0.0.1", "localhost", "0.0.0.0", "::1", "::":
+		return true
+	default:
+		return false
+	}
+}
+
+// GatewayHostLabel normalizes an empty gateway host into the default loopback label.
+func GatewayHostLabel(host string) string {
+	host = strings.TrimSpace(host)
+	if host == "" {
+		return "127.0.0.1"
+	}
+	return host
+}
+
+// NextSafePort picks a launcher port that avoids the gateway port while keeping
+// the default launcher port when possible.
+func NextSafePort(gatewayPort int) int {
+	for port := DefaultPort; port <= 65535; port++ {
+		if port != gatewayPort {
+			return port
+		}
+	}
+	return DefaultPort
+}
+
 // Validate checks if launcher settings are valid.
 func Validate(cfg Config) error {
 	if cfg.Port < 1 || cfg.Port > 65535 {

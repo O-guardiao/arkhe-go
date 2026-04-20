@@ -1,8 +1,10 @@
 package main
 
 import (
+	"path/filepath"
 	"testing"
 
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
 	"github.com/O-guardiao/arkhe-go/picoclaw-main/web/backend/launcherconfig"
 )
 
@@ -96,3 +98,70 @@ func TestMaskSecret(t *testing.T) {
 	}
 }
 
+func TestNormalizeLauncherRuntimeConfigMigratesConflictingStoredPort(t *testing.T) {
+	dir := t.TempDir()
+	configPath := filepath.Join(dir, "config.json")
+	launcherPath := filepath.Join(dir, launcherconfig.FileName)
+
+	if err := config.SaveConfig(configPath, config.DefaultConfig()); err != nil {
+		t.Fatalf("SaveConfig() error = %v", err)
+	}
+	if err := launcherconfig.Save(launcherPath, launcherconfig.Config{
+		Port:   18790,
+		Public: false,
+	}); err != nil {
+		t.Fatalf("launcherconfig.Save() error = %v", err)
+	}
+
+	got, warning, err := normalizeLauncherRuntimeConfig(
+		configPath,
+		launcherPath,
+		launcherconfig.Config{Port: 18790, Public: false},
+		false,
+	)
+	if err != nil {
+		t.Fatalf("normalizeLauncherRuntimeConfig() error = %v", err)
+	}
+	if got.Port != launcherconfig.DefaultPort {
+		t.Fatalf("normalized port = %d, want %d", got.Port, launcherconfig.DefaultPort)
+	}
+	if warning == "" {
+		t.Fatal("expected migration warning for conflicting stored port")
+	}
+
+	saved, err := launcherconfig.Load(launcherPath, launcherconfig.Default())
+	if err != nil {
+		t.Fatalf("launcherconfig.Load() error = %v", err)
+	}
+	if saved.Port != launcherconfig.DefaultPort {
+		t.Fatalf("saved launcher port = %d, want %d", saved.Port, launcherconfig.DefaultPort)
+	}
+}
+
+func TestNormalizeLauncherRuntimeConfigKeepsNonConflictingPort(t *testing.T) {
+	dir := t.TempDir()
+	configPath := filepath.Join(dir, "config.json")
+	launcherPath := filepath.Join(dir, launcherconfig.FileName)
+
+	cfg := config.DefaultConfig()
+	cfg.Gateway.Port = 18801
+	if err := config.SaveConfig(configPath, cfg); err != nil {
+		t.Fatalf("SaveConfig() error = %v", err)
+	}
+
+	got, warning, err := normalizeLauncherRuntimeConfig(
+		configPath,
+		launcherPath,
+		launcherconfig.Config{Port: 18800, Public: false},
+		false,
+	)
+	if err != nil {
+		t.Fatalf("normalizeLauncherRuntimeConfig() error = %v", err)
+	}
+	if got.Port != 18800 {
+		t.Fatalf("normalized port = %d, want %d", got.Port, 18800)
+	}
+	if warning != "" {
+		t.Fatalf("warning = %q, want empty", warning)
+	}
+}

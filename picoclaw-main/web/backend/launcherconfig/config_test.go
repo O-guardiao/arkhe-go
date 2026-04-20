@@ -84,6 +84,84 @@ func TestValidateRejectsInvalidCIDR(t *testing.T) {
 	}
 }
 
+func TestPortConflictsWithGateway(t *testing.T) {
+	tests := []struct {
+		name           string
+		launcherPort   int
+		launcherPublic bool
+		gatewayHost    string
+		gatewayPort    int
+		want           bool
+	}{
+		{
+			name:           "different ports do not conflict",
+			launcherPort:   18800,
+			launcherPublic: false,
+			gatewayHost:    "127.0.0.1",
+			gatewayPort:    18790,
+			want:           false,
+		},
+		{
+			name:           "public launcher conflicts on same port",
+			launcherPort:   18790,
+			launcherPublic: true,
+			gatewayHost:    "127.0.0.1",
+			gatewayPort:    18790,
+			want:           true,
+		},
+		{
+			name:           "loopback launcher conflicts with default gateway host",
+			launcherPort:   18790,
+			launcherPublic: false,
+			gatewayHost:    "",
+			gatewayPort:    18790,
+			want:           true,
+		},
+		{
+			name:           "custom gateway host avoids loopback conflict",
+			launcherPort:   18790,
+			launcherPublic: false,
+			gatewayHost:    "10.10.10.10",
+			gatewayPort:    18790,
+			want:           false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := PortConflictsWithGateway(tt.launcherPort, tt.launcherPublic, tt.gatewayHost, tt.gatewayPort); got != tt.want {
+				t.Fatalf(
+					"PortConflictsWithGateway(%d, %t, %q, %d) = %v, want %v",
+					tt.launcherPort,
+					tt.launcherPublic,
+					tt.gatewayHost,
+					tt.gatewayPort,
+					got,
+					tt.want,
+				)
+			}
+		})
+	}
+}
+
+func TestGatewayHostLabel(t *testing.T) {
+	if got := GatewayHostLabel(""); got != "127.0.0.1" {
+		t.Fatalf("GatewayHostLabel(\"\") = %q, want %q", got, "127.0.0.1")
+	}
+	if got := GatewayHostLabel(" 0.0.0.0 "); got != "0.0.0.0" {
+		t.Fatalf("GatewayHostLabel(\" 0.0.0.0 \") = %q, want %q", got, "0.0.0.0")
+	}
+}
+
+func TestNextSafePort(t *testing.T) {
+	if got := NextSafePort(18790); got != 18800 {
+		t.Fatalf("NextSafePort(18790) = %d, want %d", got, 18800)
+	}
+	if got := NextSafePort(18800); got != 18801 {
+		t.Fatalf("NextSafePort(18800) = %d, want %d", got, 18801)
+	}
+}
+
 func TestEnsureDashboardSecrets_GeneratesEphemeral(t *testing.T) {
 	t.Setenv("PICOCLAW_LAUNCHER_TOKEN", "")
 

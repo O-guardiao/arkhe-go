@@ -75,6 +75,8 @@ services:
       # - PICOCLAW_CHANNELS_TELEGRAM_ALLOW_FROM=SEU_USER_ID_NUMERICO
       # Set a fixed token instead of a random one each restart:
       # - PICOCLAW_LAUNCHER_TOKEN=your-secret-token-here
-    command: ["-console", "-public", "-no-browser"]
+    # Keep the launcher on container port 18800 so host mapping 18790:18800
+    # stays stable even if an older launcher-config.json still contains 18790.
+    command: ["-console", "-public", "-no-browser", "-port", "18800"]
     volumes:
       - ./data:/root/.picoclaw

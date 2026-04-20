@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/config"
 	"github.com/O-guardiao/arkhe-go/picoclaw-main/web/backend/launcherconfig"
 )
 
@@ -74,6 +75,24 @@ func (h *Handler) handleUpdateLauncherConfig(w http.ResponseWriter, r *http.Requ
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
+	appCfg, err := config.LoadConfig(h.configPath)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Failed to load app config: %v", err), http.StatusInternalServerError)
+		return
+	}
+	if launcherconfig.PortConflictsWithGateway(cfg.Port, cfg.Public, appCfg.Gateway.Host, appCfg.Gateway.Port) {
+		http.Error(
+			w,
+			fmt.Sprintf(
+				"launcher port %d conflicts with gateway bind %s:%d",
+				cfg.Port,
+				launcherconfig.GatewayHostLabel(appCfg.Gateway.Host),
+				appCfg.Gateway.Port,
+			),
+			http.StatusBadRequest,
+		)
+		return
+	}
 
 	if err := launcherconfig.Save(h.launcherConfigPath(), cfg); err != nil {
 		http.Error(w, fmt.Sprintf("Failed to save launcher config: %v", err), http.StatusInternalServerError)
@@ -88,4 +107,3 @@ func (h *Handler) handleUpdateLauncherConfig(w http.ResponseWriter, r *http.Requ
 		LauncherToken: cfg.LauncherToken,
 	})
 }
-

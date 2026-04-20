@@ -83,6 +83,44 @@ func maskSecret(s string) string {
 	return string(runes[:prefixLen]) + "**********" + string(runes[n-suffixLen:])
 }
 
+func normalizeLauncherRuntimeConfig(
+	configPath string,
+	launcherPath string,
+	cfg launcherconfig.Config,
+	effectivePublic bool,
+) (launcherconfig.Config, string, error) {
+	appCfg, err := config.LoadConfig(configPath)
+	if err != nil || appCfg == nil {
+		return cfg, "", nil
+	}
+	if !launcherconfig.PortConflictsWithGateway(cfg.Port, effectivePublic, appCfg.Gateway.Host, appCfg.Gateway.Port) {
+		return cfg, "", nil
+	}
+
+	originalPort := cfg.Port
+	cfg.Port = launcherconfig.NextSafePort(appCfg.Gateway.Port)
+	if cfg.Port == originalPort {
+		return cfg, "", nil
+	}
+
+	warning := fmt.Sprintf(
+		"Stored launcher port %d conflicts with gateway bind %s:%d; using launcher port %d instead",
+		originalPort,
+		launcherconfig.GatewayHostLabel(appCfg.Gateway.Host),
+		appCfg.Gateway.Port,
+		cfg.Port,
+	)
+
+	if _, statErr := os.Stat(launcherPath); statErr == nil {
+		if saveErr := launcherconfig.Save(launcherPath, cfg); saveErr != nil {
+			return cfg, warning, saveErr
+		}
+		warning += fmt.Sprintf(" and migrated %s", launcherPath)
+	}
+
+	return cfg, warning, nil
+}
+
 func main() {
 	port := flag.String("port", "18800", "Port to listen on")
 	public := flag.Bool("public", false, "Listen on all interfaces (0.0.0.0) instead of localhost only")
@@ -204,11 +242,24 @@ func main() {
 
 	effectivePort := *port
 	effectivePublic := *public
-	if !explicitPort {
-		effectivePort = strconv.Itoa(launcherCfg.Port)
-	}
 	if !explicitPublic {
 		effectivePublic = launcherCfg.Public
+	}
+	if !explicitPort {
+		normalizedLauncherCfg, warning, warnErr := normalizeLauncherRuntimeConfig(
+			absPath,
+			launcherPath,
+			launcherCfg,
+			effectivePublic,
+		)
+		if warning != "" {
+			logger.WarnC("web", warning)
+		}
+		if warnErr != nil {
+			logger.WarnC("web", fmt.Sprintf("Failed to persist launcher port migration: %v", warnErr))
+		}
+		launcherCfg = normalizedLauncherCfg
+		effectivePort = strconv.Itoa(launcherCfg.Port)
 	}
 
 	portNum, err := strconv.Atoi(effectivePort)
