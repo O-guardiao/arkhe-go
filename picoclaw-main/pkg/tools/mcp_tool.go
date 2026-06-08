@@ -63,6 +63,13 @@ func (t *MCPTool) SetMaxInlineTextRunes(limit int) {
 
 const maxMCPInlineTextRunes = 16 * 1024
 
+// mcpArtifactTTL bounds how long persisted large-text MCP artifacts are kept on
+// disk before opportunistic cleanup removes them. It is intentionally generous
+// (well beyond any single conversation) so an artifact referenced by an active
+// turn is never deleted out from under the agent, while still preventing the
+// .artifacts/mcp directory from growing without bound.
+const mcpArtifactTTL = 7 * 24 * time.Hour
+
 // sanitizeIdentifierComponent normalizes a string so it can be safely used
 // as part of a tool/function identifier for downstream providers.
 // It:
@@ -362,7 +369,10 @@ func (t *MCPTool) persistLargeTextArtifact(text string) *ToolResult {
 	if err := os.MkdirAll(dir, 0o700); err != nil {
 		return t.largeTextArtifactFallback(text, err)
 	}
-	// TODO: Add lifecycle cleanup/retention for MCP artifact files.
+	// Opportunistically retire artifacts older than the TTL so the directory
+	// does not grow without bound over a long-running agent. Best-effort: any
+	// error here must not block persisting the new artifact.
+	pruneExpiredArtifacts(dir, mcpArtifactTTL, time.Now())
 
 	pattern := fmt.Sprintf(
 		"%s_%s_*.txt",
@@ -390,6 +400,32 @@ func (t *MCPTool) persistLargeTextArtifact(text string) *ToolResult {
 			size,
 		),
 		ArtifactTags: []string{"[file:" + path + "]"},
+	}
+}
+
+// pruneExpiredArtifacts removes regular files in dir whose modification time is
+// older than ttl. It is best-effort: unreadable entries and removal failures are
+// ignored so artifact persistence is never blocked by cleanup.
+func pruneExpiredArtifacts(dir string, ttl time.Duration, now time.Time) {
+	if ttl <= 0 {
+		return
+	}
+	entries, err := os.ReadDir(dir)
+	if err != nil {
+		return
+	}
+	cutoff := now.Add(-ttl)
+	for _, entry := range entries {
+		if entry.IsDir() {
+			continue
+		}
+		info, err := entry.Info()
+		if err != nil {
+			continue
+		}
+		if info.ModTime().Before(cutoff) {
+			_ = os.Remove(filepath.Join(dir, entry.Name()))
+		}
 	}
 }
 
@@ -599,4 +635,3 @@ func compactStrings(parts []string) []string {
 	}
 	return compact
 }
-

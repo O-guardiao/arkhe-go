@@ -20,6 +20,12 @@ import (
 //	hookManager.Mount(agent.NamedHook("recursion", hook))
 type RecursionHook struct {
 	cfg RecursionConfig
+
+	// llm and contextWindow enable mid-recursion context compaction in
+	// BeforeLLM. When llm is nil or contextWindow is non-positive, compaction
+	// is skipped and the message history is forwarded unchanged.
+	llm           LLMCaller
+	contextWindow int
 }
 
 // Compile-time interface checks.
@@ -30,6 +36,16 @@ var (
 
 func NewRecursionHook(cfg RecursionConfig) *RecursionHook {
 	return &RecursionHook{cfg: cfg}
+}
+
+// NewRecursionHookWithCompaction builds a hook that also compacts oversized
+// message histories during a recursion using the supplied LLM caller. The
+// contextWindow is the model's token budget; compaction triggers once the
+// estimated context exceeds cfg.CompactionThreshold of it. Passing a nil llm or
+// a non-positive contextWindow disables compaction (identical to
+// NewRecursionHook).
+func NewRecursionHookWithCompaction(cfg RecursionConfig, llm LLMCaller, contextWindow int) *RecursionHook {
+	return &RecursionHook{cfg: cfg, llm: llm, contextWindow: contextWindow}
 }
 
 // BeforeTool is a no-op passthrough.
@@ -119,6 +135,24 @@ func (h *RecursionHook) BeforeLLM(
 	}
 
 	rs.Iteration++
+
+	// Compact the message history when it approaches the model context window.
+	// This is the recursion engine's equivalent of RLM's context compaction and
+	// is gated by the CompactionThreshold / CompactionKeepLast config values.
+	if h.llm != nil && h.contextWindow > 0 && h.cfg.CompactionThreshold > 0 {
+		keepLast := h.cfg.CompactionKeepLast
+		if keepLast <= 0 {
+			keepLast = 10
+		}
+		compacted, changed, err := compactMessages(
+			ctx, h.llm, req.Model, req.Messages,
+			h.cfg.CompactionThreshold, keepLast, h.contextWindow,
+		)
+		if err == nil && changed {
+			req.Messages = compacted
+		}
+	}
+
 	return req, agent.HookDecision{Action: agent.HookActionContinue}, nil
 }
 
@@ -254,4 +288,3 @@ func truncate(s string, maxLen int) string {
 	}
 	return s[:maxLen] + "..."
 }
-

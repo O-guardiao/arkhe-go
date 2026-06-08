@@ -64,6 +64,10 @@ func startGateway() error {
 	time.Sleep(1 * time.Second)
 
 	if runtime.GOOS == "windows" {
+		// `start /B` returns immediately and detaches, so look up the spawned
+		// picoclaw.exe gateway process to confirm it actually came up. When the
+		// lookup succeeds we trust it directly; if wmic is unavailable (it is
+		// deprecated on newer Windows) we fall through to the pid-file check.
 		cmd := exec.Command(
 			"wmic",
 			"process",
@@ -72,19 +76,17 @@ func startGateway() error {
 			"get",
 			"processid",
 		)
-		output, err := cmd.Output()
-		if err != nil {
-			return fmt.Errorf("failed to get gateway PID: %w", err)
-		}
-		lines := strings.Split(string(output), "\n")
-		for _, line := range lines[1:] {
-			line = strings.TrimSpace(line)
-			if line == "" {
-				continue
-			}
-			_, err := strconv.Atoi(line)
-			if err == nil {
-				break
+		if output, err := cmd.Output(); err == nil {
+			lines := strings.Split(string(output), "\n")
+			for _, line := range lines[1:] {
+				line = strings.TrimSpace(line)
+				if line == "" {
+					continue
+				}
+				if pid, convErr := strconv.Atoi(line); convErr == nil && pid > 0 {
+					// Gateway process confirmed running.
+					return nil
+				}
 			}
 		}
 	}
@@ -227,4 +229,3 @@ func (a *App) newGatewayPage() tview.Primitive {
 
 	return a.buildShell("gateway", flex, " [#39ff14]Enter:[-] select  [#ff2a2a]ESC:[-] back ")
 }
-

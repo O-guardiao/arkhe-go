@@ -32,8 +32,25 @@ func Setup(al *agent.AgentLoop) *Supervisor {
 
 	rc := configFromSettings(cfg.Recursion)
 
+	registry := al.GetRegistry()
+
+	// Resolve a primary LLM caller + context window so the recursion hook can
+	// compact oversized histories mid-recursion. The first agent with a bound
+	// provider is used; compaction is fail-safe, so a model mismatch no-ops.
+	var compactionLLM LLMCaller
+	compactionWindow := 0
+	for _, agentID := range registry.ListAgentIDs() {
+		inst, ok := registry.GetAgent(agentID)
+		if !ok || inst == nil || inst.Provider == nil {
+			continue
+		}
+		compactionLLM = inst.Provider
+		compactionWindow = inst.ContextWindow
+		break
+	}
+
 	// 1. Mount the RecursionHook as in-process hook.
-	hook := NewRecursionHook(rc)
+	hook := NewRecursionHookWithCompaction(rc, compactionLLM, compactionWindow)
 	if err := al.MountHook(agent.HookRegistration{
 		Name:     "recursion",
 		Priority: 10,
@@ -45,7 +62,6 @@ func Setup(al *agent.AgentLoop) *Supervisor {
 	}
 
 	// 2. Register MCTSTool on all agents.
-	registry := al.GetRegistry()
 	spawner := agent.NewSubTurnSpawner(al)
 	mctsCfg := MCTSConfig{
 		Branches: rc.MCTSBranches,
@@ -66,10 +82,12 @@ func Setup(al *agent.AgentLoop) *Supervisor {
 	al.SetTurnExecutor(newTurnExecutor(rc, supervisor))
 
 	logger.InfoCF("recursion", "Recursion engine initialized", map[string]any{
-		"gate_mode":       string(rc.GateMode),
-		"mcts_branches":   rc.MCTSBranches,
-		"max_iterations":  rc.MaxIterations,
-		"max_exec_time_s": int(rc.MaxExecutionTime.Seconds()),
+		"gate_mode":          string(rc.GateMode),
+		"mcts_branches":      rc.MCTSBranches,
+		"max_iterations":     rc.MaxIterations,
+		"max_exec_time_s":    int(rc.MaxExecutionTime.Seconds()),
+		"compaction_enabled": compactionLLM != nil && compactionWindow > 0,
+		"compaction_window":  compactionWindow,
 	})
 
 	return supervisor
