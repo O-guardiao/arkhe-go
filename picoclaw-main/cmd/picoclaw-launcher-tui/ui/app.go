@@ -27,8 +27,9 @@ type App struct {
 	modalOpen      map[string]bool
 
 	// OnModelSelected is called when a model is selected in the UI.
-	// Can be nil to disable.
-	OnModelSelected func(scheme tuicfg.Scheme, user tuicfg.User, modelID string)
+	// Can be nil to disable. A non-nil error is surfaced to the user so a
+	// failed sync to the main config is not silently swallowed.
+	OnModelSelected func(scheme tuicfg.Scheme, user tuicfg.User, modelID string) error
 
 	modelCache   map[string][]modelEntry
 	modelCacheMu sync.RWMutex
@@ -323,4 +324,3 @@ func (a *App) buildShell(pageID string, content tview.Primitive, hint string) tv
 
 	return grid
 }
-

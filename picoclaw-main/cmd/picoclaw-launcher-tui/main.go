@@ -38,12 +38,11 @@ func main() {
 
 	app := ui.New(cfg, configPath)
 	// Bind model selection hook to sync to main config
-	app.OnModelSelected = func(scheme tuicfg.Scheme, user tuicfg.User, modelID string) {
-		_ = tuicfg.SyncSelectedModelToMainConfig(scheme, user, modelID)
+	app.OnModelSelected = func(scheme tuicfg.Scheme, user tuicfg.User, modelID string) error {
+		return tuicfg.SyncSelectedModelToMainConfig(scheme, user, modelID)
 	}
 	if err := app.Run(); err != nil {
 		fmt.Fprintf(os.Stderr, "picoclaw-launcher-tui: %v\n", err)
 		os.Exit(1)
 	}
 }
-

@@ -137,7 +137,9 @@ func (a *App) newModelsPage(schemeName, userName, baseURL string) tview.Primitiv
 					break
 				}
 			}
-			a.OnModelSelected(*scheme, user, modelIDs[row])
+			if err := a.OnModelSelected(*scheme, user, modelIDs[row]); err != nil {
+				a.showError(fmt.Sprintf("Failed to sync selected model to main config: %v", err))
+			}
 		}
 
 		a.goBack()
@@ -198,4 +200,3 @@ func fetchModels(baseURL, apiKey string) ([]modelEntry, error) {
 		strings.TrimSpace(string(body[:min(len(body), 256)])),
 	)
 }
-

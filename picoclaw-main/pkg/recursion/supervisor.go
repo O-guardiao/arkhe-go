@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"sync"
 	"time"
+
+	"github.com/O-guardiao/arkhe-go/picoclaw-main/pkg/logger"
 )
 
 // Supervisor guards a recursion execution with per-session locking,
@@ -76,10 +78,18 @@ func (s *Supervisor) Execute(
 
 	select {
 	case outcome := <-resultCh:
+		duration := time.Since(state.StartedAt)
 		if outcome.err != nil {
+			logger.WarnCF("recursion", "recursion run failed", map[string]any{
+				"session":    sessionKey,
+				"depth":      state.Depth,
+				"iterations": state.Iteration,
+				"duration_s": duration.Seconds(),
+				"error":      outcome.err.Error(),
+			})
 			return &RecursionResult{
 				Status:   StatusError,
-				Duration: time.Since(state.StartedAt),
+				Duration: duration,
 			}, outcome.err
 		}
 		// Check if loop detection triggered abort
@@ -88,15 +98,48 @@ func (s *Supervisor) Execute(
 			outcome.result.Status = StatusLoopAbort
 		}
 		if outcome.result != nil {
-			outcome.result.Duration = time.Since(state.StartedAt)
+			outcome.result.Duration = duration
+			if outcome.result.Status == StatusLoopAbort {
+				logger.InfoCF("recursion", "recursion aborted by loop detection", map[string]any{
+					"session":    sessionKey,
+					"depth":      state.Depth,
+					"iterations": outcome.result.Iterations,
+					"duration_s": duration.Seconds(),
+				})
+			}
 		}
 		return outcome.result, nil
 
 	case <-execCtx.Done():
 		state.Aborted.Store(true)
+		duration := time.Since(state.StartedAt)
+
+		// Distinguish a caller-initiated cancellation from a recursion timeout:
+		// when the parent context is done it was cancelled upstream, otherwise
+		// the per-recursion deadline fired.
+		if ctx.Err() != nil {
+			logger.InfoCF("recursion", "recursion canceled by caller", map[string]any{
+				"session":    sessionKey,
+				"depth":      state.Depth,
+				"iterations": state.Iteration,
+				"duration_s": duration.Seconds(),
+			})
+			return &RecursionResult{
+				Status:   StatusAborted,
+				Duration: duration,
+			}, ctx.Err()
+		}
+
+		logger.WarnCF("recursion", "recursion timed out", map[string]any{
+			"session":    sessionKey,
+			"depth":      state.Depth,
+			"iterations": state.Iteration,
+			"timeout_s":  timeout.Seconds(),
+			"duration_s": duration.Seconds(),
+		})
 		return &RecursionResult{
 			Status:   StatusTimeout,
-			Duration: time.Since(state.StartedAt),
+			Duration: duration,
 		}, fmt.Errorf("recursion timeout after %v", timeout)
 	}
 }
